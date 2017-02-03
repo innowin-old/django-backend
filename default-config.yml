@@ -1,0 +1,19 @@
+DEBUG: off
+SECRET_KEY: ''
+ALLOWED_HOSTS: []
+DATABASE:
+  ENGINE: 'django.db.backends.sqlite3'
+  NAME: '../data/db.sqlite3'
+
+EMAIL:
+  ENABLE_SMTP: off
+  HOST: ''
+  HOST_USER: ''
+  HOST_PASSWORD: ''
+  PORT: 25
+  USE_TLS: on
+  EMAIL_FROM: ''
+
+STATIC_ROOT: '../static'
+FRONTEND_STATIC: '../danesh-boom-frontend/dist/static'
+
