@@ -17,3 +17,5 @@ EMAIL:
 STATIC_ROOT: '../static'
 FRONTEND_STATIC: '../danesh-boom-frontend/dist/static'
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: ''
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: ''

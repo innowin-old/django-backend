@@ -14,6 +14,7 @@ import os
 from danesh_boom.settings_helpers import get_config, get_db_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from danesh_boom.social_auth_pipeline import LOCAL_SOCIAL_AUTH_PIPELINE
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'social_django',
+    'pages',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +71,11 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 WSGI_APPLICATION = 'danesh_boom.wsgi.application'
 
@@ -127,3 +135,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, CONFIG.get('FRONTEND_STATIC')),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
