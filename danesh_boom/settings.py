@@ -130,9 +130,16 @@ EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+FRONTEND_DEV = CONFIG.get('FRONTEND_DEV')
+FRONTEND_STATIC = CONFIG.get('FRONTEND_STATIC')
+
+if FRONTEND_DEV:
+    STATIC_URL = 'http://localhost:3000/static/'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, CONFIG.get('FRONTEND_STATIC')),
+    os.path.join(BASE_DIR, FRONTEND_STATIC),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
 
