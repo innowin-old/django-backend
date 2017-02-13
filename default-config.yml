@@ -15,7 +15,7 @@ EMAIL:
   EMAIL_FROM: ''
 
 STATIC_ROOT: '../static'
-FRONTEND_STATIC: '../danesh-boom-frontend/dist/static'
+FRONTEND_ROOT: '../danesh-boom-frontend/'
 FRONTEND_DEV: off
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: ''
