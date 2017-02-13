@@ -17,10 +17,14 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from graphene_django.views import GraphQLView
+
+from danesh_boom.schema import schema
 
 urlpatterns = [
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
+    url(r'^graphql', GraphQLView.as_view(graphiql=True, schema=schema)),
     url(r'^', include('pages.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
