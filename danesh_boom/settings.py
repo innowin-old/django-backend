@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-from danesh_boom.settings_helpers import get_config, get_db_settings
+from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from danesh_boom.social_auth_pipeline import LOCAL_SOCIAL_AUTH_PIPELINE
@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pages.context_processors.static',
             ],
         },
     },
@@ -133,16 +134,16 @@ EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')
 STATIC_URL = '/static/'
 
 FRONTEND_DEV = CONFIG.get('FRONTEND_DEV')
-FRONTEND_ROOT = CONFIG.get('FRONTEND_ROOT')
-
-if FRONTEND_DEV:
-    STATIC_URL = 'http://localhost:3000/static/'
+FRONTEND_ROOT = os.path.join(BASE_DIR, CONFIG.get('FRONTEND_ROOT'))
+FRONTEND_BUILD_ROOT = os.path.join(FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, FRONTEND_ROOT, 'dist/static'),
+    os.path.join(FRONTEND_BUILD_ROOT, 'static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
+
+STATIC_ASSET_MANIFEST = load_static_asset_manifest(FRONTEND_BUILD_ROOT, FRONTEND_DEV)
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')

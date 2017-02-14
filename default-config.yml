@@ -14,8 +14,16 @@ EMAIL:
   USE_TLS: on
   EMAIL_FROM: ''
 
+# relative to BASE_DIR or absolute
 STATIC_ROOT: '../static'
+
+# relative to BASE_DIR or absolute
 FRONTEND_ROOT: '../danesh-boom-frontend/'
+
+# relative to FRONTEND_ROOT or absolute
+FRONTEND_BUILD_ROOT: 'build'
+
+# use create-react-app server for static files
 FRONTEND_DEV: off
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: ''
