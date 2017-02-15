@@ -3,11 +3,18 @@ from django.contrib.auth.models import User
 from graphene import ObjectType, AbstractType
 from graphene_django import DjangoObjectType
 
+from utils.gravatar import get_gravatar_url
+
 
 class UserNode(DjangoObjectType):
+    avatar = graphene.String()
+
     class Meta:
         model = User
-        only_fields = ('id', 'username', 'first_name', 'last_name')
+        only_fields = ('id', 'username', 'first_name', 'last_name', 'avatar')
+
+    def resolve_avatar(self, args, context, info):
+        return get_gravatar_url(self.email)
 
 
 class AuthQuery(AbstractType):
