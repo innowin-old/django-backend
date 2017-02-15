@@ -1,16 +1,16 @@
 import graphene
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as UserModel
 from graphene import ObjectType, AbstractType
 from graphene_django import DjangoObjectType
 
 from utils.gravatar import get_gravatar_url
 
 
-class UserNode(DjangoObjectType):
+class User(DjangoObjectType):
     avatar = graphene.String()
 
     class Meta:
-        model = User
+        model = UserModel
         only_fields = ('id', 'username', 'first_name', 'last_name', 'avatar')
 
     def resolve_avatar(self, args, context, info):
@@ -18,7 +18,7 @@ class UserNode(DjangoObjectType):
 
 
 class AuthQuery(AbstractType):
-    me = graphene.Field(UserNode)
+    me = graphene.Field(User)
 
     def resolve_me(self, args, context, info):
         if not context.user.is_authenticated():
