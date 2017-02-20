@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'danesh_boom.urls'
@@ -149,6 +150,15 @@ STATIC_ASSET_MANIFEST = load_static_asset_manifest(FRONTEND_BUILD_ROOT, FRONTEND
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+# TODO improve visible urls
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/#/auth/logged-in/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/#/auth/login-error/'
+SOCIAL_AUTH_LOGIN_URL = '/#/auth/login/'
+SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/#/auth/new-association/'
+SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/#/auth/account-disconnected/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/#/auth/inactive-user/'
 
 GRAPHENE = {
     'SCHEMA': 'danesh_boom.schema.schema',
