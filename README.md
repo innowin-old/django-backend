@@ -1,5 +1,10 @@
 # Danesh Boom Backend
 
+## Install required packages
+```
+$ sudo apt install libpq-dev
+```
+
 ## Install requirements
 ```
 $ pip install -r requirements.txt
