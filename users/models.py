@@ -3,6 +3,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MaxValueValidator,\
+    MinValueValidator
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -21,6 +26,10 @@ class Profile(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def clean(self):
+        if self.birth_date and self.birth_date >= timezone.now().date():
+            raise ValidationError(_('Invalid birth date'))
+
 
 class Education(models.Model):
     user = models.ForeignKey(User, related_name="educations",
@@ -30,7 +39,12 @@ class Education(models.Model):
     field_of_study = models.CharField(max_length=100)
     from_date = models.DateField(null=True, blank=True)
     to_date = models.DateField(null=True, blank=True)
-    average = models.FloatField(null=True, blank=True)
+    average = models.FloatField(
+        validators=[
+            MaxValueValidator(20),
+            MinValueValidator(0)],
+        null=True,
+        blank=True)
     description = models.TextField(blank=True)
 
     def __unicode__(self):
@@ -39,6 +53,10 @@ class Education(models.Model):
             self.grade,
             self.field_of_study
         )
+
+    def clean(self):
+        if self.from_date and self.to_date and self.from_date >= self.to_date:
+            raise ValidationError(_('To date must be greather than from date'))
 
 
 class Research(models.Model):
@@ -76,6 +94,10 @@ class WorkExperience(models.Model):
 
     def __unicode__(self):
         return "%s(%s)" % (self.user.username, self.name)
+
+    def clean(self):
+        if self.from_date and self.to_date and self.from_date >= self.to_date:
+            raise ValidationError(_('To date must be greather than from date'))
 
 
 class Skill(models.Model):
