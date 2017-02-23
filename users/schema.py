@@ -69,7 +69,9 @@ class UserNode(DjangoObjectType):
                                        'istartswith'],
         }
         only_fields = ['id', 'username', 'first_name', 'last_name',
-                       'date_joined', 'profile', 'work_experiences']
+                       'date_joined', 'profile', 'educations',
+                       'researches', 'certificates', 'skills',
+                       'work_experiences']
 
     def resolve_avatar(self, args, context, info):
         return get_gravatar_url(self.email)
