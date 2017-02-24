@@ -36,4 +36,8 @@ class Query(users.schema.UserQuery, ObjectType):
     pass
 
 
-schema = graphene.Schema(query=Query)
+class Mutation(users.schema.UserMutation, ObjectType):
+    pass
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
