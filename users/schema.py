@@ -763,6 +763,43 @@ class UserNode(DjangoObjectType):
         return get_gravatar_url(self.email)
 
 
+class ChangePasswordMutation(relay.ClientIDMutation):
+
+    class Input:
+        old_password = String()
+        new_password = String()
+        confirm_password = String()
+
+    success = Boolean()
+    message = String()
+
+    @classmethod
+    def mutate_and_get_payload(cls, input, context, info):
+        user = context.user
+        old_password = input.get('old_password')
+        new_password = input.get('new_password')
+        confirm_password = input.get('confirm_password')
+
+        if not user.check_password(old_password):
+            return ChangePasswordMutation(
+                success=False,
+                message="Invalid Password",
+            )
+        if new_password != confirm_password:
+            return ChangePasswordMutation(
+                success=False,
+                message="Password Mismatch",
+            )
+
+        # change password
+        user.set_password(new_password)
+        user.save()
+
+        return ChangePasswordMutation(success=True, message=None)
+
+
+#################### User Query & Mutation #######################
+
 class UserQuery(AbstractType):
     me = Field(UserNode)
 
@@ -802,3 +839,6 @@ class UserMutation(AbstractType):
 
     # ---------------- Profile ----------------
     update_profile = UpdateProfileMutation.Field()
+
+    # ---------------- User ----------------
+    change_password = ChangePasswordMutation.Field()
