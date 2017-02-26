@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordResetForm
 from graphene_django import DjangoObjectType
 from graphene import relay, Field, AbstractType,\
     String, Boolean, Int, Float, List
@@ -791,7 +792,35 @@ class ChangePasswordMutation(relay.ClientIDMutation):
         return ChangePasswordMutation(success=True, message=None)
 
 
+class PasswordResetMutation(relay.ClientIDMutation):
+
+    class Input:
+        email = String()
+
+    success = Boolean()
+    message = String()
+
+    @classmethod
+    def mutate_and_get_payload(cls, input, context, info):
+        email = input.get('email')
+
+        form = PasswordResetForm(input)
+        form.email = email
+        if form.is_valid():
+            opts = {
+                'use_https': context.is_secure(),
+                'from_email': 'info@daneshboom.com',
+                'email_template_name': 'password_reset_email.html',
+                'request': context,
+                #'subject_template_name': subject_template_name,
+                #'html_email_template_name': html_email_template_name,
+            }
+            form.save(**opts)
+
+        return PasswordResetMutation(success=True, message=None)
+
 #################### User Query & Mutation #######################
+
 
 class UserQuery(AbstractType):
     me = Field(UserNode)
@@ -835,3 +864,4 @@ class UserMutation(AbstractType):
 
     # ---------------- User ----------------
     change_password = ChangePasswordMutation.Field()
+    password_reset = PasswordResetMutation.Field()
