@@ -768,7 +768,6 @@ class ChangePasswordMutation(relay.ClientIDMutation):
     class Input:
         old_password = String()
         new_password = String()
-        confirm_password = String()
 
     success = Boolean()
     message = String()
@@ -778,19 +777,13 @@ class ChangePasswordMutation(relay.ClientIDMutation):
         user = context.user
         old_password = input.get('old_password')
         new_password = input.get('new_password')
-        confirm_password = input.get('confirm_password')
 
-        if not user.check_password(old_password):
-            return ChangePasswordMutation(
-                success=False,
-                message="Invalid Password",
-            )
-        if new_password != confirm_password:
-            return ChangePasswordMutation(
-                success=False,
-                message="Password Mismatch",
-            )
-
+        if user.has_usable_password():
+            if not user.check_password(old_password):
+                return ChangePasswordMutation(
+                    success=False,
+                    message="Invalid Password",
+                )
         # change password
         user.set_password(new_password)
         user.save()
