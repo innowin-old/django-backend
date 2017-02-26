@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from graphene_django import DjangoObjectType
-from graphene import relay, String, Field, ObjectType, AbstractType,\
+from graphene import relay, Field, AbstractType,\
     String, Boolean, Int, Float, List
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
