@@ -1,10 +1,9 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
 
 
-@login_required(login_url='/login/')
 @ensure_csrf_cookie
 def index(request):
     return render(request, "index.html")
@@ -12,7 +11,6 @@ def index(request):
 
 def login_page(request):
     logout(request)
-    username = password = ''
     if request.POST:
         username = request.POST['username']
         password = request.POST['password']
@@ -21,7 +19,8 @@ def login_page(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect('/')
+                return redirect(settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL)
+        return redirect(settings.SOCIAL_AUTH_LOGIN_ERROR_URL)
     return render(request, 'login.html')
 
 
