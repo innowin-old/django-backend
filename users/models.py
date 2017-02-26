@@ -7,6 +7,8 @@ from django.core.validators import MaxValueValidator,\
     MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 
@@ -16,9 +18,9 @@ class Profile(models.Model):
     public_email = models.EmailField(null=True, blank=True)
     national_code = models.CharField(max_length=20, blank=True)
     birth_date = models.DateField(null=True, blank=True)
-    web_site = ArrayField(models.URLField(), blank=True)
-    phone = ArrayField(models.CharField(max_length=20), blank=True)
-    mobile = ArrayField(models.CharField(max_length=20), blank=True)
+    web_site = ArrayField(models.URLField(), blank=True, null=True)
+    phone = ArrayField(models.CharField(max_length=20), blank=True, null=True)
+    mobile = ArrayField(models.CharField(max_length=20), blank=True, null=True)
     fax = models.CharField(max_length=20, blank=True)
     telegram_account = models.CharField(max_length=256, blank=True)
     description = models.TextField(blank=True)
