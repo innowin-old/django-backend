@@ -12,6 +12,12 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name="profile",
                                 on_delete=models.CASCADE)
