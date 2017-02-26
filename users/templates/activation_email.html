@@ -1,0 +1,4 @@
+{% load i18n %}{% autoescape off %}
+{% trans "Please go to the following page and active your account" %}
+{{ protocol }}://{{ domain }}{% url 'active' token=token %}
+{% endautoescape %}

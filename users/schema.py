@@ -1,5 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
+from django.template import loader
+from django.core.signing import TimestampSigner
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.sites.shortcuts import get_current_site
 from graphene_django import DjangoObjectType
 from graphene import relay, Field, AbstractType,\
     String, Boolean, Int, Float, List
@@ -764,6 +768,75 @@ class UserNode(DjangoObjectType):
         return get_gravatar_url(self.email)
 
 
+class CreateUserMutation(relay.ClientIDMutation):
+
+    class Input:
+        username = String()
+        email = String()
+        password = String()
+
+    success = Boolean()
+    message = String()
+
+    @classmethod
+    def mutate_and_get_payload(cls, input, context, info):
+        username = input.get('username')
+        email = input.get('email')
+        password = input.get('password')
+
+
+        # check username
+        if User.objects.filter(username=username).exists():
+            return CreateUserMutation(
+                success=False,
+                message="Username Already exists",
+            )
+
+        # check email
+        if User.objects.filter(email=email).exists():
+            return CreateUserMutation(
+                success=False,
+                message="Email Already exists",
+            )
+
+        # create user
+        user = User.objects.create(
+            username=username,
+            email=email,
+            is_active=False,
+        )
+
+        # set password
+        user.set_password(password)
+        user.save()
+
+        # send activation email
+        from_email = 'info@daneshboom.com'
+        to_email = user.email
+        signer = TimestampSigner()
+        token = signer.sign(user.pk)
+        subject = "Activation Email"
+        current_site = get_current_site(context)
+        domain = current_site.domain
+        context = {
+            'email': user.email,
+            'domain': domain,
+            'user': user,
+            'token': token,
+            'protocol': 'http',
+        }
+        email_template = html_email_template = "activation_email.html"
+        body = loader.render_to_string(email_template, context)
+
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        html_email = loader.render_to_string(html_email_template, context)
+        email_message.attach_alternative(html_email, 'text/html')
+
+        email_message.send()
+
+        return CreateUserMutation(success=True, message=None)
+
+
 class ChangePasswordMutation(relay.ClientIDMutation):
 
     class Input:
@@ -819,6 +892,7 @@ class PasswordResetMutation(relay.ClientIDMutation):
 
         return PasswordResetMutation(success=True, message=None)
 
+
 #################### User Query & Mutation #######################
 
 
@@ -863,5 +937,6 @@ class UserMutation(AbstractType):
     update_profile = UpdateProfileMutation.Field()
 
     # ---------------- User ----------------
+    create_user = CreateUserMutation.Field()
     change_password = ChangePasswordMutation.Field()
     password_reset = PasswordResetMutation.Field()
