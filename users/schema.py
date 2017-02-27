@@ -784,7 +784,6 @@ class CreateUserMutation(relay.ClientIDMutation):
         email = input.get('email')
         password = input.get('password')
 
-
         # check username
         if User.objects.filter(username=username).exists():
             return CreateUserMutation(
@@ -810,6 +809,9 @@ class CreateUserMutation(relay.ClientIDMutation):
         user.set_password(password)
         user.save()
 
+        # create user Profile
+        Profile.objects.create(user=user)
+
         # send activation email
         from_email = 'info@daneshboom.com'
         to_email = user.email
@@ -828,7 +830,8 @@ class CreateUserMutation(relay.ClientIDMutation):
         email_template = html_email_template = "activation_email.html"
         body = loader.render_to_string(email_template, context)
 
-        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        email_message = EmailMultiAlternatives(
+            subject, body, from_email, [to_email])
         html_email = loader.render_to_string(html_email_template, context)
         email_message.attach_alternative(html_email, 'text/html')
 
