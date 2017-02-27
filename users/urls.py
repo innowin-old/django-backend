@@ -11,5 +11,5 @@ urlpatterns = [
             'template_name': 'password_reset_confirm.html',
             'post_reset_redirect': 'login'},
         name='password_reset_confirm'),
-    url(r'^active/(?P<token>[0-9A-Za-z:-]+)/$', views.active_user, name='active'),
+    url(r'^active/(?P<token>[0-9A-Za-z:_\-]+)/$', views.active_user, name='active'),
 ]
