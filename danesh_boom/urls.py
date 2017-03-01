@@ -25,7 +25,6 @@ urlpatterns = [
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^graphql', GraphQLView.as_view(graphiql=True, schema=schema)),
-    url(r'^', include('pages.urls')),
     url(r'^', include('users.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
