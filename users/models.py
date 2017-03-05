@@ -44,7 +44,7 @@ class Profile(models.Model):
             RegexValidator('^@[\w\d_]+$')])
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.user.username
 
     def clean(self):
@@ -74,7 +74,7 @@ class Education(models.Model):
         blank=True)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s(%s - %s)" % (
             self.user.username,
             self.grade,
@@ -108,7 +108,7 @@ class Research(models.Model):
     year = models.IntegerField(null=True, blank=True)
     page_count = models.IntegerField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
 
 
@@ -119,7 +119,7 @@ class Certificate(models.Model):
     picture = models.ImageField(upload_to='users/certificate/',
                                 blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
 
 
@@ -131,7 +131,7 @@ class WorkExperience(models.Model):
     from_date = models.CharField(max_length=7, blank=True, null=True)
     to_date = models.CharField(max_length=7, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s(%s)" % (self.user.username, self.name)
 
     def clean(self):
@@ -158,5 +158,5 @@ class Skill(models.Model):
     tag = ArrayField(models.CharField(max_length=50), blank=True)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
