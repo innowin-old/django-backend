@@ -4,31 +4,58 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator,\
-    MinValueValidator
+    MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
+import re
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name="profile",
                                 on_delete=models.CASCADE)
     public_email = models.EmailField(null=True, blank=True)
-    national_code = models.CharField(max_length=20, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
+    national_code = models.CharField(max_length=20, blank=True,
+                                     validators=[RegexValidator('^\d{10}$')])
+    birth_date = models.CharField(max_length=10, blank=True, null=True)
     web_site = ArrayField(models.URLField(), blank=True, null=True)
-    phone = ArrayField(models.CharField(max_length=20), blank=True, null=True)
-    mobile = ArrayField(models.CharField(max_length=20), blank=True, null=True)
-    fax = models.CharField(max_length=20, blank=True)
-    telegram_account = models.CharField(max_length=256, blank=True)
+    phone = ArrayField(
+        models.CharField(
+            max_length=20,
+            validators=[
+                RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]),
+        blank=True,
+        null=True)
+    mobile = ArrayField(
+        models.CharField(
+            max_length=20,
+            validators=[
+                RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]),
+        blank=True,
+        null=True)
+    fax = models.CharField(
+        max_length=20,
+        validators=[
+            RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')],
+        blank=True)
+    telegram_account = models.CharField(
+        max_length=256, blank=True, validators=[
+            RegexValidator('^@[\w\d_]+$')])
     description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.user.username
 
     def clean(self):
-        if self.birth_date and self.birth_date >= timezone.now().date():
-            raise ValidationError(_('Invalid birth date'))
+        if self.birth_date:
+            p = re.compile('^\d{4}-\d{2}-\d{2}$')
+            birth_date = self.birth_date
+            if not re.match(p, birth_date):
+                raise ValidationError(_('Invalid birth date'))
+            now = timezone.now().date().strftime('%Y-%m-%d')
+            if birth_date > now:
+                raise ValidationError(_('Invalid birth date'))
 
 
 class Education(models.Model):
@@ -37,8 +64,8 @@ class Education(models.Model):
     grade = models.CharField(max_length=100)
     university = models.CharField(max_length=100)
     field_of_study = models.CharField(max_length=100)
-    from_date = models.DateField(null=True, blank=True)
-    to_date = models.DateField(null=True, blank=True)
+    from_date = models.CharField(max_length=7, blank=True, null=True)
+    to_date = models.CharField(max_length=7, blank=True, null=True)
     average = models.FloatField(
         validators=[
             MaxValueValidator(20),
@@ -55,7 +82,19 @@ class Education(models.Model):
         )
 
     def clean(self):
-        if self.from_date and self.to_date and self.from_date >= self.to_date:
+        p = re.compile('^\d{4}-\d{2}$')
+        from_date = to_date = None
+        if self.from_date:
+            from_date = self.from_date
+            if not re.match(p, from_date):
+                raise ValidationError(_('Invalid from date'))
+
+        if self.to_date:
+            to_date = self.to_date
+            if not re.match(p, to_date):
+                raise ValidationError(_('Invalid to date'))
+
+        if from_date and to_date and from_date > to_date:
             raise ValidationError(_('To date must be greather than from date'))
 
 
@@ -89,14 +128,26 @@ class WorkExperience(models.Model):
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     position = models.CharField(max_length=100, blank=True)
-    from_date = models.DateField(null=True, blank=True)
-    to_date = models.DateField(null=True, blank=True)
+    from_date = models.CharField(max_length=7, blank=True, null=True)
+    to_date = models.CharField(max_length=7, blank=True, null=True)
 
     def __unicode__(self):
         return "%s(%s)" % (self.user.username, self.name)
 
     def clean(self):
-        if self.from_date and self.to_date and self.from_date >= self.to_date:
+        p = re.compile('^\d{4}-\d{2}$')
+        from_date = to_date = None
+        if self.from_date:
+            from_date = self.from_date
+            if not re.match(p, from_date):
+                raise ValidationError(_('Invalid from date'))
+
+        if self.to_date:
+            to_date = self.to_date
+            if not re.match(p, to_date):
+                raise ValidationError(_('Invalid to date'))
+
+        if from_date and to_date and from_date > to_date:
             raise ValidationError(_('To date must be greather than from date'))
 
 

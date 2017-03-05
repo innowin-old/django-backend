@@ -1,22 +1,46 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from django.template import loader
+from django.contrib.postgres.fields import ArrayField
 from django.core.signing import TimestampSigner
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from graphene_django import DjangoObjectType
-from graphene import relay, Field, AbstractType,\
+from graphene import relay, Field, AbstractType, resolve_only_args,\
     String, Boolean, Int, Float, List
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
+import django_filters
+from django_filters import OrderingFilter
 
 from utils.gravatar import get_gravatar_url
 from utils.schema_helpers import convert_to_date
 from users.models import Profile, Education, Research, Certificate,\
     WorkExperience, Skill
 
-
+import graphene
 #################### Skill #######################
+
+class SkillFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Skill
+        fields = {
+            'title': ['exact', 'icontains', 'istartswith'],
+            'tag': ['icontains'],
+            'description': ['exact', 'icontains', 'istartswith'],
+        }
+        filter_overrides = {
+             ArrayField: {
+                 'filter_class': django_filters.CharFilter,
+                 'extra': lambda f: {
+                     'lookup_expr': 'icontains',
+                 },
+             }
+        }
+
+    order_by = OrderingFilter(fields=('id', 'title',))
+
 
 class SkillNode(DjangoObjectType):
 
@@ -137,6 +161,26 @@ class DeleteSkillMutation(relay.ClientIDMutation):
 
 #################### Work Experience #######################
 
+class WorkExperienceFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = WorkExperience
+        fields = {
+            'name': ['exact', 'icontains', 'istartswith'],
+            'position': ['exact', 'icontains', 'istartswith'],
+            'from_date': ['exact', 'gte', 'lte'],
+            'to_date': ['exact', 'gte', 'lte'],
+        }
+
+    order_by = OrderingFilter(
+        fields=(
+            'id',
+            'name',
+            'position',
+            'from_date',
+            'to_date'))
+
+
 class WorkExperienceNode(DjangoObjectType):
 
     class Meta:
@@ -161,8 +205,8 @@ class CreateWorkExperienceMutation(relay.ClientIDMutation):
         user = context.user
         name = input.get('name')
         position = input.get('position')
-        from_date = convert_to_date(input.get('from_date', ''))
-        to_date = convert_to_date(input.get('to_date', ''))
+        from_date = input.get('from_date', '')
+        to_date = input.get('to_date', '')
 
         # create work experience
         new_work_experience = WorkExperience(
@@ -216,8 +260,8 @@ class UpdateWorkExperienceMutation(relay.ClientIDMutation):
 
         name = input.get('name')
         position = input.get('position')
-        from_date = convert_to_date(input.get('from_date', ''))
-        to_date = convert_to_date(input.get('to_date', ''))
+        from_date = input.get('from_date', '')
+        to_date = input.get('to_date', '')
 
         # update work experience
         work_experience.name = name
@@ -267,6 +311,18 @@ class DeleteWorkExperienceMutation(relay.ClientIDMutation):
 
 
 #################### Certificate #######################
+
+class CertificateFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Certificate
+        fields = {
+            'title': ['exact', 'icontains', 'istartswith'],
+        }
+
+    order_by = OrderingFilter(
+        fields=('id', 'title'))
+
 
 class CertificateNode(DjangoObjectType):
 
@@ -387,6 +443,35 @@ class DeleteCertificateMutation(relay.ClientIDMutation):
 
 
 #################### Research #######################
+
+class ResearchFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Research
+        fields = {
+            'title': ['exact', 'icontains', 'istartswith'],
+            'publication': ['exact', 'icontains', 'istartswith'],
+            'author': ['icontains'],
+            'year': ['exact', 'gte', 'lte'],
+            'page_count': ['exact', 'gte', 'lte'],
+        }
+        filter_overrides = {
+             ArrayField: {
+                 'filter_class': django_filters.CharFilter,
+                 'extra': lambda f: {
+                     'lookup_expr': 'icontains',
+                 },
+             }
+        }
+
+    order_by = OrderingFilter(
+        fields=(
+            'id',
+            'title',
+            'publication',
+            'year',
+            'page_count'))
+
 
 class ResearchNode(DjangoObjectType):
 
@@ -529,6 +614,31 @@ class DeleteResearchMutation(relay.ClientIDMutation):
 
 #################### Education #######################
 
+class EducationFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Education
+        fields = {
+            'grade': ['exact', 'icontains', 'istartswith'],
+            'university': ['exact', 'icontains', 'istartswith'],
+            'field_of_study': ['exact', 'icontains', 'istartswith'],
+            'from_date': ['exact', 'gte', 'lte'],
+            'to_date': ['exact', 'gte', 'lte'],
+            'average': ['exact', 'gte', 'lte'],
+            'description': ['exact', 'icontains', 'istartswith'],
+        }
+
+    order_by = OrderingFilter(
+        fields=(
+            'id',
+            'grade',
+            'university',
+            'field_of_study',
+            'from_date',
+            'to_date',
+            'average'))
+
+
 class EducationNode(DjangoObjectType):
 
     class Meta:
@@ -557,8 +667,8 @@ class CreateEducationMutation(relay.ClientIDMutation):
         grade = input.get('grade')
         university = input.get('university')
         field_of_study = input.get('field_of_study')
-        from_date = convert_to_date(input.get('from_date', ''))
-        to_date = convert_to_date(input.get('to_date', ''))
+        from_date = input.get('from_date', '')
+        to_date = input.get('to_date', '')
         average = input.get('tag', None)
         description = input.get('description', '')
 
@@ -621,8 +731,8 @@ class UpdateEducationMutation(relay.ClientIDMutation):
         grade = input.get('grade')
         university = input.get('university')
         field_of_study = input.get('field_of_study')
-        from_date = convert_to_date(input.get('from_date', ''))
-        to_date = convert_to_date(input.get('to_date', ''))
+        from_date = input.get('from_date', '')
+        to_date = input.get('to_date', '')
         average = input.get('tag', None)
         description = input.get('description', '')
 
@@ -705,8 +815,8 @@ class UpdateProfileMutation(relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         public_email = input.get('public_email', '')
-        national_code = input.get('university', '')
-        birth_date = convert_to_date(input.get('birth_date', ''))
+        national_code = input.get('national_code', '')
+        birth_date = input.get('birth_date', '')
         web_site = input.get('web_site', [])
         phone = input.get('phone', [])
         mobile = input.get('mobile', [])
@@ -741,13 +851,11 @@ class UpdateProfileMutation(relay.ClientIDMutation):
 
 #################### User #######################
 
-class UserNode(DjangoObjectType):
-    avatar = String()
+class UserFilter(django_filters.FilterSet):
 
     class Meta:
         model = User
-        interfaces = (relay.Node, )
-        filter_fields = {
+        fields = {
             'id': ['exact'],
             'username': ['exact', 'icontains', 'istartswith'],
             'first_name': ['exact', 'icontains', 'istartswith'],
@@ -759,10 +867,53 @@ class UserNode(DjangoObjectType):
             'profile__national_code': ['exact', 'icontains',
                                        'istartswith'],
         }
+
+    order_by = OrderingFilter(fields=('id', 'date_joined', 'username',))
+
+
+class UserNode(DjangoObjectType):
+    avatar = String()
+    user_skills = DjangoFilterConnectionField(
+        SkillNode, filterset_class=SkillFilter)
+    user_work_experiences = DjangoFilterConnectionField(
+        WorkExperienceNode, filterset_class=WorkExperienceFilter)
+    user_certificates = DjangoFilterConnectionField(
+        CertificateNode, filterset_class=CertificateFilter)
+    user_researches = DjangoFilterConnectionField(
+        ResearchNode, filterset_class=ResearchFilter)
+    user_educations = DjangoFilterConnectionField(
+        EducationNode, filterset_class=EducationFilter)
+
+    @resolve_only_args
+    def resolve_user_skills(self, **args):
+        skills = Skill.objects.filter(user=self)
+        return SkillFilter(args, queryset=skills).qs
+
+    @resolve_only_args
+    def resolve_user_work_experiences(self, **args):
+        work_experiences = WorkExperience.objects.filter(user=self)
+        return WorkExperienceFilter(args, queryset=work_experiences).qs
+
+    @resolve_only_args
+    def resolve_user_certificates(self, **args):
+        certificates = Certificate.objects.filter(user=self)
+        return CertificateFilter(args, queryset=certificates).qs
+
+    @resolve_only_args
+    def resolve_user_researches(self, **args):
+        researches = Research.objects.filter(user=self)
+        return ResearchFilter(args, queryset=researches).qs
+
+    @resolve_only_args
+    def resolve_user_educations(self, **args):
+        educations = Education.objects.filter(user=self)
+        return EducationFilter(args, queryset=educations).qs
+
+    class Meta:
+        model = User
+        interfaces = (relay.Node, )
         only_fields = ['id', 'username', 'first_name', 'last_name',
-                       'date_joined', 'profile', 'educations',
-                       'researches', 'certificates', 'skills',
-                       'work_experiences']
+                       'date_joined', 'profile', 'educations']
 
     def resolve_avatar(self, args, context, info):
         return get_gravatar_url(self.email)
@@ -907,7 +1058,7 @@ class UserQuery(AbstractType):
             return None
         return context.user
     user = relay.Node.Field(UserNode)
-    users = DjangoFilterConnectionField(UserNode)
+    users = DjangoFilterConnectionField(UserNode, filterset_class=UserFilter)
 
 
 class UserMutation(AbstractType):
