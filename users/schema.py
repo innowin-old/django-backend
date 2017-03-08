@@ -1,24 +1,24 @@
-from django.contrib.auth.models import User
+import django_filters
 from django.contrib.auth.forms import PasswordResetForm
-from django.template import loader
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
-from django.core.signing import TimestampSigner
-from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
-from graphene_django import DjangoObjectType
+from django.core.mail import EmailMultiAlternatives
+from django.core.signing import TimestampSigner
+from django.template import loader
+from django_filters import OrderingFilter
 from graphene import relay, Field, AbstractType, resolve_only_args,\
-    String, Boolean, Int, Float, List
+    String, Boolean, Int, Float, List, ID
+from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
-import django_filters
-from django_filters import OrderingFilter
 
-from utils.gravatar import get_gravatar_url
-from utils.schema_helpers import convert_to_date
+from danesh_boom.viewer_fields import ViewerFields
 from users.models import Profile, Education, Research, Certificate,\
     WorkExperience, Skill
+from utils.gravatar import get_gravatar_url
 
-import graphene
+
 #################### Skill #######################
 
 class SkillFilter(django_filters.FilterSet):
@@ -188,7 +188,7 @@ class WorkExperienceNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateWorkExperienceMutation(relay.ClientIDMutation):
+class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         name = String(required=True)
@@ -197,8 +197,6 @@ class CreateWorkExperienceMutation(relay.ClientIDMutation):
         to_date = String()
 
     work_experience = Field(WorkExperienceNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -220,19 +218,14 @@ class CreateWorkExperienceMutation(relay.ClientIDMutation):
             new_work_experience.full_clean()
             new_work_experience.save()
         except Exception as e:
-            return CreateWorkExperienceMutation(
-                work_experience=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
         return CreateWorkExperienceMutation(
             work_experience=new_work_experience,
-            success=True
         )
 
 
-class UpdateWorkExperienceMutation(relay.ClientIDMutation):
+class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -242,8 +235,6 @@ class UpdateWorkExperienceMutation(relay.ClientIDMutation):
         to_date = String()
 
     work_experience = Field(WorkExperienceNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -252,11 +243,7 @@ class UpdateWorkExperienceMutation(relay.ClientIDMutation):
         work_experience_id = from_global_id(id)[1]
         work_experience = WorkExperience.objects.get(pk=work_experience_id)
         if work_experience.user != user:
-            return UpdateWorkExperienceMutation(
-                work_experience=None,
-                success=False,
-                message="Invalid Access to Work Experience",
-            )
+            raise Exception("Invalid Access to Work Experience")
 
         name = input.get('name')
         position = input.get('position')
@@ -272,25 +259,19 @@ class UpdateWorkExperienceMutation(relay.ClientIDMutation):
             work_experience.full_clean()
             work_experience.save()
         except Exception as e:
-            return UpdateWorkExperienceMutation(
-                work_experience=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
         return UpdateWorkExperienceMutation(
-            work_experience=work_experience,
-            success=True
+            work_experience=work_experience
         )
 
 
-class DeleteWorkExperienceMutation(relay.ClientIDMutation):
+class DeleteWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -299,15 +280,12 @@ class DeleteWorkExperienceMutation(relay.ClientIDMutation):
         work_experience_id = from_global_id(id)[1]
         work_experience = WorkExperience.objects.get(pk=work_experience_id)
         if work_experience.user != user:
-            return DeleteWorkExperienceMutation(
-                success=False,
-                message="Invalid Access to Work Experience",
-            )
+            raise Exception("Invalid Access to Work Experience")
 
         # delete work experience
         work_experience.delete()
 
-        return DeleteWorkExperienceMutation(success=True)
+        return DeleteWorkExperienceMutation(deleted_id=id)
 
 
 #################### Certificate #######################
@@ -795,7 +773,7 @@ class ProfileNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class UpdateProfileMutation(relay.ClientIDMutation):
+class UpdateProfileMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         public_email = String()
@@ -809,8 +787,6 @@ class UpdateProfileMutation(relay.ClientIDMutation):
         description = String()
 
     profile = Field(ProfileNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -824,7 +800,11 @@ class UpdateProfileMutation(relay.ClientIDMutation):
         telegram_account = input.get('telegram_account', '')
         description = input.get('description', '')
 
-        profile = context.user.profile
+        if hasattr(context.user, 'profile'):
+            profile = context.user.profile
+        else:
+            profile = Profile()
+            profile.user = context.user
 
         # update profile
         profile.public_email = public_email
@@ -840,13 +820,9 @@ class UpdateProfileMutation(relay.ClientIDMutation):
             profile.full_clean()
             profile.save()
         except Exception as e:
-            return UpdateProfileMutation(
-                profile=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateProfileMutation(profile=profile, success=True)
+        return UpdateProfileMutation(profile=profile)
 
 
 #################### User #######################
