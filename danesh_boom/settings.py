@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'social_django',
     'graphene_django',
     'users',
+    'organizations',
 ]
 
 MIDDLEWARE = [
