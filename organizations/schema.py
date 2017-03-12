@@ -4,7 +4,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
 from graphene import relay, Field, AbstractType, resolve_only_args,\
-    String, Boolean, Int, List
+    String, Boolean, Int, List, ID
 import django_filters
 
 from organizations.models import Organization, StaffCount, Picture, Agent,\
@@ -48,8 +48,6 @@ class CreateUserAgentMutation(relay.ClientIDMutation):
         agent_subject = String()
 
     user_agent = Field(UserAgentNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -63,11 +61,7 @@ class CreateUserAgentMutation(relay.ClientIDMutation):
         user_agent = User.objects.get(pk=user_agent_id)
 
         if organization.user != user:
-            return CreateUserAgentMutation(
-                user_agent=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         agent_subject = input.get('agent_subject', '')
 
@@ -81,13 +75,9 @@ class CreateUserAgentMutation(relay.ClientIDMutation):
             new_user_agent.full_clean()
             new_user_agent.save()
         except Exception as e:
-            return CreateUserAgentMutation(
-                user_agent=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateUserAgentMutation(user_agent=new_user_agent, success=True)
+        return CreateUserAgentMutation(user_agent=new_user_agent)
 
 
 class UpdateUserAgentMutation(relay.ClientIDMutation):
@@ -97,8 +87,6 @@ class UpdateUserAgentMutation(relay.ClientIDMutation):
         agent_subject = String()
 
     user_agent = Field(UserAgentNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -108,10 +96,7 @@ class UpdateUserAgentMutation(relay.ClientIDMutation):
         user_agent = UserAgent.objects.get(pk=user_agent_id)
 
         if user_agent.organization.user != user:
-            return UpdateUserAgentMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         agent_subject = input.get('agent_subject', '')
 
@@ -121,13 +106,9 @@ class UpdateUserAgentMutation(relay.ClientIDMutation):
             agent.full_clean()
             agent.save()
         except Exception as e:
-            return UpdateUserAgentMutation(
-                agent=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateUserAgentMutation(user_agent=user_agent, success=True)
+        return UpdateUserAgentMutation(user_agent=user_agent)
 
 
 class DeleteUserAgentMutation(relay.ClientIDMutation):
@@ -135,8 +116,7 @@ class DeleteUserAgentMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -146,18 +126,15 @@ class DeleteUserAgentMutation(relay.ClientIDMutation):
         user_agent = UserAgent.objects.get(pk=user_agent_id)
 
         if user_agent.organization.user != user:
-            return DeleteUserAgentMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         # delete user agent
         user_agent.delete()
 
-        return DeleteUserAgentMutation(success=True)
+        return DeleteUserAgentMutation(deleted_id=id)
+
 
 #################### Agent #######################
-
 
 class AgentFilter(django_filters.FilterSet):
 
@@ -194,8 +171,6 @@ class CreateAgentMutation(relay.ClientIDMutation):
         email = String()
 
     agent = Field(AgentNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -205,11 +180,7 @@ class CreateAgentMutation(relay.ClientIDMutation):
         organization = Organization.objects.get(pk=organization_id)
 
         if organization.user != user:
-            return CreateAgentMutation(
-                agent=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         name = input.get('name')
         agent_subject = input.get('agent_subject', '')
@@ -230,13 +201,9 @@ class CreateAgentMutation(relay.ClientIDMutation):
             new_agent.full_clean()
             new_agent.save()
         except Exception as e:
-            return CreateAgentMutation(
-                agent=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateAgentMutation(agent=new_agent, success=True)
+        return CreateAgentMutation(agent=new_agent)
 
 
 class UpdateAgentMutation(relay.ClientIDMutation):
@@ -250,8 +217,6 @@ class UpdateAgentMutation(relay.ClientIDMutation):
         email = String()
 
     agent = Field(AgentNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -261,11 +226,7 @@ class UpdateAgentMutation(relay.ClientIDMutation):
         agent = Agent.objects.get(pk=agent_id)
 
         if agent.organization.user != user:
-            return UpdateAgentMutation(
-                agent=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         name = input.get('name')
         agent_subject = input.get('agent_subject', '')
@@ -283,13 +244,9 @@ class UpdateAgentMutation(relay.ClientIDMutation):
             agent.full_clean()
             agent.save()
         except Exception as e:
-            return UpdateAgentMutation(
-                agent=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateAgentMutation(agent=agent, success=True)
+        return UpdateAgentMutation(agent=agent)
 
 
 class DeleteAgentMutation(relay.ClientIDMutation):
@@ -297,8 +254,7 @@ class DeleteAgentMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -308,15 +264,12 @@ class DeleteAgentMutation(relay.ClientIDMutation):
         agent = Agent.objects.get(pk=agent_id)
 
         if agent.organization.user != user:
-            return DeleteAgentMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         # delete agent
         agent.delete()
 
-        return DeleteAgentMutation(success=True)
+        return DeleteAgentMutation(deleted_id=id)
 
 
 #################### Picture #######################
@@ -347,8 +300,6 @@ class CreatePictureMutation(relay.ClientIDMutation):
         description = String()
 
     picture = Field(PictureNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -358,22 +309,14 @@ class CreatePictureMutation(relay.ClientIDMutation):
         organization = Organization.objects.get(pk=organization_id)
 
         if organization.user != user:
-            return CreatePictureMutation(
-                picture=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         order = input.get('order')
         description = input.get('description', '')
         files = context.FILES
         picture = files.get('picture', None)
         if picture is None:
-            return CreatePictureMutation(
-                picture=None,
-                success=False,
-                message="Invalid Picture",
-            )
+            raise Exception("Invalid Picture")
 
         # create picture
         new_picture = Picture(
@@ -386,13 +329,9 @@ class CreatePictureMutation(relay.ClientIDMutation):
             new_picture.full_clean()
             new_picture.save()
         except Exception as e:
-            return CreatePictureMutation(
-                picture=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreatePictureMutation(picture=new_picture, success=True)
+        return CreatePictureMutation(picture=new_picture)
 
 
 class UpdatePictureMutation(relay.ClientIDMutation):
@@ -403,8 +342,6 @@ class UpdatePictureMutation(relay.ClientIDMutation):
         description = String()
 
     picture = Field(PictureNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -414,11 +351,7 @@ class UpdatePictureMutation(relay.ClientIDMutation):
         picture = Picture.objects.get(pk=picture_id)
 
         if picture.organization.user != user:
-            return UpdatePictureMutation(
-                picture=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         order = input.get('order')
         description = input.get('description', '')
@@ -430,13 +363,9 @@ class UpdatePictureMutation(relay.ClientIDMutation):
             picture.full_clean()
             picture.save()
         except Exception as e:
-            return UpdatePictureMutation(
-                picture=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdatePictureMutation(picture=picture, success=True)
+        return UpdatePictureMutation(picture=picture)
 
 
 class DeletePictureMutation(relay.ClientIDMutation):
@@ -444,8 +373,7 @@ class DeletePictureMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -455,15 +383,12 @@ class DeletePictureMutation(relay.ClientIDMutation):
         picture = Picture.objects.get(pk=picture_id)
 
         if picture.organization.user != user:
-            return DeletePictureMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         # delete picture
         picture.delete()
 
-        return DeletePictureMutation(success=True)
+        return DeletePictureMutation(deleted_id=id)
 
 
 #################### StaffCount #######################
@@ -495,8 +420,6 @@ class CreateStaffCountMutation(relay.ClientIDMutation):
         count = Int(requeired=True)
 
     staff_count = Field(StaffCountNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -506,11 +429,7 @@ class CreateStaffCountMutation(relay.ClientIDMutation):
         organization = Organization.objects.get(pk=organization_id)
 
         if organization.user != user:
-            return CreateStaffCountMutation(
-                staff_count=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         count = input.get('count')
 
@@ -523,14 +442,9 @@ class CreateStaffCountMutation(relay.ClientIDMutation):
             new_staff_count.full_clean()
             new_staff_count.save()
         except Exception as e:
-            return CreateStaffCountMutation(
-                staff_count=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateStaffCountMutation(
-            staff_count=new_staff_count, success=True)
+        return CreateStaffCountMutation(staff_count=new_staff_count)
 
 
 class UpdateStaffCountMutation(relay.ClientIDMutation):
@@ -540,8 +454,6 @@ class UpdateStaffCountMutation(relay.ClientIDMutation):
         count = Int(requeired=True)
 
     staff_count = Field(StaffCountNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -551,11 +463,7 @@ class UpdateStaffCountMutation(relay.ClientIDMutation):
         staff_count = StaffCount.objects.get(pk=staff_count_id)
 
         if staff_count.organization.user != user:
-            return UpdateStaffCountMutation(
-                staff_count=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         count = input.get('count')
 
@@ -565,13 +473,9 @@ class UpdateStaffCountMutation(relay.ClientIDMutation):
             staff_count.full_clean()
             staff_count.save()
         except Exception as e:
-            return UpdateStaffCountMutation(
-                staff_count=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateStaffCountMutation(staff_count=staff_count, success=True)
+        return UpdateStaffCountMutation(staff_count=staff_count)
 
 
 class DeleteStaffCountMutation(relay.ClientIDMutation):
@@ -579,8 +483,7 @@ class DeleteStaffCountMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -590,15 +493,12 @@ class DeleteStaffCountMutation(relay.ClientIDMutation):
         staff_count = StaffCount.objects.get(pk=staff_count_id)
 
         if staff_count.organization.user != user:
-            return DeleteStaffCountMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         # delete staff count
         staff_count.delete()
 
-        return DeleteStaffCountMutation(success=True)
+        return DeleteStaffCountMutation(deleted_id=id)
 
 
 #################### Organization #######################
@@ -702,8 +602,6 @@ class CreateOrganizationMutation(relay.ClientIDMutation):
         telegram_channel = String()
 
     organization = Field(OrganizationNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -754,14 +652,9 @@ class CreateOrganizationMutation(relay.ClientIDMutation):
             new_organization.full_clean()
             new_organization.save()
         except Exception as e:
-            return CreateOrganizationMutation(
-                organization=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateOrganizationMutation(
-            organization=new_organization, success=True)
+        return CreateOrganizationMutation(organization=new_organization)
 
 
 class UpdateOrganizationMutation(relay.ClientIDMutation):
@@ -787,8 +680,6 @@ class UpdateOrganizationMutation(relay.ClientIDMutation):
         telegram_channel = String()
 
     organization = Field(OrganizationNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -797,11 +688,7 @@ class UpdateOrganizationMutation(relay.ClientIDMutation):
         organization_id = from_global_id(id)[1]
         organization = Organization.objects.get(pk=organization_id)
         if organization.user != user:
-            return UpdateOrganizationMutation(
-                organization=None,
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         name = input.get('name')
         national_code = input.get('national_code')
@@ -847,14 +734,9 @@ class UpdateOrganizationMutation(relay.ClientIDMutation):
             organization.full_clean()
             organization.save()
         except Exception as e:
-            return UpdateOrganizationMutation(
-                organization=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateOrganizationMutation(
-            organization=organization, success=True)
+        return UpdateOrganizationMutation(organization=organization)
 
 
 class DeleteOrganizationMutation(relay.ClientIDMutation):
@@ -862,8 +744,7 @@ class DeleteOrganizationMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -872,15 +753,12 @@ class DeleteOrganizationMutation(relay.ClientIDMutation):
         organization_id = from_global_id(id)[1]
         organization = Organization.objects.get(pk=organization_id)
         if organization.user != user:
-            return DeleteOrganizationMutation(
-                success=False,
-                message="Invalid Access to Organization",
-            )
+            raise Exception("Invalid Access to Organization")
 
         # delete organization
         organization.delete()
 
-        return DeleteOrganizationMutation(success=True)
+        return DeleteOrganizationMutation(deleted_id=id)
 
 
 #################### Organization Query & Mutation #######################

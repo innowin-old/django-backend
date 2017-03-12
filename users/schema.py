@@ -31,12 +31,12 @@ class SkillFilter(django_filters.FilterSet):
             'description': ['exact', 'icontains', 'istartswith'],
         }
         filter_overrides = {
-             ArrayField: {
-                 'filter_class': django_filters.CharFilter,
-                 'extra': lambda f: {
-                     'lookup_expr': 'icontains',
-                 },
-             }
+            ArrayField: {
+                'filter_class': django_filters.CharFilter,
+                'extra': lambda f: {
+                    'lookup_expr': 'icontains',
+                },
+            }
         }
 
     order_by = OrderingFilter(fields=('id', 'title',))
@@ -57,8 +57,6 @@ class CreateSkillMutation(relay.ClientIDMutation):
         description = String()
 
     skill = Field(SkillNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -78,13 +76,9 @@ class CreateSkillMutation(relay.ClientIDMutation):
             new_skill.full_clean()
             new_skill.save()
         except Exception as e:
-            return CreateSkillMutation(
-                skill=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateSkillMutation(skill=new_skill, success=True)
+        return CreateSkillMutation(skill=new_skill)
 
 
 class UpdateSkillMutation(relay.ClientIDMutation):
@@ -96,8 +90,6 @@ class UpdateSkillMutation(relay.ClientIDMutation):
         description = String()
 
     skill = Field(SkillNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -106,11 +98,7 @@ class UpdateSkillMutation(relay.ClientIDMutation):
         skill_id = from_global_id(id)[1]
         skill = Skill.objects.get(pk=skill_id)
         if skill.user != user:
-            return UpdateSkillMutation(
-                skill=None,
-                success=False,
-                message="Invalid Access to Skill",
-            )
+            raise Exception("Invalid Access to Skill")
 
         title = input.get('title')
         tag = input.get('tag', [])
@@ -124,13 +112,9 @@ class UpdateSkillMutation(relay.ClientIDMutation):
             skill.full_clean()
             skill.save()
         except Exception as e:
-            return UpdateSkillMutation(
-                skill=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateSkillMutation(skill=skill, success=True)
+        return UpdateSkillMutation(skill=skill)
 
 
 class DeleteSkillMutation(relay.ClientIDMutation):
@@ -138,8 +122,7 @@ class DeleteSkillMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -148,15 +131,12 @@ class DeleteSkillMutation(relay.ClientIDMutation):
         skill_id = from_global_id(id)[1]
         skill = Skill.objects.get(pk=skill_id)
         if skill.user != user:
-            return DeleteSkillMutation(
-                success=False,
-                message="Invalid Access to Skill",
-            )
+            raise Exception("Invalid Access to Skill")
 
         # delete skill
         skill.delete()
 
-        return DeleteSkillMutation(success=True)
+        return DeleteSkillMutation(deleted_id=id)
 
 
 #################### Work Experience #######################
@@ -221,7 +201,7 @@ class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
             raise Exception(str(e))
 
         return CreateWorkExperienceMutation(
-            work_experience=new_work_experience,
+            work_experience=new_work_experience
         )
 
 
@@ -261,9 +241,7 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
         except Exception as e:
             raise Exception(str(e))
 
-        return UpdateWorkExperienceMutation(
-            work_experience=work_experience
-        )
+        return UpdateWorkExperienceMutation(work_experience=work_experience)
 
 
 class DeleteWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
@@ -315,8 +293,6 @@ class CreateCertificateMutation(relay.ClientIDMutation):
         title = String(required=True)
 
     certificate = Field(CertificateNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -335,16 +311,9 @@ class CreateCertificateMutation(relay.ClientIDMutation):
             new_certificate.full_clean()
             new_certificate.save()
         except Exception as e:
-            return CreateCertificateMutation(
-                certificate=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return CreateCertificateMutation(
-            certificate=new_certificate,
-            success=True
-        )
+        return CreateCertificateMutation(certificate=new_certificate)
 
 
 class UpdateCertificateMutation(relay.ClientIDMutation):
@@ -354,8 +323,6 @@ class UpdateCertificateMutation(relay.ClientIDMutation):
         title = String(required=True)
 
     certificate = Field(CertificateNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -364,11 +331,7 @@ class UpdateCertificateMutation(relay.ClientIDMutation):
         certificate_id = from_global_id(id)[1]
         certificate = Certificate.objects.get(pk=certificate_id)
         if certificate.user != user:
-            return UpdateCertificateMutation(
-                certificate=None,
-                success=False,
-                message="Invalid Access to Work Certificate",
-            )
+            raise Exception("Invalid Access to Work Certificate")
 
         title = input.get('title')
         files = context.FILES
@@ -382,16 +345,9 @@ class UpdateCertificateMutation(relay.ClientIDMutation):
             certificate.full_clean()
             certificate.save()
         except Exception as e:
-            return UpdateCertificateMutation(
-                certificate=None,
-                success=False,
-                message=str(e),
-            )
+            raise Exception(str(e))
 
-        return UpdateCertificateMutation(
-            certificate=certificate,
-            success=True
-        )
+        return UpdateCertificateMutation(certificate=certificate)
 
 
 class DeleteCertificateMutation(relay.ClientIDMutation):
@@ -399,8 +355,7 @@ class DeleteCertificateMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -409,15 +364,12 @@ class DeleteCertificateMutation(relay.ClientIDMutation):
         certificate_id = from_global_id(id)[1]
         certificate = Certificate.objects.get(pk=certificate_id)
         if certificate.user != user:
-            return DeleteCertificateMutation(
-                success=False,
-                message="Invalid Access to Work Certificate",
-            )
+            raise Exception("Invalid Access to Work Certificate")
 
         # delete certificate
         certificate.delete()
 
-        return DeleteCertificateMutation(success=True)
+        return DeleteCertificateMutation(deleted_id=id)
 
 
 #################### Research #######################
@@ -434,12 +386,12 @@ class ResearchFilter(django_filters.FilterSet):
             'page_count': ['exact', 'gte', 'lte'],
         }
         filter_overrides = {
-             ArrayField: {
-                 'filter_class': django_filters.CharFilter,
-                 'extra': lambda f: {
-                     'lookup_expr': 'icontains',
-                 },
-             }
+            ArrayField: {
+                'filter_class': django_filters.CharFilter,
+                'extra': lambda f: {
+                    'lookup_expr': 'icontains',
+                },
+            }
         }
 
     order_by = OrderingFilter(
@@ -469,8 +421,6 @@ class CreateResearchMutation(relay.ClientIDMutation):
         page_count = Int()
 
     research = Field(ResearchNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -496,15 +446,9 @@ class CreateResearchMutation(relay.ClientIDMutation):
             new_research.full_clean()
             new_research.save()
         except Exception as e:
-            return CreateResearchMutation(
-                success=False,
-                message=str(e)
-            )
+            raise Exception(str(e))
 
-        return CreateResearchMutation(
-            research=new_research,
-            success=True
-        )
+        return CreateResearchMutation(research=new_research)
 
 
 class UpdateResearchMutation(relay.ClientIDMutation):
@@ -519,8 +463,6 @@ class UpdateResearchMutation(relay.ClientIDMutation):
         page_count = Int()
 
     research = Field(ResearchNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -529,11 +471,7 @@ class UpdateResearchMutation(relay.ClientIDMutation):
         research_id = from_global_id(id)[1]
         research = Research.objects.get(pk=research_id)
         if research.user != user:
-            return UpdateResearchMutation(
-                research=None,
-                success=False,
-                message="Invalid Access to Work Research",
-            )
+            raise Exception("Invalid Access to Work Research")
 
         title = input.get('title')
         url = input.get('url', '')
@@ -553,15 +491,9 @@ class UpdateResearchMutation(relay.ClientIDMutation):
             research.full_clean()
             research.save()
         except Exception as e:
-            return UpdateResearchMutation(
-                success=False,
-                message=str(e)
-            )
+            raise Exception(str(e))
 
-        return UpdateResearchMutation(
-            research=research,
-            success=True
-        )
+        return UpdateResearchMutation(research=research)
 
 
 class DeleteResearchMutation(relay.ClientIDMutation):
@@ -569,8 +501,7 @@ class DeleteResearchMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -579,15 +510,12 @@ class DeleteResearchMutation(relay.ClientIDMutation):
         research_id = from_global_id(id)[1]
         research = Research.objects.get(pk=research_id)
         if research.user != user:
-            return DeleteResearchMutation(
-                success=False,
-                message="Invalid Access to Work Research",
-            )
+            raise Exception("Invalid Access to Work Research")
 
         # delete research
         research.delete()
 
-        return DeleteResearchMutation(success=True)
+        return DeleteResearchMutation(deleted_id=id)
 
 
 #################### Education #######################
@@ -636,8 +564,6 @@ class CreateEducationMutation(relay.ClientIDMutation):
         description = String()
 
     education = Field(EducationNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -665,16 +591,9 @@ class CreateEducationMutation(relay.ClientIDMutation):
             new_education.full_clean()
             new_education.save()
         except Exception as e:
-            return CreateEducationMutation(
-                education=None,
-                success=False,
-                message=str(e)
-            )
+            raise Exception(str(e))
 
-        return CreateEducationMutation(
-            education=new_education,
-            success=True
-        )
+        return CreateEducationMutation(education=new_education)
 
 
 class UpdateEducationMutation(relay.ClientIDMutation):
@@ -690,8 +609,6 @@ class UpdateEducationMutation(relay.ClientIDMutation):
         description = String()
 
     education = Field(EducationNode)
-    success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -700,11 +617,7 @@ class UpdateEducationMutation(relay.ClientIDMutation):
         education_id = from_global_id(id)[1]
         education = Education.objects.get(pk=education_id)
         if education.user != user:
-            return UpdateEducationMutation(
-                education=None,
-                success=False,
-                message="Invalid Access to Education",
-            )
+            raise Exception("Invalid Access to Education")
 
         grade = input.get('grade')
         university = input.get('university')
@@ -726,16 +639,9 @@ class UpdateEducationMutation(relay.ClientIDMutation):
             education.full_clean()
             education.save()
         except Exception as e:
-            return UpdateEducationMutation(
-                education=None,
-                success=False,
-                message=str(e)
-            )
+            raise Exception(str(e))
 
-        return UpdateEducationMutation(
-            education=education,
-            success=True
-        )
+        return UpdateEducationMutation(education=education)
 
 
 class DeleteEducationMutation(relay.ClientIDMutation):
@@ -743,8 +649,7 @@ class DeleteEducationMutation(relay.ClientIDMutation):
     class Input:
         id = String(required=True)
 
-    success = Boolean()
-    message = String()
+    deleted_id = ID()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -753,15 +658,12 @@ class DeleteEducationMutation(relay.ClientIDMutation):
         education_id = from_global_id(id)[1]
         education = Education.objects.get(pk=education_id)
         if education.user != user:
-            return DeleteEducationMutation(
-                success=False,
-                message="Invalid Access to Education",
-            )
+            raise Exception("Invalid Access to Education")
 
         # delete education
         education.delete()
 
-        return DeleteEducationMutation(success=True)
+        return DeleteEducationMutation(deleted_id=id)
 
 
 #################### Profile #######################
