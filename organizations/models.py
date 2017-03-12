@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, MinValueValidator
 from django.contrib.postgres.fields import ArrayField
 
+from danesh_boom.models import PhoneField
+
 
 class Organization(models.Model):
     OWNERSHIP_TYPES = (
@@ -25,13 +27,7 @@ class Organization(models.Model):
     province = models.CharField(max_length=50)
     city = models.CharField(max_length=50, blank=True)
     address = models.TextField(blank=True)
-    phone = ArrayField(
-        models.CharField(
-            max_length=23,
-            validators=[
-                RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]),
-        blank=True,
-        null=True)
+    phone = ArrayField(PhoneField(), blank=True, null=True)
     web_site = models.URLField(blank=True)
     established_year = models.IntegerField(null=True, blank=True)
     ownership_type = models.CharField(
@@ -78,15 +74,8 @@ class Agent(models.Model):
                                      on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     agent_subject = models.CharField(max_length=100, blank=True)
-    mobile = models.CharField(
-        max_length=20,
-        validators=[RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]
-    )
-    phone = models.CharField(
-        max_length=23,
-        validators=[
-            RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')],
-        blank=True)
+    mobile = PhoneField()
+    phone = PhoneField(blank=True)
     email = models.EmailField(null=True, blank=True)
 
     def __str__(self):

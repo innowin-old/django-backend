@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from danesh_boom.models import PhoneField
+
 import re
 
 
@@ -20,25 +22,9 @@ class Profile(models.Model):
                                      validators=[RegexValidator('^\d{10}$')])
     birth_date = models.CharField(max_length=10, blank=True, null=True)
     web_site = ArrayField(models.URLField(), blank=True, null=True)
-    phone = ArrayField(
-        models.CharField(
-            max_length=20,
-            validators=[
-                RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]),
-        blank=True,
-        null=True)
-    mobile = ArrayField(
-        models.CharField(
-            max_length=20,
-            validators=[
-                RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]),
-        blank=True,
-        null=True)
-    fax = models.CharField(
-        max_length=20,
-        validators=[
-            RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')],
-        blank=True)
+    phone = ArrayField(PhoneField(), blank=True, null=True)
+    mobile = ArrayField(PhoneField(), blank=True, null=True)
+    fax = PhoneField(blank=True)
     telegram_account = models.CharField(
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')])
