@@ -1,15 +1,17 @@
-from django_filters import OrderingFilter
+import django_filters
 from django.contrib.auth.models import User
+from django_filters import OrderingFilter
+from graphene import relay, Field, AbstractType, resolve_only_args,\
+    String, Int, List, ID
+from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
-from graphene_django import DjangoObjectType
-from graphene import relay, Field, AbstractType, resolve_only_args,\
-    String, Boolean, Int, List, ID
-import django_filters
 
+from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, StaffCount, Picture, Agent,\
     UserAgent
 from users.schema import UserNode
+
 
 #################### UserAgent #######################
 
@@ -40,7 +42,7 @@ class UserAgentNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateUserAgentMutation(relay.ClientIDMutation):
+class CreateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         organization_id = String(required=True)
@@ -80,7 +82,7 @@ class CreateUserAgentMutation(relay.ClientIDMutation):
         return CreateUserAgentMutation(user_agent=new_user_agent)
 
 
-class UpdateUserAgentMutation(relay.ClientIDMutation):
+class UpdateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -111,7 +113,7 @@ class UpdateUserAgentMutation(relay.ClientIDMutation):
         return UpdateUserAgentMutation(user_agent=user_agent)
 
 
-class DeleteUserAgentMutation(relay.ClientIDMutation):
+class DeleteUserAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -160,7 +162,7 @@ class AgentNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateAgentMutation(relay.ClientIDMutation):
+class CreateAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         organization_id = String(required=True)
@@ -206,7 +208,7 @@ class CreateAgentMutation(relay.ClientIDMutation):
         return CreateAgentMutation(agent=new_agent)
 
 
-class UpdateAgentMutation(relay.ClientIDMutation):
+class UpdateAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -249,7 +251,7 @@ class UpdateAgentMutation(relay.ClientIDMutation):
         return UpdateAgentMutation(agent=agent)
 
 
-class DeleteAgentMutation(relay.ClientIDMutation):
+class DeleteAgentMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -292,7 +294,7 @@ class PictureNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreatePictureMutation(relay.ClientIDMutation):
+class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         organization_id = String(required=True)
@@ -334,7 +336,7 @@ class CreatePictureMutation(relay.ClientIDMutation):
         return CreatePictureMutation(picture=new_picture)
 
 
-class UpdatePictureMutation(relay.ClientIDMutation):
+class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -368,7 +370,7 @@ class UpdatePictureMutation(relay.ClientIDMutation):
         return UpdatePictureMutation(picture=picture)
 
 
-class DeletePictureMutation(relay.ClientIDMutation):
+class DeletePictureMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -413,7 +415,7 @@ class StaffCountNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateStaffCountMutation(relay.ClientIDMutation):
+class CreateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         organization_id = String(required=True)
@@ -447,7 +449,7 @@ class CreateStaffCountMutation(relay.ClientIDMutation):
         return CreateStaffCountMutation(staff_count=new_staff_count)
 
 
-class UpdateStaffCountMutation(relay.ClientIDMutation):
+class UpdateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -478,7 +480,7 @@ class UpdateStaffCountMutation(relay.ClientIDMutation):
         return UpdateStaffCountMutation(staff_count=staff_count)
 
 
-class DeleteStaffCountMutation(relay.ClientIDMutation):
+class DeleteStaffCountMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -580,7 +582,7 @@ class OrganizationNode(DjangoObjectType):
             'correspondence_language']
 
 
-class CreateOrganizationMutation(relay.ClientIDMutation):
+class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         name = String(required=True)
@@ -657,7 +659,7 @@ class CreateOrganizationMutation(relay.ClientIDMutation):
         return CreateOrganizationMutation(organization=new_organization)
 
 
-class UpdateOrganizationMutation(relay.ClientIDMutation):
+class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -739,7 +741,7 @@ class UpdateOrganizationMutation(relay.ClientIDMutation):
         return UpdateOrganizationMutation(organization=organization)
 
 
-class DeleteOrganizationMutation(relay.ClientIDMutation):
+class DeleteOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)

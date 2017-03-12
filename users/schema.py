@@ -49,7 +49,7 @@ class SkillNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateSkillMutation(relay.ClientIDMutation):
+class CreateSkillMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         title = String(required=True)
@@ -81,7 +81,7 @@ class CreateSkillMutation(relay.ClientIDMutation):
         return CreateSkillMutation(skill=new_skill)
 
 
-class UpdateSkillMutation(relay.ClientIDMutation):
+class UpdateSkillMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -117,7 +117,7 @@ class UpdateSkillMutation(relay.ClientIDMutation):
         return UpdateSkillMutation(skill=skill)
 
 
-class DeleteSkillMutation(relay.ClientIDMutation):
+class DeleteSkillMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -287,7 +287,7 @@ class CertificateNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateCertificateMutation(relay.ClientIDMutation):
+class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         title = String(required=True)
@@ -316,7 +316,7 @@ class CreateCertificateMutation(relay.ClientIDMutation):
         return CreateCertificateMutation(certificate=new_certificate)
 
 
-class UpdateCertificateMutation(relay.ClientIDMutation):
+class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -350,7 +350,7 @@ class UpdateCertificateMutation(relay.ClientIDMutation):
         return UpdateCertificateMutation(certificate=certificate)
 
 
-class DeleteCertificateMutation(relay.ClientIDMutation):
+class DeleteCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -410,7 +410,7 @@ class ResearchNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateResearchMutation(relay.ClientIDMutation):
+class CreateResearchMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         title = String(required=True)
@@ -451,7 +451,7 @@ class CreateResearchMutation(relay.ClientIDMutation):
         return CreateResearchMutation(research=new_research)
 
 
-class UpdateResearchMutation(relay.ClientIDMutation):
+class UpdateResearchMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -496,7 +496,7 @@ class UpdateResearchMutation(relay.ClientIDMutation):
         return UpdateResearchMutation(research=research)
 
 
-class DeleteResearchMutation(relay.ClientIDMutation):
+class DeleteResearchMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -552,7 +552,7 @@ class EducationNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 
-class CreateEducationMutation(relay.ClientIDMutation):
+class CreateEducationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         grade = String(required=True)
@@ -596,7 +596,7 @@ class CreateEducationMutation(relay.ClientIDMutation):
         return CreateEducationMutation(education=new_education)
 
 
-class UpdateEducationMutation(relay.ClientIDMutation):
+class UpdateEducationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -644,7 +644,7 @@ class UpdateEducationMutation(relay.ClientIDMutation):
         return UpdateEducationMutation(education=education)
 
 
-class DeleteEducationMutation(relay.ClientIDMutation):
+class DeleteEducationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
@@ -797,7 +797,7 @@ class UserNode(DjangoObjectType):
         return get_gravatar_url(self.email)
 
 
-class CreateUserMutation(relay.ClientIDMutation):
+class CreateUserMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         username = String()
@@ -869,7 +869,7 @@ class CreateUserMutation(relay.ClientIDMutation):
         return CreateUserMutation(success=True, message=None)
 
 
-class ChangePasswordMutation(relay.ClientIDMutation):
+class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         old_password = String()
@@ -897,7 +897,7 @@ class ChangePasswordMutation(relay.ClientIDMutation):
         return ChangePasswordMutation(success=True, message=None)
 
 
-class PasswordResetMutation(relay.ClientIDMutation):
+class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         email = String()
