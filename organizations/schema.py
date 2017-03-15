@@ -8,7 +8,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
-from organizations.models import Organization, StaffCount, Picture, Agent,\
+from organizations.models import Organization, StaffCount, Picture,\
     UserAgent
 from users.schema import UserNode
 from organizations.forms import UserAgentForm, PictureForm, StaffCountForm,\
@@ -133,144 +133,6 @@ class DeleteUserAgentMutation(ViewerFields, relay.ClientIDMutation):
         user_agent.delete()
 
         return DeleteUserAgentMutation(deleted_id=id)
-
-
-#################### Agent #######################
-
-class AgentFilter(django_filters.FilterSet):
-
-    class Meta:
-        model = Agent
-        fields = {
-            'id': ['exact'],
-            'name': ['exact', 'icontains', 'istartswith'],
-            'agent_subject': ['exact', 'icontains', 'istartswith'],
-            'mobile': ['exact', 'icontains', 'istartswith'],
-            'phone': ['exact', 'icontains', 'istartswith'],
-            'email': ['exact', 'icontains', 'istartswith'],
-        }
-
-    order_by = OrderingFilter(
-        fields=('id', 'agent_subject'))
-
-
-class AgentNode(DjangoObjectType):
-
-    class Meta:
-        model = Agent
-        interfaces = (relay.Node, )
-
-
-class CreateAgentMutation(ViewerFields, relay.ClientIDMutation):
-
-    class Input:
-        organization_id = String(required=True)
-        name = String(required=True)
-        agent_subject = String()
-        mobile = String(required=True)
-        phone = String()
-        email = String()
-
-    agent = Field(AgentNode)
-
-    @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
-        user = context.user
-        organization_id = input.get('organization_id')
-        organization_id = from_global_id(organization_id)[1]
-        organization = Organization.objects.get(pk=organization_id)
-
-        if organization.user != user:
-            raise Exception("Invalid Access to Organization")
-
-        name = input.get('name')
-        agent_subject = input.get('agent_subject', '')
-        mobile = input.get('mobile')
-        phone = input.get('phone', '')
-        email = input.get('email', '')
-
-        # create agent
-        new_agent = Agent(
-            organization=organization,
-            name=name,
-            agent_subject=agent_subject,
-            mobile=mobile,
-            phone=phone,
-            email=email
-        )
-        try:
-            new_agent.full_clean()
-            new_agent.save()
-        except Exception as e:
-            raise Exception(str(e))
-
-        return CreateAgentMutation(agent=new_agent)
-
-
-class UpdateAgentMutation(ViewerFields, relay.ClientIDMutation):
-
-    class Input:
-        id = String(required=True)
-        name = String(required=True)
-        agent_subject = String()
-        mobile = String(required=True)
-        phone = String()
-        email = String()
-
-    agent = Field(AgentNode)
-
-    @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
-        user = context.user
-        id = input.get('id')
-        agent_id = from_global_id(id)[1]
-        agent = Agent.objects.get(pk=agent_id)
-
-        if agent.organization.user != user:
-            raise Exception("Invalid Access to Organization")
-
-        name = input.get('name')
-        agent_subject = input.get('agent_subject', '')
-        mobile = input.get('mobile')
-        phone = input.get('phone', '')
-        email = input.get('email', '')
-
-        # update agent
-        agent.name = name
-        agent.agent_subject = agent_subject
-        agent.mobile = mobile
-        agent.phone = phone
-        agent.email = email
-        try:
-            agent.full_clean()
-            agent.save()
-        except Exception as e:
-            raise Exception(str(e))
-
-        return UpdateAgentMutation(agent=agent)
-
-
-class DeleteAgentMutation(ViewerFields, relay.ClientIDMutation):
-
-    class Input:
-        id = String(required=True)
-
-    deleted_id = ID()
-
-    @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
-        user = context.user
-        id = input.get('id')
-        agent_id = from_global_id(id)[1]
-        agent = Agent.objects.get(pk=agent_id)
-
-        if agent.organization.user != user:
-            raise Exception("Invalid Access to Organization")
-
-        # delete agent
-        agent.delete()
-
-        return DeleteAgentMutation(deleted_id=id)
 
 
 #################### Picture #######################
@@ -512,8 +374,6 @@ class OrganizationNode(DjangoObjectType):
         StaffCountNode, filterset_class=StaffCountFilter)
     organization_pictures = DjangoFilterConnectionField(
         PictureNode, filterset_class=PictureFilter)
-    organization_agents = DjangoFilterConnectionField(
-        AgentNode, filterset_class=AgentFilter)
     organization_user_agents = DjangoFilterConnectionField(
         UserAgentNode, filterset_class=UserAgentFilter)
 
@@ -526,11 +386,6 @@ class OrganizationNode(DjangoObjectType):
     def resolve_organization_pictures(self, **args):
         pictures = Picture.objects.filter(organization=self)
         return PictureFilter(args, queryset=pictures).qs
-
-    @resolve_only_args
-    def resolve_organization_agents(self, **args):
-        agents = Agent.objects.filter(organization=self)
-        return AgentFilter(args, queryset=agents).qs
 
     @resolve_only_args
     def resolve_organization_user_agents(self, **args):
@@ -690,11 +545,6 @@ class OrganizationMutation(AbstractType):
     create_organization_picture = CreatePictureMutation.Field()
     update_organization_picture = UpdatePictureMutation.Field()
     delete_organization_picture = DeletePictureMutation.Field()
-
-    # ---------------- Agent ----------------
-    create_organization_agent = CreateAgentMutation.Field()
-    update_organization_agent = UpdateAgentMutation.Field()
-    delete_organization_agent = DeleteAgentMutation.Field()
 
     # ---------------- UserAgent ----------------
     create_organization_user_agent = CreateUserAgentMutation.Field()

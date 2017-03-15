@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from organizations.models import Organization, StaffCount, Picture,\
-    Agent, UserAgent
+    UserAgent
 
 
 class OrganizationAdmin(admin.ModelAdmin):
@@ -26,12 +26,6 @@ class PictureAdmin(admin.ModelAdmin):
             (obj.picture.url, obj.picture.url))
 
 
-class AgentAdmin(admin.ModelAdmin):
-    model = Agent
-    list_display = ['organization', 'name', 'mobile', 'email',
-                    'agent_subject']
-
-
 class UserAgentAdmin(admin.ModelAdmin):
     model = UserAgent
     list_display = ['organization', 'user']
@@ -40,5 +34,4 @@ class UserAgentAdmin(admin.ModelAdmin):
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(StaffCount, StaffCountAdmin)
 admin.site.register(Picture, PictureAdmin)
-admin.site.register(Agent, AgentAdmin)
 admin.site.register(UserAgent, UserAgentAdmin)

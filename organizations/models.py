@@ -69,19 +69,6 @@ class Picture(models.Model):
         return self.organization.name
 
 
-class Agent(models.Model):
-    organization = models.ForeignKey(Organization, related_name="agents",
-                                     on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    agent_subject = models.CharField(max_length=100, blank=True)
-    mobile = PhoneField()
-    phone = PhoneField(blank=True)
-    email = models.EmailField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-
 class UserAgent(models.Model):
     organization = models.ForeignKey(Organization, related_name="user_agents",
                                      on_delete=models.CASCADE)
