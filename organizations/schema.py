@@ -2,7 +2,7 @@ import django_filters
 from django.contrib.auth.models import User
 from django_filters import OrderingFilter
 from graphene import relay, Field, AbstractType, resolve_only_args,\
-    String, Int, List, ID
+    List, String, Int, ID
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
@@ -11,6 +11,8 @@ from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, StaffCount, Picture, Agent,\
     UserAgent
 from users.schema import UserNode
+from organizations.forms import UserAgentForm, PictureForm, StaffCountForm,\
+    OrganizationForm
 
 
 #################### UserAgent #######################
@@ -65,19 +67,19 @@ class CreateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        agent_subject = input.get('agent_subject', '')
+        # TODO check business logic
+        if organization.user == user_agent:
+            raise Exception("Organization Owner cant not be Agent")
 
         # create user agent
-        new_user_agent = UserAgent(
-            organization=organization,
-            user=user_agent,
-            agent_subject=agent_subject,
-        )
-        try:
-            new_user_agent.full_clean()
+        form = UserAgentForm(input)
+        if form.is_valid():
+            new_user_agent = form.save(commit=False)
+            new_user_agent.organization = organization
+            new_user_agent.user = user_agent
             new_user_agent.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateUserAgentMutation(user_agent=new_user_agent)
 
@@ -100,15 +102,12 @@ class UpdateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
         if user_agent.organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        agent_subject = input.get('agent_subject', '')
-
         # update agent
-        user_agent.agent_subject = agent_subject
-        try:
-            agent.full_clean()
-            agent.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = UserAgentForm(input, instance=user_agent)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateUserAgentMutation(user_agent=user_agent)
 
@@ -313,25 +312,14 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        order = input.get('order')
-        description = input.get('description', '')
-        files = context.FILES
-        picture = files.get('picture', None)
-        if picture is None:
-            raise Exception("Invalid Picture")
-
         # create picture
-        new_picture = Picture(
-            organization=organization,
-            picture=picture,
-            order=order,
-            description=description,
-        )
-        try:
-            new_picture.full_clean()
+        form = PictureForm(input, context.FILES)
+        if form.is_valid():
+            new_picture = form.save(commit=False)
+            new_picture.organization = organization
             new_picture.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreatePictureMutation(picture=new_picture)
 
@@ -355,17 +343,13 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        order = input.get('order')
-        description = input.get('description', '')
 
         # update picture
-        picture.order = order
-        picture.description = description
-        try:
-            picture.full_clean()
-            picture.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = PictureForm(input, context.FILES, instance=picture)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdatePictureMutation(picture=picture)
 
@@ -433,18 +417,14 @@ class CreateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        count = input.get('count')
-
         # create staff count
-        new_staff_count = StaffCount(
-            organization=organization,
-            count=count
-        )
-        try:
-            new_staff_count.full_clean()
+        form = StaffCountForm(input)
+        if form.is_valid():
+            new_staff_count = form.save(commit=False)
+            new_staff_count.organization = organization
             new_staff_count.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateStaffCountMutation(staff_count=new_staff_count)
 
@@ -470,12 +450,11 @@ class UpdateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
         count = input.get('count')
 
         # update staff count
-        staff_count.count = count
-        try:
-            staff_count.full_clean()
-            staff_count.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = StaffCountForm(input, instance=staff_count)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateStaffCountMutation(staff_count=staff_count)
 
@@ -608,53 +587,15 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        name = input.get('name')
-        national_code = input.get('national_code')
-        registration_ads_url = input.get('registration_ads_url', '')
-        registrar_organization = input.get('registrar_organization', '')
-        country = input.get('country')
-        province = input.get('province')
-        city = input.get('city', '')
-        address = input.get('address', '')
-        phone = input.get('phone', [])
-        web_site = input.get('web_site', '')
-        established_year = input.get('established_year', None)
-        ownership_type = input.get('', 'oth')
-        business_type = input.get('business_type', '')
-        description = input.get('description', '')
-        advantages = input.get('advantages', '')
-        correspondence_language = input.get('correspondence_language', '')
-        telegram_channel = input.get('telegram_channel', '')
-        files = context.FILES
-        logo = files.get('logo', None)
 
         # create organization
-        new_organization = Organization(
-            user=user,
-            name=name,
-            national_code=national_code,
-            registration_ads_url=registration_ads_url,
-            registrar_organization=registrar_organization,
-            country=country,
-            province=province,
-            city=city,
-            address=address,
-            phone=phone,
-            web_site=web_site,
-            established_year=established_year,
-            ownership_type=ownership_type,
-            business_type=business_type,
-            description=description,
-            advantages=advantages,
-            correspondence_language=correspondence_language,
-            telegram_channel=telegram_channel,
-            logo=logo,
-        )
-        try:
-            new_organization.full_clean()
+        form = OrganizationForm(input)
+        if form.is_valid():
+            new_organization = form.save(commit=False)
+            new_organization.user = user
             new_organization.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateOrganizationMutation(organization=new_organization)
 
@@ -692,51 +633,13 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        name = input.get('name')
-        national_code = input.get('national_code')
-        registration_ads_url = input.get('registration_ads_url', '')
-        registrar_organization = input.get('registrar_organization', '')
-        country = input.get('country')
-        province = input.get('province')
-        city = input.get('city', '')
-        address = input.get('address', '')
-        phone = input.get('phone', [])
-        web_site = input.get('web_site', '')
-        established_year = input.get('established_year', None)
-        ownership_type = input.get('', 'oth')
-        business_type = input.get('business_type', '')
-        description = input.get('description', '')
-        advantages = input.get('advantages', '')
-        correspondence_language = input.get('correspondence_language', '')
-        telegram_channel = input.get('telegram_channel', '')
-        files = context.FILES
-        logo = files.get('logo', None)
 
         # update organization
-        organization.name = name
-        organization.national_code = national_code
-        organization.registration_ads_url = registration_ads_url
-        organization.registrar_organization = registrar_organization
-        organization.country = country
-        organization.province = province
-        organization.city = city
-        organization.address = address
-        organization.phone = phone
-        organization.web_site = web_site
-        organization.established_year = established_year
-        organization.ownership_type = ownership_type
-        organization.business_type = business_type
-        organization.description = description
-        organization.advantages = advantages
-        organization.correspondence_language = correspondence_language
-        organization.telegram_channel = telegram_channel
-        if logo:
-            organization.logo = logo
-        try:
-            organization.full_clean()
-            organization.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = OrganizationForm(input)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateOrganizationMutation(organization=organization)
 
@@ -795,4 +698,5 @@ class OrganizationMutation(AbstractType):
 
     # ---------------- UserAgent ----------------
     create_organization_user_agent = CreateUserAgentMutation.Field()
+    update_organization_user_agent = UpdateUserAgentMutation.Field()
     delete_organization_user_agent = DeleteUserAgentMutation.Field()

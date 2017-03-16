@@ -8,7 +8,7 @@ from django.core.signing import TimestampSigner
 from django.template import loader
 from django_filters import OrderingFilter
 from graphene import relay, Field, AbstractType, resolve_only_args,\
-    String, Boolean, Int, Float, List, ID
+    List, String, Boolean, Int, Float, ID
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
@@ -16,6 +16,8 @@ from graphql_relay.node.node import from_global_id
 from danesh_boom.viewer_fields import ViewerFields
 from users.models import Profile, Education, Research, Certificate,\
     WorkExperience, Skill
+from users.forms import SkillForm, WorkExperienceForm, CertificateForm,\
+    ResearchForm, EducationForm, ProfileForm, RegisterUserForm
 from utils.gravatar import get_gravatar_url
 
 
@@ -61,22 +63,15 @@ class CreateSkillMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        title = input.get('title')
-        tag = input.get('tag', [])
-        description = input.get('description', '')
 
         # create skill
-        new_skill = Skill(
-            user=user,
-            title=title,
-            tag=tag,
-            description=description
-        )
-        try:
-            new_skill.full_clean()
+        form = SkillForm(input)
+        if form.is_valid():
+            new_skill = form.save(commit=False)
+            new_skill.user = user
             new_skill.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateSkillMutation(skill=new_skill)
 
@@ -100,19 +95,12 @@ class UpdateSkillMutation(ViewerFields, relay.ClientIDMutation):
         if skill.user != user:
             raise Exception("Invalid Access to Skill")
 
-        title = input.get('title')
-        tag = input.get('tag', [])
-        description = input.get('description', '')
-
         # update skill
-        skill.title = title
-        skill.tag = tag
-        skill.description = description
-        try:
-            skill.full_clean()
-            skill.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = SkillForm(input, instance=skill)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateSkillMutation(skill=skill)
 
@@ -181,24 +169,15 @@ class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        name = input.get('name')
-        position = input.get('position')
-        from_date = input.get('from_date', '')
-        to_date = input.get('to_date', '')
 
         # create work experience
-        new_work_experience = WorkExperience(
-            user=user,
-            name=name,
-            position=position,
-            from_date=from_date,
-            to_date=to_date,
-        )
-        try:
-            new_work_experience.full_clean()
+        form = WorkExperienceForm(input)
+        if form.is_valid():
+            new_work_experience = form.save(commit=False)
+            new_work_experience.user = user
             new_work_experience.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateWorkExperienceMutation(
             work_experience=new_work_experience
@@ -225,21 +204,12 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
         if work_experience.user != user:
             raise Exception("Invalid Access to Work Experience")
 
-        name = input.get('name')
-        position = input.get('position')
-        from_date = input.get('from_date', '')
-        to_date = input.get('to_date', '')
-
         # update work experience
-        work_experience.name = name
-        work_experience.position = position
-        work_experience.from_date = from_date
-        work_experience.to_date = to_date
-        try:
-            work_experience.full_clean()
-            work_experience.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = WorkExperienceForm(input, instance=work_experience)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateWorkExperienceMutation(work_experience=work_experience)
 
@@ -297,21 +267,15 @@ class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        title = input.get('title')
-        files = context.FILES
-        picture = files.get('picture', None)
 
         # create certificate
-        new_certificate = Certificate(
-            user=user,
-            title=title,
-            picture=picture,
-        )
-        try:
-            new_certificate.full_clean()
+        form = CertificateForm(input, context.FILES)
+        if form.is_valid():
+            new_certificate = form.save(commit=False)
+            new_certificate.user = user
             new_certificate.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateCertificateMutation(certificate=new_certificate)
 
@@ -331,21 +295,14 @@ class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
         certificate_id = from_global_id(id)[1]
         certificate = Certificate.objects.get(pk=certificate_id)
         if certificate.user != user:
-            raise Exception("Invalid Access to Work Certificate")
-
-        title = input.get('title')
-        files = context.FILES
-        picture = files.get('picture', None)
+            raise Exception("Invalid Access to Certificate")
 
         # update certificate
-        certificate.title = title
-        if picture:
-            certificate.picture = picture
-        try:
-            certificate.full_clean()
-            certificate.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = CertificateForm(input, context.FILES, instance=certificate)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateCertificateMutation(certificate=certificate)
 
@@ -425,28 +382,15 @@ class CreateResearchMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        title = input.get('title')
-        url = input.get('url', '')
-        author = input.get('author', [])
-        publication = input.get('publication', '')
-        year = input.get('year', None)
-        page_count = input.get('page_count', None)
 
         # create research
-        new_research = Research(
-            user=user,
-            title=title,
-            url=url,
-            author=author,
-            publication=publication,
-            year=year,
-            page_count=page_count,
-        )
-        try:
-            new_research.full_clean()
+        form = ResearchForm(input)
+        if form.is_valid():
+            new_research = form.save(commit=False)
+            new_research.user = user
             new_research.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateResearchMutation(research=new_research)
 
@@ -473,25 +417,12 @@ class UpdateResearchMutation(ViewerFields, relay.ClientIDMutation):
         if research.user != user:
             raise Exception("Invalid Access to Work Research")
 
-        title = input.get('title')
-        url = input.get('url', '')
-        author = input.get('author', [])
-        publication = input.get('publication', '')
-        year = input.get('year', None)
-        page_count = input.get('page_count', None)
-
         # update research
-        research.title = title
-        research.url = url
-        research.author = author
-        research.publication = publication
-        research.year = year
-        research.page_count = page_count
-        try:
-            research.full_clean()
-            research.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = ResearchForm(input, instance=research)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateResearchMutation(research=research)
 
@@ -568,30 +499,15 @@ class CreateEducationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        grade = input.get('grade')
-        university = input.get('university')
-        field_of_study = input.get('field_of_study')
-        from_date = input.get('from_date', '')
-        to_date = input.get('to_date', '')
-        average = input.get('tag', None)
-        description = input.get('description', '')
 
         # create research
-        try:
-            new_education = Education(
-                user=user,
-                grade=grade,
-                university=university,
-                field_of_study=field_of_study,
-                from_date=from_date,
-                to_date=to_date,
-                average=average,
-                description=description
-            )
-            new_education.full_clean()
+        form = EducationForm(input)
+        if form.is_valid():
+            new_education = form.save(commit=False)
+            new_education.user = user
             new_education.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return CreateEducationMutation(education=new_education)
 
@@ -619,27 +535,12 @@ class UpdateEducationMutation(ViewerFields, relay.ClientIDMutation):
         if education.user != user:
             raise Exception("Invalid Access to Education")
 
-        grade = input.get('grade')
-        university = input.get('university')
-        field_of_study = input.get('field_of_study')
-        from_date = input.get('from_date', '')
-        to_date = input.get('to_date', '')
-        average = input.get('tag', None)
-        description = input.get('description', '')
-
         # update education
-        education.grade = grade
-        education.university = university
-        education.field_of_study = field_of_study
-        education.from_date = from_date
-        education.to_date = to_date
-        education.average = average
-        education.description = description
-        try:
-            education.full_clean()
+        form = EducationForm(input, instance=education)
+        if form.is_valid():
             education.save()
-        except Exception as e:
-            raise Exception(str(e))
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateEducationMutation(education=education)
 
@@ -692,15 +593,6 @@ class UpdateProfileMutation(ViewerFields, relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
-        public_email = input.get('public_email', '')
-        national_code = input.get('national_code', '')
-        birth_date = input.get('birth_date', '')
-        web_site = input.get('web_site', [])
-        phone = input.get('phone', [])
-        mobile = input.get('mobile', [])
-        fax = input.get('fax', '')
-        telegram_account = input.get('telegram_account', '')
-        description = input.get('description', '')
 
         if hasattr(context.user, 'profile'):
             profile = context.user.profile
@@ -709,20 +601,11 @@ class UpdateProfileMutation(ViewerFields, relay.ClientIDMutation):
             profile.user = context.user
 
         # update profile
-        profile.public_email = public_email
-        profile.national_code = national_code
-        profile.birth_date = birth_date
-        profile.web_site = web_site
-        profile.phone = phone
-        profile.mobile = mobile
-        profile.fax = fax
-        profile.telegram_account = telegram_account
-        profile.description = description
-        try:
-            profile.full_clean()
-            profile.save()
-        except Exception as e:
-            raise Exception(str(e))
+        form = ProfileForm(input, instance=profile)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception(str(form.errors))
 
         return UpdateProfileMutation(profile=profile)
 
@@ -797,44 +680,26 @@ class UserNode(DjangoObjectType):
         return get_gravatar_url(self.email)
 
 
-class CreateUserMutation(ViewerFields, relay.ClientIDMutation):
+class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         username = String()
         email = String()
         password = String()
 
-    success = Boolean()
-    message = String()
+    user = Field(UserNode)
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
-        username = input.get('username')
-        email = input.get('email')
-        password = input.get('password')
-
-        # check username
-        if User.objects.filter(username=username).exists():
-            return CreateUserMutation(
-                success=False,
-                message="Username Already exists",
-            )
-
-        # check email
-        if User.objects.filter(email=email).exists():
-            return CreateUserMutation(
-                success=False,
-                message="Email Already exists",
-            )
-
         # create user
-        user = User.objects.create(
-            username=username,
-            email=email,
-            is_active=False,
-        )
+        form = RegisterUserForm(input, initial={'is_active': False})
+        if form.is_valid():
+            user = form.save()
+        else:
+            raise Exception(str(form.errors))
 
         # set password
+        password = form.cleaned_data['password']
         user.set_password(password)
         user.save()
 
@@ -866,7 +731,7 @@ class CreateUserMutation(ViewerFields, relay.ClientIDMutation):
 
         email_message.send()
 
-        return CreateUserMutation(success=True, message=None)
+        return RegisterUserMutation(user=user)
 
 
 class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
@@ -876,7 +741,6 @@ class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
         new_password = String()
 
     success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -886,15 +750,13 @@ class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
 
         if user.has_usable_password():
             if not user.check_password(old_password):
-                return ChangePasswordMutation(
-                    success=False,
-                    message="Invalid Password",
-                )
+                raise Exception("Invalid Password")
+
         # change password
         user.set_password(new_password)
         user.save()
 
-        return ChangePasswordMutation(success=True, message=None)
+        return ChangePasswordMutation(success=True)
 
 
 class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
@@ -903,7 +765,6 @@ class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
         email = String()
 
     success = Boolean()
-    message = String()
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
@@ -922,7 +783,7 @@ class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
             }
             form.save(**opts)
 
-        return PasswordResetMutation(success=True, message=None)
+        return PasswordResetMutation(success=True)
 
 
 #################### User Query & Mutation #######################
@@ -969,6 +830,6 @@ class UserMutation(AbstractType):
     update_profile = UpdateProfileMutation.Field()
 
     # ---------------- User ----------------
-    create_user = CreateUserMutation.Field()
+    register_user = RegisterUserMutation.Field()
     change_password = ChangePasswordMutation.Field()
     password_reset = PasswordResetMutation.Field()
