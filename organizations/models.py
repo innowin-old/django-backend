@@ -34,12 +34,13 @@ class Organization(models.Model):
         choices=OWNERSHIP_TYPES,
         max_length=20,
         default='oth')
-    business_type = models.CharField(max_length=100)
+    business_type = ArrayField(models.CharField(max_length=100))
     logo = models.ImageField(upload_to='organizations/logo/',
                              blank=True, null=True)
     description = models.TextField(blank=True)
     advantages = models.TextField(blank=True)
-    correspondence_language = models.CharField(max_length=50, blank=True)
+    correspondence_language = ArrayField(
+        models.CharField(max_length=50), blank=True)
     telegram_channel = models.CharField(
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')])
@@ -62,7 +63,7 @@ class Picture(models.Model):
     organization = models.ForeignKey(Organization, related_name="pictures",
                                      on_delete=models.CASCADE)
     picture = models.ImageField(upload_to='organizations/picture/')
-    order = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
     def __str__(self):

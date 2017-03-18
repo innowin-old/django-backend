@@ -33,4 +33,6 @@ class OrganizationForm(ModelForm):
         exclude = ['user']
         field_classes = {
             'phone': ArrayField,
+            'correspondence_language': ArrayField,
+            'business_type': ArrayField,
         }

@@ -1,6 +1,7 @@
 import django_filters
 from django.contrib.auth.models import User
 from django_filters import OrderingFilter
+from django.contrib.postgres.fields import ArrayField
 from graphene import relay, Field, AbstractType, resolve_only_args,\
     List, String, Int, ID
 from graphene_django import DjangoObjectType
@@ -359,10 +360,18 @@ class OrganizationFilter(django_filters.FilterSet):
             'province': ['exact', 'icontains', 'istartswith'],
             'city': ['exact', 'icontains', 'istartswith'],
             'ownership_type': ['exact', 'icontains', 'istartswith'],
-            'business_type': ['exact', 'icontains', 'istartswith'],
+            'business_type': ['icontains'],
             # ---------- User ------------
             'user_id': ['exact'],
             'user__username': ['exact', 'icontains', 'istartswith'],
+        }
+        filter_overrides = {
+            ArrayField: {
+                'filter_class': django_filters.CharFilter,
+                'extra': lambda f: {
+                    'lookup_expr': 'icontains',
+                },
+            }
         }
 
     order_by = OrderingFilter(fields=('id', 'established_year',))
@@ -431,10 +440,10 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         web_site = String()
         established_year = Int()
         ownership_type = String()
-        business_type = String(required=True)
+        business_type = List(String, required=True)
         description = String()
         advantages = String()
-        correspondence_language = String()
+        correspondence_language = List(String)
         telegram_channel = String()
 
     organization = Field(OrganizationNode)
@@ -471,10 +480,10 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         web_site = String()
         established_year = Int()
         ownership_type = String()
-        business_type = String(required=True)
+        business_type = List(String, required=True)
         description = String()
         advantages = String()
-        correspondence_language = String()
+        correspondence_language = List(String)
         telegram_channel = String()
 
     organization = Field(OrganizationNode)
@@ -490,7 +499,7 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
 
         # update organization
-        form = OrganizationForm(input)
+        form = OrganizationForm(input, instance=organization)
         if form.is_valid():
             form.save()
         else:
