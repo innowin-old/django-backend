@@ -173,3 +173,16 @@ class Skill(models.Model):
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
+
+
+class Badge(models.Model):
+    user = models.ForeignKey(User, related_name="badges",
+                             on_delete=models.CASCADE)
+    badge = models.CharField(max_length=100)
+    create_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "%s(%s)" % (self.user.username, self.badge)
+
+    class Meta:
+        unique_together = (('user', 'badge'),)

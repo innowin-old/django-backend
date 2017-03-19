@@ -15,12 +15,32 @@ from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from users.models import Profile, Education, Research, Certificate,\
-    WorkExperience, Skill
+    WorkExperience, Skill, Badge
 from users.forms import SkillForm, WorkExperienceForm, CertificateForm,\
     ResearchForm, EducationForm, ProfileForm, RegisterUserForm
 from utils.gravatar import get_gravatar_url
 from organizations.models import Organization
 
+
+#################### Badge #######################
+
+class BadgeFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Badge
+        fields = {
+            'badge': ['exact', 'icontains', 'istartswith'],
+            'create_time': ['exact', 'gte', 'lte'],
+        }
+
+    order_by = OrderingFilter(fields=('id', 'badge', 'create_time'))
+
+
+class BadgeNode(DjangoObjectType):
+
+    class Meta:
+        model = Badge
+        interfaces = (relay.Node, )
 
 #################### Skill #######################
 
@@ -215,6 +235,7 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
         if work_experience.user != user:
             raise Exception("Invalid Access to Work Experience")
 
+        organization_id = input.get('organization_id', None)
         if organization_id:
             organization_id = from_global_id(organization_id)[1]
             input['organization'] = organization_id
@@ -686,6 +707,8 @@ class UserNode(DjangoObjectType):
         ResearchNode, filterset_class=ResearchFilter)
     user_educations = DjangoFilterConnectionField(
         EducationNode, filterset_class=EducationFilter)
+    user_badges = DjangoFilterConnectionField(
+        BadgeNode, filterset_class=BadgeFilter)
 
     @resolve_only_args
     def resolve_user_skills(self, **args):
@@ -711,6 +734,11 @@ class UserNode(DjangoObjectType):
     def resolve_user_educations(self, **args):
         educations = Education.objects.filter(user=self)
         return EducationFilter(args, queryset=educations).qs
+
+    @resolve_only_args
+    def resolve_user_badges(self, **args):
+        badges = Badge.objects.filter(user=self)
+        return BadgeFilter(args, queryset=badges).qs
 
     class Meta:
         model = User
