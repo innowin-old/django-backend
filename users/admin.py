@@ -34,7 +34,8 @@ class CertificateAdmin(admin.ModelAdmin):
 
 class WorkExperienceAdmin(admin.ModelAdmin):
     model = WorkExperience
-    list_display = ['user', 'name', 'position', 'from_date', 'to_date']
+    list_display = ['user', 'name', 'organization', 'position',
+                    'from_date', 'to_date', 'status']
 
 
 class SkillAdmin(admin.ModelAdmin):

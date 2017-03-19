@@ -11,7 +11,8 @@ from graphql_relay.node.node import from_global_id
 from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, StaffCount, Picture,\
     UserAgent
-from users.schema import UserNode
+from users.schema import UserNode, WorkExperienceNode, WorkExperienceFilter
+from users.models import WorkExperience
 from organizations.forms import UserAgentForm, PictureForm, StaffCountForm,\
     OrganizationForm
 
@@ -206,7 +207,6 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-
         # update picture
         form = PictureForm(input, context.FILES, instance=picture)
         if form.is_valid():
@@ -385,6 +385,8 @@ class OrganizationNode(DjangoObjectType):
         PictureNode, filterset_class=PictureFilter)
     organization_user_agents = DjangoFilterConnectionField(
         UserAgentNode, filterset_class=UserAgentFilter)
+    organization_work_experiences = DjangoFilterConnectionField(
+        WorkExperienceNode, filterset_class=WorkExperienceFilter)
 
     @resolve_only_args
     def resolve_organization_staff_counts(self, **args):
@@ -400,6 +402,12 @@ class OrganizationNode(DjangoObjectType):
     def resolve_organization_user_agents(self, **args):
         user_agents = UserAgent.objects.filter(organization=self)
         return UserAgentFilter(args, queryset=user_agents).qs
+
+    @resolve_only_args
+    def resolve_organization_work_experiences(self, **args):
+        work_experiences = WorkExperience.objects.filter(
+            organization=self)
+        return WorkExperienceFilter(args, queryset=work_experiences).qs
 
     class Meta:
         model = Organization
@@ -496,7 +504,6 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         organization = Organization.objects.get(pk=organization_id)
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
-
 
         # update organization
         form = OrganizationForm(input, instance=organization)

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from danesh_boom.models import PhoneField
+from organizations.models import Organization
 
 import re
 
@@ -110,17 +111,43 @@ class Certificate(models.Model):
 
 
 class WorkExperience(models.Model):
+    STATUSES = (
+        ('WITHOUT_CONFIRM', 'بدون تایید'),
+        ('WAIT_FOR_CONFIRM', 'منتظر تایید'),
+        ('CONFIRMED', 'تایید شده'),
+        ('UNCONFIRMED', 'تایید نشده'),
+    )
+
     user = models.ForeignKey(User, related_name="work_experiences",
                              on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True)
+    organization = models.ForeignKey(
+        Organization,
+        related_name="work_experience_organization",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True)
     position = models.CharField(max_length=100, blank=True)
     from_date = models.CharField(max_length=7, blank=True, null=True)
     to_date = models.CharField(max_length=7, blank=True, null=True)
+    status = models.CharField(
+        choices=STATUSES,
+        max_length=20,
+        default='WITHOUT_CONFIRM')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.name)
 
     def clean(self):
+        if not self.organization and not self.name:
+            raise ValidationError(_('Please enter name or organization'))
+
+        if self.organization and self.name:
+            raise ValidationError(_('Please enter name or organization'))
+
+        if self.name and self.status != 'WITHOUT_CONFIRM':
+            raise ValidationError(_('Invalid status'))
+
         p = re.compile('^\d{4}-\d{2}$')
         from_date = to_date = None
         if self.from_date:

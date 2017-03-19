@@ -19,6 +19,7 @@ from users.models import Profile, Education, Research, Certificate,\
 from users.forms import SkillForm, WorkExperienceForm, CertificateForm,\
     ResearchForm, EducationForm, ProfileForm, RegisterUserForm
 from utils.gravatar import get_gravatar_url
+from organizations.models import Organization
 
 
 #################### Skill #######################
@@ -138,6 +139,7 @@ class WorkExperienceFilter(django_filters.FilterSet):
             'position': ['exact', 'icontains', 'istartswith'],
             'from_date': ['exact', 'gte', 'lte'],
             'to_date': ['exact', 'gte', 'lte'],
+            'status': ['exact', 'icontains', 'istartswith'],
         }
 
     order_by = OrderingFilter(
@@ -146,7 +148,8 @@ class WorkExperienceFilter(django_filters.FilterSet):
             'name',
             'position',
             'from_date',
-            'to_date'))
+            'to_date',
+            'status'))
 
 
 class WorkExperienceNode(DjangoObjectType):
@@ -159,16 +162,22 @@ class WorkExperienceNode(DjangoObjectType):
 class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
-        name = String(required=True)
+        name = String()
+        organization_id = String()
         position = String(required=True)
         from_date = String()
         to_date = String()
+        status = String()
 
     work_experience = Field(WorkExperienceNode)
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
+        organization_id = input.get('organization_id', None)
+        if organization_id:
+            organization_id = from_global_id(organization_id)[1]
+            input['organization'] = organization_id
 
         # create work experience
         form = WorkExperienceForm(input)
@@ -188,10 +197,12 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
-        name = String(required=True)
+        name = String()
+        organization_id = String()
         position = String(required=True)
         from_date = String()
         to_date = String()
+        status = String()
 
     work_experience = Field(WorkExperienceNode)
 
@@ -204,6 +215,10 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
         if work_experience.user != user:
             raise Exception("Invalid Access to Work Experience")
 
+        if organization_id:
+            organization_id = from_global_id(organization_id)[1]
+            input['organization'] = organization_id
+
         # update work experience
         form = WorkExperienceForm(input, instance=work_experience)
         if form.is_valid():
@@ -212,6 +227,33 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
             raise Exception(str(form.errors))
 
         return UpdateWorkExperienceMutation(work_experience=work_experience)
+
+
+class ConfirmWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
+
+    class Input:
+        id = String(required=True)
+        confirm = Boolean(required=True)
+
+    work_experience = Field(WorkExperienceNode)
+
+    @classmethod
+    def mutate_and_get_payload(cls, input, context, info):
+        user = context.user
+        id = input.get('id', None)
+        work_experience_id = from_global_id(id)[1]
+        work_experience = WorkExperience.objects.get(pk=work_experience_id)
+        if work_experience.organization.user != user:
+            raise Exception("Invalid Access to Work Experience")
+
+        confirm = input.get('confirm')
+        if confirm:
+            work_experience.status = 'CONFIRMED'
+        else:
+            work_experience.status = 'UNCONFIRMED'
+        work_experience.save()
+
+        return ConfirmWorkExperienceMutation(work_experience=work_experience)
 
 
 class DeleteWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
@@ -810,6 +852,7 @@ class UserMutation(AbstractType):
     create_work_experience = CreateWorkExperienceMutation.Field()
     update_work_experience = UpdateWorkExperienceMutation.Field()
     delete_work_experience = DeleteWorkExperienceMutation.Field()
+    confirm_work_experience = ConfirmWorkExperienceMutation.Field()
 
     # ---------------- Certificate ----------------
     create_certificate = CreateCertificateMutation.Field()
