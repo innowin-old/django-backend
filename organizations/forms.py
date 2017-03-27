@@ -16,7 +16,7 @@ class PictureForm(ModelForm):
 
     class Meta:
         model = Picture
-        exclude = ['organization']
+        exclude = ['organization', 'picture']
 
 
 class StaffCountForm(ModelForm):
@@ -30,7 +30,7 @@ class OrganizationForm(ModelForm):
 
     class Meta:
         model = Organization
-        exclude = ['user']
+        exclude = ['user', 'logo']
         field_classes = {
             'phone': ArrayField,
             'correspondence_language': ArrayField,

@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from media.models import Media
 from danesh_boom.models import PhoneField
 from organizations.models import Organization
 
@@ -103,8 +104,11 @@ class Certificate(models.Model):
     user = models.ForeignKey(User, related_name="certificates",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
-    picture = models.ImageField(upload_to='users/certificate/',
-                                blank=True, null=True)
+    picture = models.ForeignKey(
+        Media,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)

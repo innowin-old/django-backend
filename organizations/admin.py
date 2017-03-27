@@ -23,7 +23,7 @@ class PictureAdmin(admin.ModelAdmin):
     def picture_link(self, obj):
         return format_html(
             "<a href='%s'>%s</a>" %
-            (obj.picture.url, obj.picture.url))
+            (obj.picture.file.url, obj.picture.file.url))
 
 
 class UserAgentAdmin(admin.ModelAdmin):

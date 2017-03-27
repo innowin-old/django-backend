@@ -14,12 +14,13 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
-from users.models import Profile, Education, Research, Certificate,\
-    WorkExperience, Skill, Badge
+from media.models import Media
+from media.schema import MediaNode, MediaFilter
 from users.forms import SkillForm, WorkExperienceForm, CertificateForm,\
     ResearchForm, EducationForm, ProfileForm, RegisterUserForm
+from users.models import Profile, Education, Research, Certificate,\
+    WorkExperience, Skill, Badge
 from utils.gravatar import get_gravatar_url
-from organizations.models import Organization
 
 
 #################### Badge #######################
@@ -43,6 +44,7 @@ class BadgeNode(DjangoObjectType):
         interfaces = (relay.Node, )
 
 #################### Skill #######################
+
 
 class SkillFilter(django_filters.FilterSet):
 
@@ -324,6 +326,7 @@ class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         title = String(required=True)
+        picture_id = String()
 
     certificate = Field(CertificateNode)
 
@@ -331,11 +334,19 @@ class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
 
+        picture = None
+        picture_id = input.get('picture_id')
+
+        if picture_id:
+            picture_id = from_global_id(picture_id)[1]
+            picture = Media.objects.get(pk=picture_id)
+
         # create certificate
         form = CertificateForm(input, context.FILES)
         if form.is_valid():
             new_certificate = form.save(commit=False)
             new_certificate.user = user
+            new_certificate.picture = picture
             new_certificate.save()
         else:
             raise Exception(str(form.errors))
@@ -347,6 +358,7 @@ class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
+        picture_id = String()
         title = String(required=True)
 
     certificate = Field(CertificateNode)
@@ -360,7 +372,14 @@ class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
         if certificate.user != user:
             raise Exception("Invalid Access to Certificate")
 
+        picture = None
+        picture_id = input.get('picture_id')
+        if picture_id:
+            picture_id = from_global_id(picture_id)[1]
+            picture = Media.objects.get(pk=picture_id)
+
         # update certificate
+        certificate.picture = picture
         form = CertificateForm(input, context.FILES, instance=certificate)
         if form.is_valid():
             form.save()
@@ -709,6 +728,8 @@ class UserNode(DjangoObjectType):
         EducationNode, filterset_class=EducationFilter)
     user_badges = DjangoFilterConnectionField(
         BadgeNode, filterset_class=BadgeFilter)
+    user_medias = DjangoFilterConnectionField(
+        MediaNode, filterset_class=MediaFilter)
 
     @resolve_only_args
     def resolve_user_skills(self, **args):
@@ -739,6 +760,11 @@ class UserNode(DjangoObjectType):
     def resolve_user_badges(self, **args):
         badges = Badge.objects.filter(user=self)
         return BadgeFilter(args, queryset=badges).qs
+
+    @resolve_only_args
+    def resolve_user_medias(self, **args):
+        medias = Media.objects.filter(uploader=self)
+        return MediaFilter(args, queryset=medias).qs
 
     class Meta:
         model = User

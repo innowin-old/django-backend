@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, MinValueValidator
 from django.contrib.postgres.fields import ArrayField
 
+from media.models import Media
 from danesh_boom.models import PhoneField
 
 
@@ -35,8 +36,11 @@ class Organization(models.Model):
         max_length=20,
         default='oth')
     business_type = ArrayField(models.CharField(max_length=100))
-    logo = models.ImageField(upload_to='organizations/logo/',
-                             blank=True, null=True)
+    logo = models.ForeignKey(
+        Media,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
     description = models.TextField(blank=True)
     advantages = models.TextField(blank=True)
     correspondence_language = ArrayField(
@@ -62,7 +66,7 @@ class StaffCount(models.Model):
 class Picture(models.Model):
     organization = models.ForeignKey(Organization, related_name="pictures",
                                      on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to='organizations/picture/')
+    picture = models.ForeignKey(Media, on_delete=models.CASCADE)
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 

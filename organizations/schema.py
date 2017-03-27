@@ -1,7 +1,7 @@
 import django_filters
 from django.contrib.auth.models import User
-from django_filters import OrderingFilter
 from django.contrib.postgres.fields import ArrayField
+from django_filters import OrderingFilter
 from graphene import relay, Field, AbstractType, resolve_only_args,\
     List, String, Int, ID
 from graphene_django import DjangoObjectType
@@ -9,12 +9,14 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
-from organizations.models import Organization, StaffCount, Picture,\
-    UserAgent
-from users.schema import UserNode, WorkExperienceNode, WorkExperienceFilter
-from users.models import WorkExperience
+from media.models import Media
+from media.schema import MediaNode
 from organizations.forms import UserAgentForm, PictureForm, StaffCountForm,\
     OrganizationForm
+from organizations.models import Organization, StaffCount, Picture,\
+    UserAgent
+from users.models import WorkExperience
+from users.schema import UserNode, WorkExperienceNode, WorkExperienceFilter
 
 
 #################### UserAgent #######################
@@ -161,6 +163,7 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         organization_id = String(required=True)
+        picture_id = String(required=True)
         order = Int(required=True)
         description = String()
 
@@ -173,6 +176,10 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
         organization_id = from_global_id(organization_id)[1]
         organization = Organization.objects.get(pk=organization_id)
 
+        media_id = input.get('picture_id')
+        media_id = from_global_id(media_id)[1]
+        media = Media.objects.get(pk=media_id)
+
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
@@ -181,6 +188,7 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if form.is_valid():
             new_picture = form.save(commit=False)
             new_picture.organization = organization
+            new_picture.picture = media
             new_picture.save()
         else:
             raise Exception(str(form.errors))
@@ -192,6 +200,7 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         id = String(required=True)
+        picture_id = String(required=True)
         order = Int(requeired=True)
         description = String()
 
@@ -204,10 +213,16 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
         picture_id = from_global_id(id)[1]
         picture = Picture.objects.get(pk=picture_id)
 
+        media_id = input.get('picture_id')
+        media_id = from_global_id(media_id)[1]
+        picture_media = Media.objects.get(pk=media_id)
+
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")
 
         # update picture
+        picture.picture = picture_media
+
         form = PictureForm(input, context.FILES, instance=picture)
         if form.is_valid():
             form.save()
@@ -233,6 +248,9 @@ class DeletePictureMutation(ViewerFields, relay.ClientIDMutation):
 
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")
+
+        # delete picture in media model
+        picture.picture.delete()
 
         # delete picture
         picture.delete()
@@ -379,6 +397,7 @@ class OrganizationFilter(django_filters.FilterSet):
 
 class OrganizationNode(DjangoObjectType):
 
+    logo = Field(MediaNode)
     organization_staff_counts = DjangoFilterConnectionField(
         StaffCountNode, filterset_class=StaffCountFilter)
     organization_pictures = DjangoFilterConnectionField(
@@ -387,6 +406,10 @@ class OrganizationNode(DjangoObjectType):
         UserAgentNode, filterset_class=UserAgentFilter)
     organization_work_experiences = DjangoFilterConnectionField(
         WorkExperienceNode, filterset_class=WorkExperienceFilter)
+
+    @resolve_only_args
+    def resolve_logo(self, **args):
+        return self.logo
 
     @resolve_only_args
     def resolve_organization_staff_counts(self, **args):
@@ -427,7 +450,6 @@ class OrganizationNode(DjangoObjectType):
             'established_year',
             'ownership_type',
             'business_type',
-            'logo',
             'description',
             'advantages',
             'correspondence_language']
@@ -449,6 +471,7 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         established_year = Int()
         ownership_type = String()
         business_type = List(String, required=True)
+        logo_id = String()
         description = String()
         advantages = String()
         correspondence_language = List(String)
@@ -460,11 +483,18 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
 
+        logo = None
+        logo_id = input.get('logo_id')
+        if logo_id:
+            logo_id = from_global_id(logo_id)[1]
+            logo = Media.objects.get(pk=logo_id)
+
         # create organization
         form = OrganizationForm(input)
         if form.is_valid():
             new_organization = form.save(commit=False)
             new_organization.user = user
+            new_organization.logo = logo
             new_organization.save()
         else:
             raise Exception(str(form.errors))
@@ -489,6 +519,7 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         established_year = Int()
         ownership_type = String()
         business_type = List(String, required=True)
+        logo_id = String()
         description = String()
         advantages = String()
         correspondence_language = List(String)
@@ -505,7 +536,14 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
+        logo = None
+        logo_id = input.get('logo_id')
+        if logo_id:
+            logo_id = from_global_id(logo_id)[1]
+            logo = Media.objects.get(pk=logo_id)
+
         # update organization
+        organization.logo = logo
         form = OrganizationForm(input, instance=organization)
         if form.is_valid():
             form.save()
@@ -530,6 +568,9 @@ class DeleteOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         organization = Organization.objects.get(pk=organization_id)
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
+
+        # delete logo in media model
+        organization.logo.delete()
 
         # delete organization
         organization.delete()

@@ -27,7 +27,7 @@ class CertificateForm(ModelForm):
 
     class Meta:
         model = Certificate
-        exclude = ['user']
+        exclude = ['user', 'picture']
 
 
 class ResearchForm(ModelForm):

@@ -1,15 +1,17 @@
 import graphene
 from graphene import ObjectType
 
+import media.schema
 import organizations.schema
 import users.schema
 from danesh_boom.viewer_fields import ViewerFields
 
 
 class ViewerNode(
-    users.schema.UserQuery,
-    organizations.schema.OrganizationQuery,
-    ObjectType):
+        users.schema.UserQuery,
+        organizations.schema.OrganizationQuery,
+        media.schema.MediaQuery,
+        ObjectType):
 
     class Meta:
         interfaces = (graphene.relay.Node,)
@@ -28,6 +30,7 @@ class Query(ViewerFields, ObjectType):
 class Mutation(
         users.schema.UserMutation,
         organizations.schema.OrganizationMutation,
+        media.schema.MediaMutation,
         ObjectType):
     pass
 

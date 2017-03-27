@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'users',
     'organizations',
+    'media',
 ]
 
 MIDDLEWARE = [
