@@ -1,16 +1,14 @@
-from graphene import relay, Field, List, String, Boolean, ID
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import TimestampSigner
 from django.template import loader
-from graphql_relay.node.node import from_global_id
+from graphene import relay, Field, List, String, Boolean
 
 from danesh_boom.viewer_fields import ViewerFields
-from users.schemas.queries.user import UserNode, ProfileNode
-from users.models import Education
 from users.forms import ProfileForm, RegisterUserForm
+from users.models import Profile
+from users.schemas.queries.user import UserNode, ProfileNode
 
 
 class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):

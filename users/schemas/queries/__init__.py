@@ -1,8 +1,7 @@
 from graphene import relay, AbstractType, Field
 from graphene_django.filter import DjangoFilterConnectionField
-from users.schemas.queries.user import UserFilter, UserNode
 
-from organizations.models import Organization
+from users.schemas.queries.user import UserFilter, UserNode
 
 
 class UserQuery(AbstractType):

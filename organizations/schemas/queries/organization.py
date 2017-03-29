@@ -10,6 +10,7 @@ from organizations.models import Organization, StaffCount, Picture,\
 from organizations.schemas.queries.user_agent import UserAgentFilter, UserAgentNode
 from organizations.schemas.queries.picture import PictureFilter, PictureNode
 from organizations.schemas.queries.staff_count import StaffCountFilter, StaffCountNode
+from users.models import WorkExperience
 from users.schemas.queries.work_experience import WorkExperienceNode,\
     WorkExperienceFilter
 from media.schemas.queries.media import MediaNode

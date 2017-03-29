@@ -5,6 +5,7 @@ from graphene import relay, resolve_only_args, String
 from django.contrib.auth.models import User
 from graphene_django.filter import DjangoFilterConnectionField
 
+from media.models import Media
 from users.models import Profile, Education, Research, Certificate,\
     WorkExperience, Skill, Badge
 from users.schemas.queries.skill import SkillFilter, SkillNode

@@ -1,8 +1,7 @@
 from graphene import relay, Field
-from danesh_boom.viewer_fields import ViewerFields
 
+from danesh_boom.viewer_fields import ViewerFields
 from media.forms import MediaForm
-from media.models import Media
 from media.schemas.queries.media import MediaNode
 
 
