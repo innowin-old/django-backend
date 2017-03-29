@@ -1,16 +1,19 @@
 import graphene
 from graphene import ObjectType
 
-import media.schema
-import organizations.schema
-import users.schema
+from media.schemas.queries import MediaQuery
+from media.schemas.mutations import MediaMutation
+from organizations.schemas.queries import OrganizationQuery
+from organizations.schemas.mutations import OrganizationMutation
+from users.schemas.queries import UserQuery
+from users.schemas.mutations import UserMutation
 from danesh_boom.viewer_fields import ViewerFields
 
 
 class ViewerNode(
-        users.schema.UserQuery,
-        organizations.schema.OrganizationQuery,
-        media.schema.MediaQuery,
+        UserQuery,
+        OrganizationQuery,
+        MediaQuery,
         ObjectType):
 
     class Meta:
@@ -28,9 +31,9 @@ class Query(ViewerFields, ObjectType):
 
 
 class Mutation(
-        users.schema.UserMutation,
-        organizations.schema.OrganizationMutation,
-        media.schema.MediaMutation,
+        UserMutation,
+        OrganizationMutation,
+        MediaMutation,
         ObjectType):
     pass
 
