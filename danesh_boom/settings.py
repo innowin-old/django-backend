@@ -165,3 +165,9 @@ GRAPHENE = {
     'SCHEMA': 'danesh_boom.schema.schema',
     'SCHEMA_OUTPUT': os.path.join(BASE_DIR, FRONTEND_ROOT, 'graphql.schema.json'),
 }
+
+# x-sendfile
+SENDFILE_BACKEND = CONFIG.get('SENDFILE_BACKEND')
+SENDFILE_ROOT = os.path.normpath(os.path.join(BASE_DIR, CONFIG.get('SENDFILE_ROOT')))
+SENDFILE_URL = CONFIG.get('SENDFILE_URL')
+MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')  # not MEDIA_ROOT. this is media app settings

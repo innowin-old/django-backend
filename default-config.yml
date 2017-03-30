@@ -28,3 +28,7 @@ FRONTEND_DEV: off
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: ''
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: ''
+
+SENDFILE_BACKEND: 'sendfile.backends.nginx' # Alternative 'sendfile.backends.development'
+SENDFILE_ROOT: '' # e.g. '/path/to/examples/protected_downloads/protected' or '../data/protected'
+SENDFILE_URL: '' # e.g. '/protected'

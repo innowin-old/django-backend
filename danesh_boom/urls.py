@@ -19,11 +19,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from graphene_django.views import GraphQLView
 
+import media.views
 from danesh_boom.schema import schema
 
 urlpatterns = [
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
+    url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
     url(r'^graphql', GraphQLView.as_view(graphiql=True, schema=schema)),
     url(r'^', include('users.urls')),
 ]
