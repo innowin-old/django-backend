@@ -11,6 +11,7 @@ from media.MediaStorage import MediaStorage
 
 def get_upload_path(media, filename):
     name, ext = os.path.splitext(filename)
+    ext = ext.lower()
     return os.path.join(settings.MEDIA_DIR, uuid.uuid4().hex + ext)
 
 
