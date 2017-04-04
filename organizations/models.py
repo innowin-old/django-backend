@@ -21,6 +21,7 @@ class Organization(models.Model):
     user = models.ForeignKey(User, related_name="organizations",
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    organ_name = models.CharField(max_length=75)
     national_code = models.CharField(max_length=20)
     registration_ads_url = models.URLField(blank=True)
     registrar_organization = models.CharField(max_length=100, blank=True)
