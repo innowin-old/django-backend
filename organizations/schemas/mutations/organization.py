@@ -12,6 +12,7 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
     class Input:
         name = String(required=True)
+        organ_name = String(required=True)
         national_code = String(required=True)
         registration_ads_url = String()
         registrar_organization = String()
@@ -60,6 +61,7 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     class Input:
         id = String(required=True)
         name = String(required=True)
+        organ_name = String(required=True)
         national_code = String(required=True)
         registration_ads_url = String()
         registrar_organization = String()

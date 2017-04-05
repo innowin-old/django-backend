@@ -23,6 +23,7 @@ class OrganizationFilter(django_filters.FilterSet):
         fields = {
             'id': ['exact'],
             'name': ['exact', 'icontains', 'istartswith'],
+            'organ_name': ['exact', 'icontains', 'istartswith'],
             'national_code': ['exact', 'icontains', 'istartswith'],
             'registrar_organization': ['exact', 'icontains', 'istartswith'],
             'country': ['exact', 'icontains', 'istartswith'],
@@ -89,6 +90,7 @@ class OrganizationNode(DjangoObjectType):
         only_fields = [
             'id',
             'name',
+            'organ_name',
             'national_code',
             'phone',
             'registration_ads_url',
@@ -103,4 +105,5 @@ class OrganizationNode(DjangoObjectType):
             'business_type',
             'description',
             'advantages',
-            'correspondence_language']
+            'correspondence_language',
+        ]
