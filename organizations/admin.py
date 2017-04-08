@@ -7,7 +7,7 @@ from organizations.models import Organization, StaffCount, Picture,\
 
 class OrganizationAdmin(admin.ModelAdmin):
     model = Organization
-    list_display = ['user', 'name', 'national_code', 'country',
+    list_display = ['organ_name', 'user', 'name', 'national_code', 'country',
                     'province', 'ownership_type']
 
 

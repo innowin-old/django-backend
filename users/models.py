@@ -1,19 +1,63 @@
 from __future__ import unicode_literals
 
-from django.db import models
+import re
+
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import MaxValueValidator,\
-    MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, \
+    MinValueValidator, RegexValidator
+from django.db import models, transaction
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
-from media.models import Media
 from danesh_boom.models import PhoneField
+from media.models import Media
 from organizations.models import Organization
 
-import re
+
+class Identity(models.Model):
+    user = models.OneToOneField(
+        User,
+        related_name="identity",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
+    organization = models.OneToOneField(
+        Organization,
+        related_name="identity",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
+    name = models.CharField(max_length=150, unique=True)
+
+    def clean(self):
+        if not self.user and not self.organization:
+            raise ValidationError(_('User or Organization should be set'))
+        if self.user and self.organization:
+            raise ValidationError(
+                _('Only on of User or Organization should be set'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Identity, self).save(*args, **kwargs)
+
+
+default_user_save = User.save
+
+
+def user_save(self, *args, **kwargs):
+    with transaction.atomic():
+        default_user_save(self, *args, **kwargs)
+        if hasattr(self, 'identity'):
+            identity = self.identity
+        else:
+            identity = Identity(user=self)
+        identity.name = self.username
+        identity.save()
+
+
+User.save = user_save
 
 
 class Profile(models.Model):

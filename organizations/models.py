@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, MinValueValidator
 from django.contrib.postgres.fields import ArrayField
@@ -52,6 +52,17 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        from users.models import Identity
+        with transaction.atomic():
+            super(Organization, self).save(*args, **kwargs)
+            if hasattr(self, 'identity'):
+                identity = self.identity
+            else:
+                identity = Identity(organization=self)
+            identity.name = self.organ_name
+            identity.save()
 
 
 class StaffCount(models.Model):
