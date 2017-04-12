@@ -38,6 +38,21 @@ class Identity(models.Model):
             raise ValidationError(
                 _('Only on of User or Organization should be set'))
 
+    def __str__(self):
+        return self.name
+
+    def validate_user(self, user):
+        if self.user and self.user == user:
+            return True
+        elif self.organization and self.organization.user == user:
+            return True
+        return False
+
+    def validate_organization(self, organization):
+        if self.organization == organization:
+            return True
+        return False
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super(Identity, self).save(*args, **kwargs)

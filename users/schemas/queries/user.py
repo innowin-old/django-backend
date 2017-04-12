@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from graphene_django.filter import DjangoFilterConnectionField
 
 from media.models import Media
-from users.models import Profile, Education, Research, Certificate,\
-    WorkExperience, Skill, Badge
+from users.models import Identity, Profile, Education, Research,\
+    Certificate, WorkExperience, Skill, Badge
 from users.schemas.queries.skill import SkillFilter, SkillNode
 from users.schemas.queries.work_experience import WorkExperienceFilter,\
     WorkExperienceNode
@@ -17,6 +17,13 @@ from users.schemas.queries.education import EducationFilter, EducationNode
 from users.schemas.queries.badge import BadgeFilter, BadgeNode
 from media.schemas.queries.media import MediaFilter, MediaNode
 from utils.gravatar import get_gravatar_url
+
+
+class IdentityNode(DjangoObjectType):
+
+    class Meta:
+        model = Identity
+        interfaces = (relay.Node, )
 
 
 class UserFilter(django_filters.FilterSet):
@@ -94,7 +101,7 @@ class UserNode(DjangoObjectType):
     class Meta:
         model = User
         interfaces = (relay.Node, )
-        only_fields = ['id', 'username', 'first_name', 'last_name',
+        only_fields = ['id', 'identity', 'username', 'first_name', 'last_name',
                        'date_joined', 'profile', 'educations']
 
     def resolve_avatar(self, args, context, info):

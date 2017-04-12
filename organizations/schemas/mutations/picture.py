@@ -29,6 +29,9 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
         media_id = from_global_id(media_id)[1]
         media = Media.objects.get(pk=media_id)
 
+        if not media.identity.validate_organization(organization):
+            raise Exception("Invalid Media Identiy")
+
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
@@ -65,6 +68,10 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
         media_id = input.get('picture_id')
         media_id = from_global_id(media_id)[1]
         picture_media = Media.objects.get(pk=media_id)
+
+        if not picture_media.identity.validate_organization(
+                picture.organization):
+            raise Exception("Invalid Media Identiy")
 
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")

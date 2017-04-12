@@ -19,9 +19,16 @@ media_file_storage = MediaStorage(location=settings.MEDIA_DIR)
 
 
 class Media(models.Model):
-    file = models.FileField(upload_to=get_upload_path, storage=media_file_storage)
+    identity = models.ForeignKey(
+        'users.Identity',
+        related_name="identity_medias",
+        on_delete=models.CASCADE)
+    file = models.FileField(
+        upload_to=get_upload_path,
+        storage=media_file_storage)
     uploader = models.ForeignKey(User, related_name="medias",
-                                 on_delete=models.CASCADE)
+                                 on_delete=models.SET_NULL,
+                                 null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

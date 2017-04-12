@@ -106,4 +106,5 @@ class OrganizationNode(DjangoObjectType):
             'description',
             'advantages',
             'correspondence_language',
+            'identity',
         ]
