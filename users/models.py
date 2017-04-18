@@ -82,9 +82,9 @@ class Profile(models.Model):
     national_code = models.CharField(max_length=20, blank=True,
                                      validators=[RegexValidator('^\d{10}$')])
     birth_date = models.CharField(max_length=10, blank=True, null=True)
-    web_site = ArrayField(models.URLField(), blank=True, null=True)
-    phone = ArrayField(PhoneField(), blank=True, null=True)
-    mobile = ArrayField(PhoneField(), blank=True, null=True)
+    web_site = ArrayField(models.URLField(), blank=True, default=[])
+    phone = ArrayField(PhoneField(), blank=True, default=[])
+    mobile = ArrayField(PhoneField(), blank=True, default=[])
     fax = PhoneField(blank=True)
     telegram_account = models.CharField(
         max_length=256, blank=True, validators=[
