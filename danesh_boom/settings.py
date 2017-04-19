@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
+from django.utils.translation import ugettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from danesh_boom.social_auth_pipeline import LOCAL_SOCIAL_AUTH_PIPELINE
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -114,6 +116,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+LANGUAGE_SESSION_KEY = 'LANG'
+LANGUAGES = [
+    ('fa', _('Persian')),
+    ('en', _('English')),
+]
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -138,7 +148,8 @@ STATIC_URL = '/static/'
 
 FRONTEND_DEV = CONFIG.get('FRONTEND_DEV')
 FRONTEND_ROOT = os.path.join(BASE_DIR, CONFIG.get('FRONTEND_ROOT'))
-FRONTEND_BUILD_ROOT = os.path.join(FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
+FRONTEND_BUILD_ROOT = os.path.join(
+    FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -146,10 +157,12 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
 
-STATIC_ASSET_MANIFEST = load_static_asset_manifest(FRONTEND_BUILD_ROOT, FRONTEND_DEV)
+STATIC_ASSET_MANIFEST = load_static_asset_manifest(
+    FRONTEND_BUILD_ROOT, FRONTEND_DEV)
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get(
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
@@ -163,11 +176,18 @@ SOCIAL_AUTH_INACTIVE_USER_URL = '/#/auth/inactive-user/'
 
 GRAPHENE = {
     'SCHEMA': 'danesh_boom.schema.schema',
-    'SCHEMA_OUTPUT': os.path.join(BASE_DIR, FRONTEND_ROOT, 'graphql.schema.json'),
+    'SCHEMA_OUTPUT': os.path.join(
+        BASE_DIR,
+        FRONTEND_ROOT,
+        'graphql.schema.json'),
 }
 
 # x-sendfile
 SENDFILE_BACKEND = CONFIG.get('SENDFILE_BACKEND')
-SENDFILE_ROOT = os.path.normpath(os.path.join(BASE_DIR, CONFIG.get('SENDFILE_ROOT')))
+SENDFILE_ROOT = os.path.normpath(
+    os.path.join(
+        BASE_DIR,
+        CONFIG.get('SENDFILE_ROOT')))
 SENDFILE_URL = CONFIG.get('SENDFILE_URL')
-MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')  # not MEDIA_ROOT. this is media app settings
+# not MEDIA_ROOT. this is media app settings
+MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')

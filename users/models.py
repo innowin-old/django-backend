@@ -142,7 +142,7 @@ class Education(models.Model):
                 raise ValidationError(_('Invalid to date'))
 
         if from_date and to_date and from_date > to_date:
-            raise ValidationError(_('To date must be greather than from date'))
+            raise ValidationError(_('To date must be greater than from date'))
 
 
 class Research(models.Model):
@@ -224,7 +224,7 @@ class WorkExperience(models.Model):
                 raise ValidationError(_('Invalid to date'))
 
         if from_date and to_date and from_date > to_date:
-            raise ValidationError(_('To date must be greather than from date'))
+            raise ValidationError(_('To date must be greater than from date'))
 
 
 class Skill(models.Model):

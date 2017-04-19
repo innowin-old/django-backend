@@ -1,12 +1,9 @@
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.conf import settings
-from django.core.signing import TimestampSigner, SignatureExpired,\
-    BadSignature
 
-from datetime import timedelta
+from utils.token import validate_token
 
 
 @ensure_csrf_cookie
@@ -35,36 +32,11 @@ def logout_page(request):
 
 
 def active_user(request, token):
-    signer = TimestampSigner()
+    err, user = validate_token(token)
+    if user:
+        # active user
+        user.is_active = True
+        user.save()
+        err = 'success-activation'
 
-    # get user id
-    try:
-        user_id = signer.unsign(token, max_age=timedelta(days=1))
-    except SignatureExpired:
-        context = {
-            'msg': 'Token was Expired',
-        }
-        return render(request, 'activation.html', context)
-    except BadSignature:
-        context = {
-            'msg': 'Token does not Match',
-        }
-        return render(request, 'activation.html', context)
-
-    # fetch user
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        context = {
-            'msg': 'User Does Not Exist',
-        }
-        return render(request, 'activation.html', context)
-
-    # active user
-    user.is_active = True
-    user.save()
-
-    context = {
-        'msg': 'User Actived Successfully',
-    }
-    return render(request, 'activation.html', context)
+    return redirect('/#/auth/{}/'.format(err))

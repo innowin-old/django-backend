@@ -1,0 +1,127 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-19 14:02+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: danesh_boom/models/fields.py:9
+msgid "Phone"
+msgstr ""
+
+#: danesh_boom/settings.py:121
+msgid "Persian"
+msgstr "فارسی"
+
+#: danesh_boom/settings.py:122
+msgid "English"
+msgstr "English"
+
+#: users/models.py:36
+msgid "User or Organization should be set"
+msgstr ""
+
+#: users/models.py:39
+msgid "Only on of User or Organization should be set"
+msgstr ""
+
+#: users/models.py:102 users/models.py:105
+msgid "Invalid birth date"
+msgstr ""
+
+#: users/models.py:137 users/models.py:219
+msgid "Invalid from date"
+msgstr ""
+
+#: users/models.py:142 users/models.py:224
+msgid "Invalid to date"
+msgstr ""
+
+#: users/models.py:145 users/models.py:227
+msgid "To date must be greater than from date"
+msgstr ""
+
+#: users/models.py:206 users/models.py:209
+msgid "Please enter name or organization"
+msgstr ""
+
+#: users/models.py:212
+msgid "Invalid status"
+msgstr ""
+
+#: users/schemas/mutations/user.py:46
+msgid "Activation Email"
+msgstr "فعال‌سازی ایمیل"
+
+#: users/templates/activation_email.txt:2
+msgid "Please go to the following page and active your account"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:6
+msgid "Home"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:17
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:21
+msgid "New password:"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:23
+msgid "Confirm password:"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:24
+msgid "Change my password"
+msgstr ""
+
+#: users/templates/password_reset_confirm.html:29
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: users/templates/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: users/templates/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: users/templates/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: users/templates/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: users/templates/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""

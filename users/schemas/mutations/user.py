@@ -1,14 +1,18 @@
+from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
-from django.core.signing import TimestampSigner
 from django.template import loader
+from django.urls import reverse
+from django.utils import translation
+from django.utils.translation import ugettext_lazy as _
 from graphene import relay, Field, List, String, Boolean
 
 from danesh_boom.viewer_fields import ViewerFields
 from users.forms import ProfileForm, RegisterUserForm
 from users.models import Profile
 from users.schemas.queries.user import UserNode, ProfileNode
+from utils.token import generate_token
 
 
 class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
@@ -38,27 +42,28 @@ class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
         Profile.objects.create(user=user)
 
         # send activation email
-        from_email = 'info@daneshboom.com'
+        translation.activate('fa')
+        from_email = settings.EMAIL_FROM
         to_email = user.email
-        signer = TimestampSigner()
-        token = signer.sign(user.pk)
-        subject = "Activation Email"
+        token = generate_token(user)
+        subject = _("Activation Email")
         current_site = get_current_site(context)
         domain = current_site.domain
+        link = 'http://' + domain + reverse('active', kwargs={'token': token})
         context = {
+            'link': link,
             'email': user.email,
-            'domain': domain,
             'user': user,
             'token': token,
-            'protocol': 'http',
         }
-        email_template = html_email_template = "activation_email.html"
-        body = loader.render_to_string(email_template, context)
+
+        text_body = loader.render_to_string("activation_email.txt", context)
+        html_body = loader.render_to_string("activation_email.html", context)
 
         email_message = EmailMultiAlternatives(
-            subject, body, from_email, [to_email])
-        html_email = loader.render_to_string(html_email_template, context)
-        email_message.attach_alternative(html_email, 'text/html')
+            subject, text_body, from_email, [to_email])
+
+        email_message.attach_alternative(html_body, 'text/html')
 
         email_message.send()
 
@@ -109,8 +114,8 @@ class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
                 'from_email': 'info@daneshboom.com',
                 'email_template_name': 'password_reset_email.html',
                 'request': context,
-                #'subject_template_name': subject_template_name,
-                #'html_email_template_name': html_email_template_name,
+                # 'subject_template_name': subject_template_name,
+                # 'html_email_template_name': html_email_template_name,
             }
             form.save(**opts)
 

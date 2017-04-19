@@ -1,4 +1,56 @@
-{% load i18n %}{% autoescape off %}
-{% trans "Please go to the following page and active your account" %}
-{{ protocol }}://{{ domain }}{% url 'active' token=token %}
-{% endautoescape %}
+{% load i18n %}
+<div
+        style="
+            max-width: 500px;
+            border: 1px solid #cecece;
+            border-top: 5px solid #688491;
+            margin: auto;
+            padding: 20px;
+            direction: rtl;
+        ">
+    <p>
+        کاربر گرامی،
+        {{ user.username }}
+        <br/>
+        سلام
+        <br/>
+        به دانش‌بوم خوش آمدید!
+        <br/>
+        برای تایید ایمیل
+        {{ user.email }}
+        و فعال سازی عضویت خود، لطفا روی لینک زیر کلیک کنید.
+    </p>
+    <div style="text-align: center">
+        <a
+                href="{{ link }}"
+                style="
+                    padding: 10px;
+                    background: #25b09d;
+                    color: #ffffff;
+                    text-decoration: none!important;
+                ">
+            فعال‌سازی
+        </a>
+    </div>
+    <p>
+
+        در صورتی که برای کلیک کردن با مشکل مواجه هستید، لینک زیر را در مرورگر خود باز نمایید.
+    </p>
+    <div style="font-size: 0.8em; color: #999; margin-top: 20px; direction: ltr;">
+        <a href="{{ link }}" style="color: #999; text-decoration: none!important;">{{ link }}</a>
+    </div>
+    <p>
+        دانش‌بوم؛ تسهیل کننده ارتباط در اکو سیستم دانش‌بنیان
+        <br/>
+        تلفن:
+        <span style="direction: ltr; display: inline-block;">+98 (21) 12345678</span>
+        <br/>
+        ایمیل:
+        <a href="mailto:info@daneshboom.ir">info@daneshboom.ir</a>
+    </p>
+    <p>
+        اگر شما در دانش‌بوم ثبت نام نکرده‌اید و این پیام به اشتباه برای شما ارسال شده است لطفا آن را نادیده بگیرید.
+    </p>
+
+
+</div>
