@@ -12,6 +12,7 @@ from danesh_boom.viewer_fields import ViewerFields
 from users.forms import ProfileForm, RegisterUserForm
 from users.models import Profile
 from users.schemas.queries.user import UserNode, ProfileNode
+from utils.Exceptions import ResponseError, FormError
 from utils.token import generate_token
 
 
@@ -31,7 +32,7 @@ class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
         if form.is_valid():
             user = form.save()
         else:
-            raise Exception(str(form.errors))
+            raise FormError(form.errors)
 
         # set password
         password = form.cleaned_data['password']
@@ -86,8 +87,11 @@ class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
 
         if user.has_usable_password():
             if not user.check_password(old_password):
-                raise Exception("Invalid Password")
+                raise ResponseError(
+                    "Invalid Password",
+                    code='invalid_old_password')
 
+        # TODO password validator
         # change password
         user.set_password(new_password)
         user.save()
@@ -151,6 +155,6 @@ class UpdateProfileMutation(ViewerFields, relay.ClientIDMutation):
         if form.is_valid():
             form.save()
         else:
-            raise Exception(str(form.errors))
+            raise FormError(form.errors)
 
         return UpdateProfileMutation(profile=profile)
