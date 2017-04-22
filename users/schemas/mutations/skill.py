@@ -5,6 +5,7 @@ from danesh_boom.viewer_fields import ViewerFields
 from users.schemas.queries.skill import SkillNode
 from users.models import Skill
 from users.forms import SkillForm
+from utils.relay_helpers import get_node
 
 
 class CreateSkillMutation(ViewerFields, relay.ClientIDMutation):
@@ -45,9 +46,12 @@ class UpdateSkillMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        skill_id = from_global_id(id)[1]
-        skill = Skill.objects.get(pk=skill_id)
+        skill_id = input.get('id', None)
+        skill = get_node(skill_id, context, info, Skill)
+
+        if not skill:
+            raise Exception("Invalid Skill")
+
         if skill.user != user:
             raise Exception("Invalid Access to Skill")
 
@@ -71,9 +75,12 @@ class DeleteSkillMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        skill_id = from_global_id(id)[1]
-        skill = Skill.objects.get(pk=skill_id)
+        skill_id = input.get('id', None)
+        skill = get_node(skill_id, context, info, Skill)
+
+        if not skill:
+            raise Exception("Invalid Skill")
+
         if skill.user != user:
             raise Exception("Invalid Access to Skill")
 

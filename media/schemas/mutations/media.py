@@ -1,10 +1,10 @@
 from graphene import relay, Field, String
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from media.forms import MediaForm
 from media.schemas.queries.media import MediaNode
 from users.models import Identity
+from utils.relay_helpers import get_node
 
 
 class CreateMediaMutation(ViewerFields, relay.ClientIDMutation):
@@ -19,10 +19,9 @@ class CreateMediaMutation(ViewerFields, relay.ClientIDMutation):
         user = context.user
 
         identity_id = input.get('identity_id')
-        identity_id = from_global_id(identity_id)[1]
-        identity = Identity.objects.get(pk=identity_id)
+        identity = get_node(identity_id, context, info, Identity)
 
-        if not identity.validate_user(user):
+        if not identity or not identity.validate_user(user):
             raise Exception("Invalid Identity")
 
         if not 'file' in context.FILES:

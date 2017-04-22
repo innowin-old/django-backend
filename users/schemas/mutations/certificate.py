@@ -1,15 +1,14 @@
 from graphene import relay, Field, String, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from media.models import Media
-from users.schemas.queries.certificate import CertificateNode
-from users.models import Certificate
 from users.forms import CertificateForm
+from users.models import Certificate
+from users.schemas.queries.certificate import CertificateNode
+from utils.relay_helpers import get_node
 
 
 class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         title = String(required=True)
         picture_id = String()
@@ -20,12 +19,8 @@ class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
 
-        picture = None
         picture_id = input.get('picture_id')
-
-        if picture_id:
-            picture_id = from_global_id(picture_id)[1]
-            picture = Media.objects.get(pk=picture_id)
+        picture = get_node(picture_id, context, info, Media)
 
         # create certificate
         form = CertificateForm(input, context.FILES)
@@ -41,7 +36,6 @@ class CreateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         id = String(required=True)
         picture_id = String()
@@ -52,17 +46,16 @@ class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        certificate_id = from_global_id(id)[1]
-        certificate = Certificate.objects.get(pk=certificate_id)
+        certificate_id = input.get('id', None)
+        certificate = get_node(certificate_id, context, info, Certificate)
+        if not certificate:
+            raise Exception("Invalid Certificate")
+
         if certificate.user != user:
             raise Exception("Invalid Access to Certificate")
 
-        picture = None
         picture_id = input.get('picture_id')
-        if picture_id:
-            picture_id = from_global_id(picture_id)[1]
-            picture = Media.objects.get(pk=picture_id)
+        picture = get_node(picture_id, context, info, Media)
 
         # update certificate
         certificate.picture = picture
@@ -76,7 +69,6 @@ class UpdateCertificateMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class DeleteCertificateMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         id = String(required=True)
 
@@ -85,11 +77,12 @@ class DeleteCertificateMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        certificate_id = from_global_id(id)[1]
-        certificate = Certificate.objects.get(pk=certificate_id)
+        certificate_id = input.get('id', None)
+        certificate = get_node(certificate_id, context, info, Certificate)
+        if not certificate:
+            raise Exception("Invalid Certificate")
         if certificate.user != user:
-            raise Exception("Invalid Access to Work Certificate")
+            raise Exception("Invalid Access to Certificate")
 
         # delete certificate
         certificate.delete()

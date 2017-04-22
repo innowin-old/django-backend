@@ -1,10 +1,11 @@
 from graphene import relay, Field, String, Boolean, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
-from users.schemas.queries.work_experience import WorkExperienceNode
-from users.models import WorkExperience
+from organizations.models import Organization
 from users.forms import WorkExperienceForm
+from users.models import WorkExperience
+from users.schemas.queries.work_experience import WorkExperienceNode
+from utils.relay_helpers import get_node
 
 
 class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
@@ -20,15 +21,15 @@ class CreateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
     work_experience = Field(WorkExperienceNode)
 
     @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
+    def mutate_and_get_payload(cls, args, context, info):
         user = context.user
-        organization_id = input.get('organization_id', None)
-        if organization_id:
-            organization_id = from_global_id(organization_id)[1]
-            input['organization'] = organization_id
+        organization_id = args.get('organization_id', None)
+        organization = get_node(organization_id, context, info, Organization)
+        if organization:
+            args['organization'] = organization.id
 
         # create work experience
-        form = WorkExperienceForm(input)
+        form = WorkExperienceForm(args)
         if form.is_valid():
             new_work_experience = form.save(commit=False)
             new_work_experience.user = user
@@ -55,21 +56,25 @@ class UpdateWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
     work_experience = Field(WorkExperienceNode)
 
     @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
+    def mutate_and_get_payload(cls, args, context, info):
         user = context.user
-        id = input.get('id', None)
-        work_experience_id = from_global_id(id)[1]
-        work_experience = WorkExperience.objects.get(pk=work_experience_id)
+        work_experience_id = args.get('id', None)
+        work_experience = get_node(
+            work_experience_id, context, info, WorkExperience)
+
+        if not work_experience:
+            raise Exception("Invalid Work Experience id")
+
         if work_experience.user != user:
             raise Exception("Invalid Access to Work Experience")
 
-        organization_id = input.get('organization_id', None)
-        if organization_id:
-            organization_id = from_global_id(organization_id)[1]
-            input['organization'] = organization_id
+        organization_id = args.get('organization_id', None)
+        organization = get_node(organization_id, context, info, Organization)
+        if organization:
+            args['organization'] = organization.id
 
         # update work experience
-        form = WorkExperienceForm(input, instance=work_experience)
+        form = WorkExperienceForm(args, instance=work_experience)
         if form.is_valid():
             form.save()
         else:
@@ -87,15 +92,19 @@ class ConfirmWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
     work_experience = Field(WorkExperienceNode)
 
     @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
+    def mutate_and_get_payload(cls, args, context, info):
         user = context.user
-        id = input.get('id', None)
-        work_experience_id = from_global_id(id)[1]
-        work_experience = WorkExperience.objects.get(pk=work_experience_id)
+        work_experience_id = args.get('id', None)
+        work_experience = get_node(
+            work_experience_id, context, info, WorkExperience)
+
+        if not work_experience:
+            raise Exception("Invalid Work Experience id")
+
         if work_experience.organization.user != user:
             raise Exception("Invalid Access to Work Experience")
 
-        confirm = input.get('confirm')
+        confirm = args.get('confirm')
         if confirm:
             work_experience.status = 'CONFIRMED'
         else:
@@ -113,11 +122,15 @@ class DeleteWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
     deleted_id = ID()
 
     @classmethod
-    def mutate_and_get_payload(cls, input, context, info):
+    def mutate_and_get_payload(cls, args, context, info):
         user = context.user
-        id = input.get('id', None)
-        work_experience_id = from_global_id(id)[1]
-        work_experience = WorkExperience.objects.get(pk=work_experience_id)
+        work_experience_id = args.get('id', None)
+        work_experience = get_node(
+            work_experience_id, context, info, WorkExperience)
+
+        if not work_experience:
+            raise Exception("Invalid Work Experience")
+
         if work_experience.user != user:
             raise Exception("Invalid Access to Work Experience")
 
