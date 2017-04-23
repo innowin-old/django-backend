@@ -1,11 +1,11 @@
 from graphene import relay, Field, String, ID
-from graphql_relay.node.node import from_global_id
 from django.contrib.auth.models import User
 
 from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, UserAgent
 from organizations.schemas.queries.user_agent import UserAgentNode
 from organizations.forms import UserAgentForm
+from utils.relay_helpers import get_node
 
 
 class CreateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
@@ -20,16 +20,20 @@ class CreateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        organization_id = input.get('organization_id')
-        organization_id = from_global_id(organization_id)[1]
-        organization = Organization.objects.get(pk=organization_id)
+        organization_id = input.get('id', None)
+        organization = get_node(organization_id, context, info, Organization)
 
-        user_agent_id = input.get('user_id')
-        user_agent_id = from_global_id(user_agent_id)[1]
-        user_agent = User.objects.get(pk=user_agent_id)
+        if not organization:
+            raise Exception("Invalid Organization")
 
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
+
+        user_agent_id = input.get('user_id')
+        user_agent = get_node(user_agent_id, context, info, User)
+
+        if not user_agent:
+            raise Exception("Invalid User")
 
         # TODO check business logic
         if organization.user == user_agent:
@@ -59,9 +63,11 @@ class UpdateUserAgentMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        user_agent_id = from_global_id(id)[1]
-        user_agent = UserAgent.objects.get(pk=user_agent_id)
+        user_agent_id = input.get('id')
+        user_agent = get_node(user_agent_id, context, info, UserAgent)
+
+        if not user_agent:
+            raise Exception("Invalid User Agent")
 
         if user_agent.organization.user != user:
             raise Exception("Invalid Access to Organization")
@@ -86,9 +92,11 @@ class DeleteUserAgentMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        user_agent_id = from_global_id(id)[1]
-        user_agent = UserAgent.objects.get(pk=user_agent_id)
+        user_agent_id = input.get('id')
+        user_agent = get_node(user_agent_id, context, info, UserAgent)
+
+        if not user_agent:
+            raise Exception("Invalid User Agent")
 
         if user_agent.organization.user != user:
             raise Exception("Invalid Access to Organization")

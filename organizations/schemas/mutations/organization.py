@@ -1,11 +1,11 @@
 from graphene import relay, Field, List, String, Int, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization
 from organizations.schemas.queries.organization import OrganizationNode
 from organizations.forms import OrganizationForm
 from media.models import Media
+from utils.relay_helpers import get_node
 
 
 class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
@@ -37,11 +37,8 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
 
-        logo = None
         logo_id = input.get('logo_id')
-        if logo_id:
-            logo_id = from_global_id(logo_id)[1]
-            logo = Media.objects.get(pk=logo_id)
+        logo = get_node(logo_id, context, info, Media)
 
         # create organization
         form = OrganizationForm(input)
@@ -85,17 +82,17 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        organization_id = from_global_id(id)[1]
-        organization = Organization.objects.get(pk=organization_id)
+        organization_id = input.get('id', None)
+        organization = get_node(organization_id, context, info, Organization)
+
+        if not organization:
+            raise Exception("Invalid Organization")
+
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 
-        logo = None
         logo_id = input.get('logo_id')
-        if logo_id:
-            logo_id = from_global_id(logo_id)[1]
-            logo = Media.objects.get(pk=logo_id)
+        logo = get_node(logo_id, context, info, Media)
 
         # update organization
         organization.logo = logo
@@ -118,9 +115,12 @@ class DeleteOrganizationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        organization_id = from_global_id(id)[1]
-        organization = Organization.objects.get(pk=organization_id)
+        organization_id = input.get('id', None)
+        organization = get_node(organization_id, context, info, Organization)
+
+        if not organization:
+            raise Exception("Invalid Organization")
+
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
 

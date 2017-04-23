@@ -1,10 +1,10 @@
 from graphene import relay, Field, String, Int, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, StaffCount
 from organizations.schemas.queries.staff_count import StaffCountNode
 from organizations.forms import StaffCountForm
+from utils.relay_helpers import get_node
 
 
 class CreateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
@@ -18,9 +18,11 @@ class CreateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        organization_id = input.get('organization_id')
-        organization_id = from_global_id(organization_id)[1]
-        organization = Organization.objects.get(pk=organization_id)
+        organization_id = input.get('organization_id', None)
+        organization = get_node(organization_id, context, info, Organization)
+
+        if not organization:
+            raise Exception("Invalid Organization")
 
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
@@ -48,9 +50,11 @@ class UpdateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        staff_count_id = from_global_id(id)[1]
-        staff_count = StaffCount.objects.get(pk=staff_count_id)
+        staff_count_id = input.get('id')
+        staff_count = get_node(staff_count_id, context, info, StaffCount)
+
+        if not staff_count:
+            raise Exception("Invalid Staff Count")
 
         if staff_count.organization.user != user:
             raise Exception("Invalid Access to Organization")
@@ -77,9 +81,11 @@ class DeleteStaffCountMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        staff_count_id = from_global_id(id)[1]
-        staff_count = StaffCount.objects.get(pk=staff_count_id)
+        staff_count_id = input.get('id')
+        staff_count = get_node(staff_count_id, context, info, StaffCount)
+
+        if not staff_count:
+            raise Exception("Invalid Staff Count")
 
         if staff_count.organization.user != user:
             raise Exception("Invalid Access to Organization")

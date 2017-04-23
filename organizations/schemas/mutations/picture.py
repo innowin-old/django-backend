@@ -1,11 +1,11 @@
 from graphene import relay, Field, String, Int, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from organizations.models import Organization, Picture
 from organizations.schemas.queries.picture import PictureNode
 from organizations.forms import PictureForm
 from media.models import Media
+from utils.relay_helpers import get_node
 
 
 class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
@@ -21,19 +21,23 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        organization_id = input.get('organization_id')
-        organization_id = from_global_id(organization_id)[1]
-        organization = Organization.objects.get(pk=organization_id)
+        organization_id = input.get('organization_id', None)
+        organization = get_node(organization_id, context, info, Organization)
 
-        media_id = input.get('picture_id')
-        media_id = from_global_id(media_id)[1]
-        media = Media.objects.get(pk=media_id)
-
-        if not media.identity.validate_organization(organization):
-            raise Exception("Invalid Media Identiy")
+        if not organization:
+            raise Exception("Invalid Organization")
 
         if organization.user != user:
             raise Exception("Invalid Access to Organization")
+
+        media_id = input.get('picture_id')
+        media = get_node(media_id, context, info, Media)
+
+        if not media:
+            raise Exception("Invalid Media")
+
+        if not media.identity.validate_organization(organization):
+            raise Exception("Invalid Media Identiy")
 
         # create picture
         form = PictureForm(input, context.FILES)
@@ -61,23 +65,26 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        picture_id = from_global_id(id)[1]
-        picture = Picture.objects.get(pk=picture_id)
+        picture_id = input.get('id')
+        picture = get_node(picture_id, context, info, Picture)
+
+        if not picture:
+            raise Exception("Invalid Picture")
 
         media_id = input.get('picture_id')
-        media_id = from_global_id(media_id)[1]
-        picture_media = Media.objects.get(pk=media_id)
+        media = get_node(media_id, context, info, Media)
 
-        if not picture_media.identity.validate_organization(
-                picture.organization):
+        if not media:
+            raise Exception("Invalid Media")
+
+        if not media.identity.validate_organization(picture.organization):
             raise Exception("Invalid Media Identiy")
 
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")
 
         # update picture
-        picture.picture = picture_media
+        picture.picture = media
 
         form = PictureForm(input, context.FILES, instance=picture)
         if form.is_valid():
@@ -98,9 +105,11 @@ class DeletePictureMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id')
-        picture_id = from_global_id(id)[1]
-        picture = Picture.objects.get(pk=picture_id)
+        picture_id = input.get('id')
+        picture = get_node(picture_id, context, info, Picture)
+
+        if not picture:
+            raise Exception("Invalid Picture")
 
         if picture.organization.user != user:
             raise Exception("Invalid Access to Organization")

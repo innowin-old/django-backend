@@ -1,10 +1,10 @@
 from graphene import relay, Field, String, Float, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from users.schemas.queries.education import EducationNode
 from users.models import Education
 from users.forms import EducationForm
+from utils.relay_helpers import get_node
 
 
 class CreateEducationMutation(ViewerFields, relay.ClientIDMutation):
@@ -53,9 +53,12 @@ class UpdateEducationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        education_id = from_global_id(id)[1]
-        education = Education.objects.get(pk=education_id)
+        education_id = input.get('id', None)
+        education = get_node(education_id, context, info, Education)
+
+        if not education:
+            raise Exception("Invalid Education")
+
         if education.user != user:
             raise Exception("Invalid Access to Education")
 
@@ -79,9 +82,12 @@ class DeleteEducationMutation(ViewerFields, relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
         user = context.user
-        id = input.get('id', None)
-        education_id = from_global_id(id)[1]
-        education = Education.objects.get(pk=education_id)
+        education_id = input.get('id', None)
+        education = get_node(education_id, context, info, Education)
+
+        if not education:
+            raise Exception("Invalid Education")
+
         if education.user != user:
             raise Exception("Invalid Access to Education")
 

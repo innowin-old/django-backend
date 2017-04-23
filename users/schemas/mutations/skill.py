@@ -1,5 +1,4 @@
 from graphene import relay, Field, List, String, ID
-from graphql_relay.node.node import from_global_id
 
 from danesh_boom.viewer_fields import ViewerFields
 from users.schemas.queries.skill import SkillNode
