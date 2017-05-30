@@ -10,6 +10,8 @@ from django.core.validators import MaxValueValidator, \
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from danesh_boom.models import PhoneField
 from media.models import Media
@@ -73,6 +75,11 @@ def user_save(self, *args, **kwargs):
 
 
 User.save = user_save
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
 
 class Profile(models.Model):
