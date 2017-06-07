@@ -17,7 +17,6 @@ from utils.token import generate_token
 
 
 class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         username = String()
         email = String()
@@ -38,7 +37,6 @@ class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
         password = form.cleaned_data['password']
         user.set_password(password)
         user.save()
-
 
         # send activation email
         translation.activate('fa')
@@ -70,7 +68,6 @@ class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         old_password = String()
         new_password = String()
@@ -98,7 +95,6 @@ class ChangePasswordMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         email = String()
 
@@ -125,7 +121,6 @@ class PasswordResetMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class UpdateProfileMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         public_email = String()
         national_code = String()
