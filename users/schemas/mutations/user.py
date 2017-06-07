@@ -39,8 +39,6 @@ class RegisterUserMutation(ViewerFields, relay.ClientIDMutation):
         user.set_password(password)
         user.save()
 
-        # create user Profile
-        Profile.objects.create(user=user)
 
         # send activation email
         translation.activate('fa')
