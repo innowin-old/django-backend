@@ -7,6 +7,8 @@ from organizations.schemas.queries import OrganizationQuery
 from organizations.schemas.mutations import OrganizationMutation
 from users.schemas.queries import UserQuery
 from users.schemas.mutations import UserMutation
+from products.schemas.queries import ProductQuery
+from products.schemas.mutations import ProductMutation
 from danesh_boom.viewer_fields import ViewerFields
 
 
@@ -14,6 +16,7 @@ class ViewerNode(
         UserQuery,
         OrganizationQuery,
         MediaQuery,
+        ProductQuery,
         ObjectType):
 
     class Meta:
@@ -34,6 +37,7 @@ class Mutation(
         UserMutation,
         OrganizationMutation,
         MediaMutation,
+        ProductMutation,
         ObjectType):
     pass
 
