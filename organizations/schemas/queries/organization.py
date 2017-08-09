@@ -107,4 +107,5 @@ class OrganizationNode(DjangoObjectType):
             'advantages',
             'correspondence_language',
             'identity',
+            'telegram_channel',
         ]
