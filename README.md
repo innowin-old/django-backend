@@ -16,6 +16,11 @@ change configs in `config.yml` file.
 cp default-config.yml config.yml
 ```
 
+## create DB using docker
+```bash
+docker run --name danesh-boom-postgres -e POSTGRES_PASSWORD=123 -e POSTGRES_DB='danesh-boom' -d -p=5432:5432 postgres:9
+```
+
 ## Init DB
 ```
 python manage.py migrate
