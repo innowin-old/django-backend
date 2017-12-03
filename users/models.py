@@ -46,7 +46,7 @@ class Identity(models.Model):
     def validate_user(self, user):
         if self.user and self.user == user:
             return True
-        elif self.organization and self.organization.user == user:
+        elif self.organization and self.organization.owner == user:
             return True
         return False
 
@@ -75,6 +75,7 @@ def user_save(self, *args, **kwargs):
 
 
 User.save = user_save
+
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):

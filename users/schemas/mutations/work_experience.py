@@ -101,7 +101,7 @@ class ConfirmWorkExperienceMutation(ViewerFields, relay.ClientIDMutation):
         if not work_experience:
             raise Exception("Invalid Work Experience id")
 
-        if work_experience.organization.user != user:
+        if work_experience.organization.owner != user:
             raise Exception("Invalid Access to Work Experience")
 
         confirm = args.get('confirm')

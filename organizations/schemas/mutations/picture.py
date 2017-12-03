@@ -27,7 +27,7 @@ class CreatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if not organization:
             raise Exception("Invalid Organization")
 
-        if organization.user != user:
+        if organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         media_id = input.get('picture_id')
@@ -80,7 +80,7 @@ class UpdatePictureMutation(ViewerFields, relay.ClientIDMutation):
         if not media.identity.validate_organization(picture.organization):
             raise Exception("Invalid Media Identiy")
 
-        if picture.organization.user != user:
+        if picture.organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         # update picture
@@ -111,7 +111,7 @@ class DeletePictureMutation(ViewerFields, relay.ClientIDMutation):
         if not picture:
             raise Exception("Invalid Picture")
 
-        if picture.organization.user != user:
+        if picture.organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         # delete picture in media model

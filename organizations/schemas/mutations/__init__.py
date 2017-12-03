@@ -1,12 +1,10 @@
 from graphene import AbstractType
 
-from organizations.schemas.mutations.organization import CreateOrganizationMutation,\
+from organizations.schemas.mutations.organization import CreateOrganizationMutation, \
     UpdateOrganizationMutation, DeleteOrganizationMutation
-from organizations.schemas.mutations.user_agent import CreateUserAgentMutation,\
-    UpdateUserAgentMutation, DeleteUserAgentMutation
-from organizations.schemas.mutations.picture import CreatePictureMutation,\
+from organizations.schemas.mutations.picture import CreatePictureMutation, \
     UpdatePictureMutation, DeletePictureMutation
-from organizations.schemas.mutations.staff_count import CreateStaffCountMutation,\
+from organizations.schemas.mutations.staff_count import CreateStaffCountMutation, \
     UpdateStaffCountMutation, DeleteStaffCountMutation
 
 
@@ -15,11 +13,6 @@ class OrganizationMutation(AbstractType):
     create_organization = CreateOrganizationMutation.Field()
     update_organization = UpdateOrganizationMutation.Field()
     delete_organization = DeleteOrganizationMutation.Field()
-
-    # ---------------- UserAgent ----------------
-    create_organization_user_agent = CreateUserAgentMutation.Field()
-    update_organization_user_agent = UpdateUserAgentMutation.Field()
-    delete_organization_user_agent = DeleteUserAgentMutation.Field()
 
     # ---------------- Picture ----------------
     create_organization_picture = CreatePictureMutation.Field()

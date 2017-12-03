@@ -6,46 +6,46 @@ from organizations.schemas.queries.organization import OrganizationNode
 from organizations.forms import OrganizationForm
 from media.models import Media
 from utils.relay_helpers import get_node
+from django.contrib.auth.models import User
+
+
+def add_admins(organization, input, context, info):
+    admins_id = input.get('admins_id', None)
+    admins_pk = []
+    if admins_id:
+        for id in admins_id:
+            admin = get_node(id, context, info, User)
+            if admin:
+                organization.admins.add(admin)
+                admins_pk.append(admin.pk)
+    for extra_admin in User.objects.filter(organ_admins=organization).exclude(pk__in=admins_pk):
+        organization.admins.remove(extra_admin)
 
 
 class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
-        name = String(required=True)
-        organ_name = String(required=True)
+        username = String(required=True)
+        nike_name = String()
+        official_name = String(required=True)
         national_code = String(required=True)
-        registration_ads_url = String()
-        registrar_organization = String()
         country = String(required=True)
         province = String(required=True)
-        city = String()
-        address = String()
-        phone = List(String)
-        web_site = String()
-        established_year = Int()
-        ownership_type = String()
+        city = String(required=True)
+        ownership_type = String(required=True)
         business_type = List(String, required=True)
-        logo_id = String()
-        description = String()
-        advantages = String()
-        correspondence_language = List(String)
-        telegram_channel = String()
 
     organization = Field(OrganizationNode)
 
     @classmethod
     def mutate_and_get_payload(cls, input, context, info):
-        user = context.user
 
-        logo_id = input.get('logo_id')
-        logo = get_node(logo_id, context, info, Media)
+        user = context.user
 
         # create organization
         form = OrganizationForm(input)
         if form.is_valid():
             new_organization = form.save(commit=False)
-            new_organization.user = user
-            new_organization.logo = logo
+            new_organization.owner = user
             new_organization.save()
         else:
             raise Exception(str(form.errors))
@@ -54,28 +54,30 @@ class CreateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         id = String(required=True)
-        name = String(required=True)
-        organ_name = String(required=True)
+        admins_id = List(String)
+        username = String(required=True)
+        nike_name = String()
+        official_name = String(required=True)
         national_code = String(required=True)
         registration_ads_url = String()
         registrar_organization = String()
         country = String(required=True)
         province = String(required=True)
-        city = String()
+        city = String(required=True)
         address = String()
         phone = List(String)
         web_site = String()
         established_year = Int()
-        ownership_type = String()
+        ownership_type = String(required=True)
         business_type = List(String, required=True)
         logo_id = String()
+        biography = String()
         description = String()
-        advantages = String()
         correspondence_language = List(String)
-        telegram_channel = String()
+        social_network = List(String)
+        staff_count = Int()
 
     organization = Field(OrganizationNode)
 
@@ -88,17 +90,20 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         if not organization:
             raise Exception("Invalid Organization")
 
-        if organization.user != user:
+        if organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         logo_id = input.get('logo_id')
         logo = get_node(logo_id, context, info, Media)
 
-        # update organization
+        # update logo
         organization.logo = logo
+
+        # update organization
         form = OrganizationForm(input, instance=organization)
         if form.is_valid():
-            form.save()
+            add_admins(organization, input, context, info)
+            organization.save()
         else:
             raise Exception(str(form.errors))
 
@@ -106,7 +111,6 @@ class UpdateOrganizationMutation(ViewerFields, relay.ClientIDMutation):
 
 
 class DeleteOrganizationMutation(ViewerFields, relay.ClientIDMutation):
-
     class Input:
         id = String(required=True)
 
@@ -121,11 +125,8 @@ class DeleteOrganizationMutation(ViewerFields, relay.ClientIDMutation):
         if not organization:
             raise Exception("Invalid Organization")
 
-        if organization.user != user:
+        if organization.owner != user:
             raise Exception("Invalid Access to Organization")
-
-        # delete logo in media model
-        organization.logo.delete()
 
         # delete organization
         organization.delete()

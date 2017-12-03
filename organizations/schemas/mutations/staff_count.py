@@ -24,7 +24,7 @@ class CreateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
         if not organization:
             raise Exception("Invalid Organization")
 
-        if organization.user != user:
+        if organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         # create staff count
@@ -56,7 +56,7 @@ class UpdateStaffCountMutation(ViewerFields, relay.ClientIDMutation):
         if not staff_count:
             raise Exception("Invalid Staff Count")
 
-        if staff_count.organization.user != user:
+        if staff_count.organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         count = input.get('count')
@@ -87,7 +87,7 @@ class DeleteStaffCountMutation(ViewerFields, relay.ClientIDMutation):
         if not staff_count:
             raise Exception("Invalid Staff Count")
 
-        if staff_count.organization.user != user:
+        if staff_count.organization.owner != user:
             raise Exception("Invalid Access to Organization")
 
         # delete staff count

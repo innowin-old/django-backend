@@ -1,6 +1,5 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator, MinValueValidator
 from django.contrib.postgres.fields import ArrayField
 
 from media.models import Media
@@ -18,40 +17,50 @@ class Organization(models.Model):
         ('oth', 'سایر'),
     )
 
-    user = models.ForeignKey(User, related_name="organizations",
-                             on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    organ_name = models.CharField(max_length=75)
+    BUSINESS_TYPES = (
+        ('producer', 'تولید کننده'),
+        ('investor', 'سرمایه گذار'),
+        ('service provider', 'ارائه دهنده خدمات'),
+    )
+
+    owner = models.ForeignKey(User, related_name="organizations",
+                              on_delete=models.CASCADE)
+    admins = models.ManyToManyField(User,
+                                    related_name="organ_admins",
+                                    blank=True)
+    username = models.CharField(max_length=100, unique=True)
+    nike_name = models.CharField(max_length=100, null=True, blank=True)
+    official_name = models.CharField(max_length=75)
     national_code = models.CharField(max_length=20)
-    registration_ads_url = models.URLField(blank=True)
-    registrar_organization = models.CharField(max_length=100, blank=True)
+    registration_ads_url = models.URLField(null=True, blank=True)
+    registrar_organization = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=50)
     province = models.CharField(max_length=50)
-    city = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=50)
     address = models.TextField(blank=True)
-    phone = ArrayField(PhoneField(), blank=True, null=True)
-    web_site = models.URLField(blank=True)
+    phone = ArrayField(PhoneField(), blank=True, default=[])
+    web_site = models.URLField(null=True, blank=True)
     established_year = models.IntegerField(null=True, blank=True)
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
-        max_length=20,
-        default='oth')
-    business_type = ArrayField(models.CharField(max_length=100))
+        max_length=20)
+    business_type = ArrayField(models.CharField(
+        choices=BUSINESS_TYPES,
+        max_length=30)
+    )
     logo = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
+        null=True,
+        blank=True)
+    biography = models.TextField(max_length=256, blank=True)
     description = models.TextField(blank=True)
-    advantages = models.TextField(blank=True)
-    correspondence_language = ArrayField(
-        models.CharField(max_length=50), blank=True)
-    telegram_channel = models.CharField(
-        max_length=256, blank=True, validators=[
-            RegexValidator('^@[\w\d_]+$')])
+    correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[])
+    social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[])
+    staff_count = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.official_name
 
     def save(self, *args, **kwargs):
         from users.models import Identity
@@ -61,8 +70,10 @@ class Organization(models.Model):
                 identity = self.identity
             else:
                 identity = Identity(organization=self)
-            identity.name = self.organ_name
+            identity.name = self.official_name
             identity.save()
+            if self.staff_count:
+                StaffCount.objects.create(organization=self, count=self.staff_count)
 
 
 class StaffCount(models.Model):
@@ -72,7 +83,7 @@ class StaffCount(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s(%s)' % (self.organization.name, self.count)
+        return '%s(%s)' % (self.organization.official_name, self.count)
 
 
 class Picture(models.Model):
@@ -83,18 +94,4 @@ class Picture(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return self.organization.name
-
-
-class UserAgent(models.Model):
-    organization = models.ForeignKey(Organization, related_name="user_agents",
-                                     on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name="user_organizations",
-                             on_delete=models.CASCADE)
-    agent_subject = models.CharField(max_length=100, blank=True)
-
-    class Meta:
-        unique_together = (('organization', 'user'),)
-
-    def __str__(self):
-        return '%s(%s)' % (self.organization.name, self.user.username)
+        return self.organization.official_name
