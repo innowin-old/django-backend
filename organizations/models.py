@@ -131,3 +131,9 @@ class Staff(models.Model):
 class Follow(models.Model):
     identity = models.ForeignKey('users.Identity', related_name='followers', on_delete=models.CASCADE)
     follower = models.ForeignKey('users.Identity', related_name='following', on_delete=models.CASCADE)
+
+
+class Ability(models.Model):
+    organization = models.ForeignKey(Organization, related_name='abilities', on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    text = models.TextField()

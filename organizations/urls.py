@@ -7,7 +7,8 @@ from .views import (
     PictureViewset,
     PostViewset,
     StaffViewset,
-    FollowViewset
+    FollowViewset,
+    AbilityViewset
 )
 
 router = DefaultRouter()
@@ -16,6 +17,7 @@ router.register(r'pictures', PictureViewset)
 router.register(r'posts', PostViewset)
 router.register(r'staff', StaffViewset)
 router.register(r'followers', FollowViewset)
+router.register(r'abilities', AbilityViewset)
 router.register(r'', OrganizationViewset)
 
 urlpatterns = [

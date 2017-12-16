@@ -5,7 +5,8 @@ from .models import (
         Picture,
         Post,
         Staff,
-        Follow
+        Follow,
+        Ability
     )
 
 
@@ -42,4 +43,10 @@ class StaffSerializer(ModelSerializer):
 class FollowSerializer(ModelSerializer):
     class Meta:
         model = Follow
+        fields = '__all__'
+
+
+class AbilitySerializer(ModelSerializer):
+    class Meta:
+        model = Ability
         fields = '__all__'

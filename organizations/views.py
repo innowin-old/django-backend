@@ -7,7 +7,8 @@ from .models import (
         Picture,
         Post,
         Staff,
-        Follow
+        Follow,
+        Ability
     )
 
 from .serializers import (
@@ -16,7 +17,8 @@ from .serializers import (
         PictureSerializer,
         PostSerializer,
         StaffSerializer,
-        FollowSerializer
+        FollowSerializer,
+        AbilitySerializer
     )
 
 
@@ -200,3 +202,24 @@ class FollowViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return FollowSerializer
+
+
+class AbilityViewset(ModelViewSet):
+    queryset = Ability.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Ability.objects.all()
+
+        organization = self.request.query_params.get('organization', None)
+        if organization is not None:
+            queryset = queryset.filter(organization_id=organization)
+
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title=title)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return AbilitySerializer
