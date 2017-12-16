@@ -12,13 +12,15 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 from danesh_boom.models import PhoneField
 from media.models import Media
 from organizations.models import Organization
+from base.models import Base
 
 
-class Identity(models.Model):
+class Identity(Base):
     user = models.OneToOneField(
         User,
         related_name="identity",
@@ -83,7 +85,7 @@ def create_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
 
 
-class Profile(models.Model):
+class Profile(Base):
     user = models.OneToOneField(User, related_name="profile",
                                 on_delete=models.CASCADE)
     public_email = models.EmailField(null=True, blank=True)
@@ -113,7 +115,7 @@ class Profile(models.Model):
                 raise ValidationError(_('Invalid birth date'))
 
 
-class Education(models.Model):
+class Education(Base):
     user = models.ForeignKey(User, related_name="educations",
                              on_delete=models.CASCADE)
     grade = models.CharField(max_length=100)
@@ -153,7 +155,7 @@ class Education(models.Model):
             raise ValidationError(_('To date must be greater than from date'))
 
 
-class Research(models.Model):
+class Research(Base):
     user = models.ForeignKey(User, related_name="researches",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
@@ -167,7 +169,7 @@ class Research(models.Model):
         return "%s(%s)" % (self.user.username, self.title)
 
 
-class Certificate(models.Model):
+class Certificate(Base):
     user = models.ForeignKey(User, related_name="certificates",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
@@ -181,7 +183,7 @@ class Certificate(models.Model):
         return "%s(%s)" % (self.user.username, self.title)
 
 
-class WorkExperience(models.Model):
+class WorkExperience(Base):
     STATUSES = (
         ('WITHOUT_CONFIRM', 'بدون تایید'),
         ('WAIT_FOR_CONFIRM', 'منتظر تایید'),
@@ -235,7 +237,7 @@ class WorkExperience(models.Model):
             raise ValidationError(_('To date must be greater than from date'))
 
 
-class Skill(models.Model):
+class Skill(Base):
     user = models.ForeignKey(User, related_name="skills",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
@@ -246,7 +248,7 @@ class Skill(models.Model):
         return "%s(%s)" % (self.user.username, self.title)
 
 
-class Badge(models.Model):
+class Badge(Base):
     user = models.ForeignKey(User, related_name="badges",
                              on_delete=models.CASCADE)
     badge = models.CharField(max_length=100)

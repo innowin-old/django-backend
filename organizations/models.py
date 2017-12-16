@@ -4,9 +4,10 @@ from django.contrib.postgres.fields import ArrayField
 
 from media.models import Media
 from danesh_boom.models import PhoneField
+from base.models import Base
 
 
-class Organization(models.Model):
+class Organization(Base):
     OWNERSHIP_TYPES = (
         ('idi', 'موسسه انفرادی'),
         ('org', 'شرکت'),
@@ -76,7 +77,7 @@ class Organization(models.Model):
                 StaffCount.objects.create(organization=self, count=self.staff_count)
 
 
-class StaffCount(models.Model):
+class StaffCount(Base):
     organization = models.ForeignKey(Organization, related_name="staff_counts",
                                      on_delete=models.CASCADE)
     count = models.IntegerField()
@@ -86,7 +87,7 @@ class StaffCount(models.Model):
         return '%s(%s)' % (self.organization.official_name, self.count)
 
 
-class Picture(models.Model):
+class Picture(Base):
     organization = models.ForeignKey(Organization, related_name="pictures",
                                      on_delete=models.CASCADE)
     picture = models.ForeignKey(Media, on_delete=models.CASCADE)
@@ -97,7 +98,7 @@ class Picture(models.Model):
         return self.organization.official_name
 
 
-class Post(models.Model):
+class Post(Base):
     POST_TYPES = (
         ('post', 'پست'),
         ('offer', 'تقاضا'),
@@ -120,7 +121,7 @@ class Post(models.Model):
         return self.user.username
 
 
-class Staff(models.Model):
+class Staff(Base):
     organization = models.ForeignKey(Organization, related_name='staffs', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
 
@@ -128,18 +129,18 @@ class Staff(models.Model):
     post_permission = models.BooleanField(default=False)
 
 
-class Follow(models.Model):
+class Follow(Base):
     identity = models.ForeignKey('users.Identity', related_name='followers', on_delete=models.CASCADE)
     follower = models.ForeignKey('users.Identity', related_name='following', on_delete=models.CASCADE)
 
 
-class Ability(models.Model):
+class Ability(Base):
     organization = models.ForeignKey(Organization, related_name='abilities', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     text = models.TextField()
 
 
-class Confirmation(models.Model):
+class Confirmation(Base):
     corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant', on_delete=models.CASCADE)
     confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
@@ -148,7 +149,7 @@ class Confirmation(models.Model):
     confirm_flag = models.BooleanField(default=False)
 
 
-class Customer(models.Model):
+class Customer(Base):
     organization = models.ForeignKey(Organization, related_name='customer_organization', on_delete=models.CASCADE)
     related_customer = models.ForeignKey('users.Identity', related_name='customers', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)

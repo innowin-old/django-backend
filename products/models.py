@@ -4,9 +4,10 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 from media.models import Media
 from users.models import Identity
+from base.models import Base
 
 
-class Category(models.Model):
+class Category(Base):
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     name = models.CharField(max_length=100, unique=True, db_index=True)
     title = models.CharField(max_length=100, db_index=True)
@@ -16,7 +17,7 @@ class Category(models.Model):
         return self.name
 
 
-class CategoryField(models.Model):
+class CategoryField(Base):
     STRING = 'string'
     FLOAT = 'float'
     CHOICES = 'choices'
@@ -39,7 +40,7 @@ class CategoryField(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class Product(Base):
     owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE, db_index=True)
     category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE, db_index=True)
     name = models.CharField(max_length=100, db_index=True)
@@ -54,7 +55,7 @@ class Product(models.Model):
         return self.name
 
 
-class Price(models.Model):
+class Price(Base):
     product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True)
     price = models.FloatField()
     create_time = models.DateTimeField(auto_now_add=True)
@@ -63,7 +64,7 @@ class Price(models.Model):
         return '%s(%s)' % (self.product.name, self.price)
 
 
-class Picture(models.Model):
+class Picture(Base):
     product = models.ForeignKey(Product, related_name="pictures", on_delete=models.CASCADE, db_index=True)
     picture = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="product_picture")
     order = models.IntegerField(default=0)
@@ -73,7 +74,7 @@ class Picture(models.Model):
         return self.product.name
 
 
-class Comment(models.Model):
+class Comment(Base):
     product = models.ForeignKey(Product, related_name="product_comments", on_delete=models.CASCADE, db_index=True)
     user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE, db_index=True)
     text = models.TextField(db_index=True)
