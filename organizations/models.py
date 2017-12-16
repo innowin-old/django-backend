@@ -146,3 +146,10 @@ class Confirmation(models.Model):
     description = models.TextField()
     link = models.CharField(max_length=200)
     confirm_flag = models.BooleanField(default=False)
+
+
+class Customer(models.Model):
+    organization = models.ForeignKey(Organization, related_name='customer_organization', on_delete=models.CASCADE)
+    related_customer = models.ForeignKey('users.Identity', related_name='customers', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    picture = models.ForeignKey(Media, on_delete=models.CASCADE)

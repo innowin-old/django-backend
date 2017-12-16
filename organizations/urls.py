@@ -9,7 +9,8 @@ from .views import (
     StaffViewset,
     FollowViewset,
     AbilityViewset,
-    ConfirmationViewset
+    ConfirmationViewset,
+    CustomerViewset
 )
 
 router = DefaultRouter()
@@ -20,6 +21,7 @@ router.register(r'staff', StaffViewset)
 router.register(r'followers', FollowViewset)
 router.register(r'abilities', AbilityViewset)
 router.register(r'confirmations', ConfirmationViewset)
+router.register(r'customers', CustomerViewset)
 router.register(r'', OrganizationViewset)
 
 urlpatterns = [

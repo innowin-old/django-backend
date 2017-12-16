@@ -9,7 +9,8 @@ from .models import (
         Staff,
         Follow,
         Ability,
-        Confirmation
+        Confirmation,
+        Customer
     )
 
 from .serializers import (
@@ -20,7 +21,8 @@ from .serializers import (
         StaffSerializer,
         FollowSerializer,
         AbilitySerializer,
-        ConfirmationSerializer
+        ConfirmationSerializer,
+        CustomerSerializer
     )
 
 
@@ -258,3 +260,24 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return ConfirmationSerializer
+
+
+class CustomerViewset(ModelViewSet):
+    queryset = Customer.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Customer.objects.all()
+        
+        related_customer = self.request.query_params.get('related_customer', None)
+        if related_customer is not None:
+            queryset = queryset.filter(related_customer_id=related_customer)
+
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title=title)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return CustomerSerializer

@@ -7,7 +7,8 @@ from .models import (
         Staff,
         Follow,
         Ability,
-        Confirmation
+        Confirmation,
+        Customer
     )
 
 
@@ -56,4 +57,10 @@ class AbilitySerializer(ModelSerializer):
 class ConfirmationSerializer(ModelSerializer):
     class Meta:
         model = Confirmation
+        fields = '__all__'
+
+
+class CustomerSerializer(ModelSerializer):
+    class Meta:
+        model = Customer
         fields = '__all__'
