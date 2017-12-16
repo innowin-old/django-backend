@@ -8,7 +8,8 @@ from .models import (
         Post,
         Staff,
         Follow,
-        Ability
+        Ability,
+        Confirmation
     )
 
 from .serializers import (
@@ -18,7 +19,8 @@ from .serializers import (
         PostSerializer,
         StaffSerializer,
         FollowSerializer,
-        AbilitySerializer
+        AbilitySerializer,
+        ConfirmationSerializer
     )
 
 
@@ -223,3 +225,36 @@ class AbilityViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return AbilitySerializer
+
+
+class ConfirmationViewset(ModelViewSet):
+    queryset = Confirmation.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Confirmation.objects.all()
+        
+        corroborant = self.request.query_params.get('corroborant', None)
+        if corroborant is not None:
+            queryset = queryset.filter(corroborant_id=corroborant)
+
+        confirmed = self.request.query_params.get('confirmed', None)
+        if confirmed is not None:
+            queryset = queryset.filter(confirmed_id=confirmed)
+
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title=title)
+
+        link = self.request.query_params.get('link', None)
+        if link is not None:
+            queryset = queryset.filter(link=link)
+
+        confirm_flag = self.request.query_params.get('confirm_flag', None)
+        if confirm_flag is not None:
+            queryset = queryset.filter(confirm_flag=confirm_flag)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return ConfirmationSerializer

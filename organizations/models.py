@@ -137,3 +137,12 @@ class Ability(models.Model):
     organization = models.ForeignKey(Organization, related_name='abilities', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     text = models.TextField()
+
+
+class Confirmation(models.Model):
+    corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant', on_delete=models.CASCADE)
+    confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    description = models.TextField()
+    link = models.CharField(max_length=200)
+    confirm_flag = models.BooleanField(default=False)

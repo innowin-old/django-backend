@@ -6,7 +6,8 @@ from .models import (
         Post,
         Staff,
         Follow,
-        Ability
+        Ability,
+        Confirmation
     )
 
 
@@ -49,4 +50,10 @@ class FollowSerializer(ModelSerializer):
 class AbilitySerializer(ModelSerializer):
     class Meta:
         model = Ability
+        fields = '__all__'
+
+
+class ConfirmationSerializer(ModelSerializer):
+    class Meta:
+        model = Confirmation
         fields = '__all__'
