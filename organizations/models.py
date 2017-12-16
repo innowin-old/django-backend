@@ -95,3 +95,39 @@ class Picture(models.Model):
 
     def __str__(self):
         return self.organization.official_name
+
+
+class Post(models.Model):
+    POST_TYPES = (
+        ('post', 'پست'),
+        ('offer', 'تقاضا'),
+        ('request', 'عرضه')
+    )
+    organization = models.ForeignKey(Organization, related_name="posts", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE)
+
+    title = models.CharField(max_length=100)
+    text = models.TextField()
+    type = models.CharField(choices=POST_TYPES, max_length=10)
+    picture = models.ForeignKey(Media, on_delete=models.CASCADE)
+    create_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+
+    @property
+    def user_username(self):
+        return self.user.username
+
+
+class Staff(models.Model):
+    organization = models.ForeignKey(Organization, related_name='staffs', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
+
+    position = models.CharField(max_length=50)
+    post_permission = models.BooleanField(default=False)
+
+
+class Follow(models.Model):
+    identity = models.ForeignKey('users.Identity', related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey('users.Identity', related_name='following', on_delete=models.CASCADE)

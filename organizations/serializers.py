@@ -2,7 +2,10 @@ from rest_framework.serializers import ModelSerializer
 from .models import (
         Organization,
         StaffCount,
-        Picture
+        Picture,
+        Post,
+        Staff,
+        Follow
     )
 
 
@@ -21,4 +24,22 @@ class StaffCountSerializer(ModelSerializer):
 class PictureSerializer(ModelSerializer):
     class Meta:
         model = Picture
+        fields = '__all__'
+
+
+class PostSerializer(ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+
+class StaffSerializer(ModelSerializer):
+    class Meta:
+        model = Staff
+        fields = '__all__'
+
+
+class FollowSerializer(ModelSerializer):
+    class Meta:
+        model = Follow
         fields = '__all__'
