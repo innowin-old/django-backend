@@ -7,9 +7,9 @@ from users.models import Identity
 
 
 class Category(models.Model):
-    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, unique=True)
-    title = models.CharField(max_length=100)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, db_index=True)
+    name = models.CharField(max_length=100, unique=True, db_index=True)
+    title = models.CharField(max_length=100, db_index=True)
     creatable = models.BooleanField(default=False)
 
     def __str__(self):
@@ -28,25 +28,25 @@ class CategoryField(models.Model):
         (BOOL, 'ارئه ارزش بصورت چک باکس')
     )
 
-    category = models.ForeignKey(Category, related_name="category_fields", on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, unique=True)
-    title = models.CharField(max_length=100)
-    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=STRING)
-    order = models.IntegerField(default=0)
-    option = JSONField(null=True, blank=True)
+    category = models.ForeignKey(Category, related_name="category_fields", on_delete=models.CASCADE, db_index=True)
+    name = models.CharField(max_length=100, unique=True, db_index=True)
+    title = models.CharField(max_length=100, db_index=True)
+    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=STRING, db_index=True)
+    order = models.IntegerField(default=0, db_index=True)
+    option = JSONField(null=True, blank=True, db_index=True)
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    country = models.CharField(max_length=50)
-    province = models.CharField(max_length=50)
-    city = models.CharField(max_length=50, blank=True)
-    description = models.CharField(max_length=1000, blank=True)
+    owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE, db_index=True)
+    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE, db_index=True)
+    name = models.CharField(max_length=100, db_index=True)
+    country = models.CharField(max_length=50, db_index=True)
+    province = models.CharField(max_length=50, db_index=True)
+    city = models.CharField(max_length=50, blank=True, db_index=True)
+    description = models.CharField(max_length=1000, blank=True, db_index=True)
     attrs = JSONField(null=True, blank=True)
     custom_attrs = JSONField(null=True, blank=True)
 
@@ -55,7 +55,7 @@ class Product(models.Model):
 
 
 class Price(models.Model):
-    product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True)
     price = models.FloatField()
     create_time = models.DateTimeField(auto_now_add=True)
 
@@ -64,19 +64,19 @@ class Price(models.Model):
 
 
 class Picture(models.Model):
-    product = models.ForeignKey(Product, related_name="pictures", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="pictures", on_delete=models.CASCADE, db_index=True)
     picture = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="product_picture")
     order = models.IntegerField(default=0)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, db_index=True)
 
     def __str__(self):
         return self.product.name
 
 
 class Comment(models.Model):
-    product = models.ForeignKey(Product, related_name="product_comments", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE)
-    text = models.TextField()
+    product = models.ForeignKey(Product, related_name="product_comments", on_delete=models.CASCADE, db_index=True)
+    user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE, db_index=True)
+    text = models.TextField(db_index=True)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

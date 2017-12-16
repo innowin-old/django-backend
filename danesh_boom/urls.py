@@ -17,12 +17,17 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.documentation import include_docs_urls
 
 import media.views
 from danesh_boom.schema import schema
 from .views import SafeGraphQLView
 
 urlpatterns = [
+    url(r'^api/v1/users/', include('users.urls')),
+    url(r'^api/v1/organizations/', include('organizations.urls')),
+    url(r'^api/v1/products/', include('products.urls')),
+    url(r'^docs/', include_docs_urls(title='Danesh Boom Documentation')),
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
