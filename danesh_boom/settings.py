@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'organizations',
     'media',
     'products',
+    'chats',
 ]
 
 MIDDLEWARE = [
