@@ -5,3 +5,4 @@ organization/migrations/
 products/migrations/
 users/migrations/
 media/migrations/
+.idea/
