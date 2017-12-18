@@ -13,15 +13,11 @@ class Base(models.Model):
     updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
 
 
-class HashtagParent(models.Model):
+class HashtagParent(Base):
     title = models.CharField(db_index=True, max_length=50)
 
 
-class Hashtag(models.Model):
+class Hashtag(Base):
     title = models.CharField(db_index=True, max_length=50)
     related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True)
-    c_type = models.ForeignKey(ContentType, related_name='content_type_mention',null=True,blank=True)
-    related_instance_id = models.PositiveIntegerField()
-    content_instance = GenericForeignKey('c_type', 'related_instance_id')
-    created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
-    updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
+    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True, null=True)

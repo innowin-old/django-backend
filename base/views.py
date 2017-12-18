@@ -21,9 +21,9 @@ class HashtagParentViewset(ModelViewSet):
     def get_queryset(self):
         queryset = HashtagParent.objects.all()
 
-        related_parent = self.request.query_params.get('related_parent', None)
-        if related_parent is not None:
-            queryset = queryset.filter(related_parent_id=related_parent)
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
@@ -42,13 +42,9 @@ class HashtagViewset(ModelViewSet):
         if related_parent is not None:
             queryset = queryset.filter(related_parent_id=related_parent)
 
-        c_type = self.request.query_params.get('c_type', None)
-        if c_type is not None:
-            queryset = queryset.filter(c_type=c_type)
-
-        related_instance = self.request.query_params.get('related_instance', None)
-        if related_instance is not None:
-            queryset = queryset.filter(related_instance_id=related_instance)
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
