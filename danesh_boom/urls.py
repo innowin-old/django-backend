@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^api/v1/users/', include('users.urls')),
     url(r'^api/v1/organizations/', include('organizations.urls')),
     url(r'^api/v1/products/', include('products.urls')),
+    url(r'^api/v1/base/', include('base.urls')),
     url(r'^docs/', include_docs_urls(title='Danesh Boom Documentation')),
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),

@@ -6,27 +6,27 @@ from products.models import Category, CategoryField, Product, Price, Picture, Co
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
-    list_display = ['parent', 'name', 'title', 'creatable']
+    list_display = ['category_parent', 'name', 'title', 'creatable']
 
 
 class CategoryFieldAdmin(admin.ModelAdmin):
     model = CategoryField
-    list_display = ['category', 'name', 'title', 'type']
+    list_display = ['field_category', 'name', 'title', 'type']
 
 
 class ProductAdmin(admin.ModelAdmin):
     model = Product
-    list_display = ['owner', 'category', 'name', 'country']
+    list_display = ['product_owner', 'category', 'name', 'country']
 
 
 class PriceAdmin(admin.ModelAdmin):
     model = Price
-    list_display = ['product', 'price']
+    list_display = ['price_product', 'price']
 
 
 class PictureAdmin(admin.ModelAdmin):
     model = Picture
-    list_display = ['product', 'order', 'picture_link']
+    list_display = ['picture_product', 'order', 'picture_link']
 
     def picture_link(self, obj):
         return format_html(
@@ -36,7 +36,7 @@ class PictureAdmin(admin.ModelAdmin):
 
 class CommentAdmin(admin.ModelAdmin):
     model = Comment
-    list_display = ['product', 'user', 'create_time']
+    list_display = ['comment_product', 'comment_user', 'create_time']
 
 
 admin.site.register(Category, CategoryAdmin)

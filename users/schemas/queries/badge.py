@@ -11,11 +11,11 @@ class BadgeFilter(django_filters.FilterSet):
     class Meta:
         model = Badge
         fields = {
-            'badge': ['exact', 'icontains', 'istartswith'],
+            'title': ['exact', 'icontains', 'istartswith'],
             'create_time': ['exact', 'gte', 'lte'],
         }
 
-    order_by = OrderingFilter(fields=('id', 'badge', 'create_time'))
+    order_by = OrderingFilter(fields=('id', 'title', 'create_time'))
 
 
 class BadgeNode(DjangoObjectType):

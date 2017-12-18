@@ -1,7 +1,7 @@
 from graphene import relay, Field, String, Int, ID
 
 from danesh_boom.viewer_fields import ViewerFields
-from organizations.models import Organization, Picture
+from organizations.models import Organization, OrganizationPicture
 from organizations.schemas.queries.picture import PictureNode
 from organizations.forms import PictureForm
 from media.models import Media

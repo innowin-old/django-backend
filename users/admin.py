@@ -18,34 +18,34 @@ class CustomUserAdmin(UserAdmin):
 
 class EducationAdmin(admin.ModelAdmin):
     model = Education
-    list_display = ['user', 'grade', 'university', 'field_of_study',
+    list_display = ['education_user', 'grade', 'university', 'field_of_study',
                     'from_date', 'to_date', 'average', 'description']
 
 
 class ResearchAdmin(admin.ModelAdmin):
     model = Research
-    list_display = ['user', 'title', 'author', 'publication', 'year']
+    list_display = ['research_user', 'title', 'author', 'publication', 'year']
 
 
 class CertificateAdmin(admin.ModelAdmin):
     model = Certificate
-    list_display = ['user', 'title']
+    list_display = ['certificate_user', 'title']
 
 
 class WorkExperienceAdmin(admin.ModelAdmin):
     model = WorkExperience
-    list_display = ['user', 'name', 'organization', 'position',
+    list_display = ['work_experience_user', 'name', 'work_experience_organization', 'position',
                     'from_date', 'to_date', 'status']
 
 
 class SkillAdmin(admin.ModelAdmin):
     model = Skill
-    list_display = ['user', 'title', 'tag']
+    list_display = ['skill_user', 'title', 'tag']
 
 
 class BadgeAdmin(admin.ModelAdmin):
     model = Badge
-    list_display = ['user', 'badge', 'create_time']
+    list_display = ['badge_user', 'badge', 'create_time']
 
 
 admin.site.unregister(User)

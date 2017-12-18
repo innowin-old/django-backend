@@ -8,7 +8,7 @@ from base.models import Base
 
 
 class Category(Base):
-    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, db_index=True)
+    category_parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     name = models.CharField(max_length=100, unique=True, db_index=True)
     title = models.CharField(max_length=100, db_index=True)
     creatable = models.BooleanField(default=False)
@@ -29,7 +29,7 @@ class CategoryField(Base):
         (BOOL, 'ارئه ارزش بصورت چک باکس')
     )
 
-    category = models.ForeignKey(Category, related_name="category_fields", on_delete=models.CASCADE, db_index=True)
+    field_category = models.ForeignKey(Category, related_name="category_fields", on_delete=models.CASCADE, db_index=True)
     name = models.CharField(max_length=100, unique=True, db_index=True)
     title = models.CharField(max_length=100, db_index=True)
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=STRING, db_index=True)
@@ -41,8 +41,8 @@ class CategoryField(Base):
 
 
 class Product(Base):
-    owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE, db_index=True)
-    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE, db_index=True)
+    product_owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE, db_index=True)
+    product_category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE, db_index=True)
     name = models.CharField(max_length=100, db_index=True)
     country = models.CharField(max_length=50, db_index=True)
     province = models.CharField(max_length=50, db_index=True)
@@ -56,8 +56,8 @@ class Product(Base):
 
 
 class Price(Base):
-    product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True)
-    price = models.FloatField()
+    price_product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True)
+    value = models.FloatField()
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -65,8 +65,8 @@ class Price(Base):
 
 
 class Picture(Base):
-    product = models.ForeignKey(Product, related_name="pictures", on_delete=models.CASCADE, db_index=True)
-    picture = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="product_picture")
+    picture_product = models.ForeignKey(Product, related_name="product_pictures", on_delete=models.CASCADE, db_index=True)
+    picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="product_picture_media")
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True, db_index=True)
 
@@ -75,8 +75,8 @@ class Picture(Base):
 
 
 class Comment(Base):
-    product = models.ForeignKey(Product, related_name="product_comments", on_delete=models.CASCADE, db_index=True)
-    user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE, db_index=True)
+    comment_product = models.ForeignKey(Product, related_name="product_comments", on_delete=models.CASCADE, db_index=True)
+    comment_user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE, db_index=True)
     text = models.TextField(db_index=True)
     create_time = models.DateTimeField(auto_now_add=True)
 

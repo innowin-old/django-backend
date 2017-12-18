@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from .models import (
         Organization,
         StaffCount,
-        Picture,
+        OrganizationPicture,
         Post,
         Staff,
         Follow,
@@ -16,7 +16,7 @@ from .models import (
 from .serializers import (
         OrganizationSerializer,
         StaffCountSerializer,
-        PictureSerializer,
+        OrganizationPictureSerializer,
         PostSerializer,
         StaffSerializer,
         FollowSerializer,
@@ -112,12 +112,12 @@ class StaffCountViewset(ModelViewSet):
         return StaffCountSerializer
 
 
-class PictureViewset(ModelViewSet):
-    queryset = Picture.objects.all()
+class OrganizationPictureViewset(ModelViewSet):
+    queryset = OrganizationPicture.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Picture.objects.all()
+        queryset = OrganizationPicture.objects.all()
 
         organization = slef.request.query_params.get('organization', None)
         if organization is not None:
@@ -126,7 +126,7 @@ class PictureViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        return PictureSerializer
+        return OrganizationPictureSerializer
 
 
 class PostViewset(ModelViewSet):

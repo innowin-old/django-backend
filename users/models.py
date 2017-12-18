@@ -21,13 +21,13 @@ from base.models import Base
 
 
 class Identity(Base):
-    user = models.OneToOneField(
+    identity_user = models.OneToOneField(
         User,
         related_name="identity",
         on_delete=models.CASCADE,
         null=True,
         blank=True)
-    organization = models.OneToOneField(
+    identity_organization = models.OneToOneField(
         Organization,
         related_name="identity",
         on_delete=models.CASCADE,
@@ -86,7 +86,7 @@ def create_profile(sender, instance, created, **kwargs):
 
 
 class Profile(Base):
-    user = models.OneToOneField(User, related_name="profile",
+    profile_user = models.OneToOneField(User, related_name="profile",
                                 on_delete=models.CASCADE)
     public_email = models.EmailField(null=True, blank=True)
     national_code = models.CharField(max_length=20, blank=True,
@@ -116,7 +116,7 @@ class Profile(Base):
 
 
 class Education(Base):
-    user = models.ForeignKey(User, related_name="educations",
+    education_user = models.ForeignKey(User, related_name="educations",
                              on_delete=models.CASCADE)
     grade = models.CharField(max_length=100)
     university = models.CharField(max_length=100)
@@ -156,7 +156,7 @@ class Education(Base):
 
 
 class Research(Base):
-    user = models.ForeignKey(User, related_name="researches",
+    research_user = models.ForeignKey(User, related_name="researches",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     url = models.URLField(blank=True)
@@ -170,10 +170,10 @@ class Research(Base):
 
 
 class Certificate(Base):
-    user = models.ForeignKey(User, related_name="certificates",
+    certificate_user = models.ForeignKey(User, related_name="certificates",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
-    picture = models.ForeignKey(
+    picture_media = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
         blank=True,
@@ -191,10 +191,10 @@ class WorkExperience(Base):
         ('UNCONFIRMED', 'تایید نشده'),
     )
 
-    user = models.ForeignKey(User, related_name="work_experiences",
+    work_experience_user = models.ForeignKey(User, related_name="work_experiences",
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=True)
-    organization = models.ForeignKey(
+    work_experience_organization = models.ForeignKey(
         Organization,
         related_name="work_experience_organization",
         on_delete=models.CASCADE,
@@ -238,7 +238,7 @@ class WorkExperience(Base):
 
 
 class Skill(Base):
-    user = models.ForeignKey(User, related_name="skills",
+    skill_user = models.ForeignKey(User, related_name="skills",
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     tag = ArrayField(models.CharField(max_length=50), blank=True)
@@ -249,13 +249,13 @@ class Skill(Base):
 
 
 class Badge(Base):
-    user = models.ForeignKey(User, related_name="badges",
+    badge_user = models.ForeignKey(User, related_name="badges",
                              on_delete=models.CASCADE)
-    badge = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.badge)
 
     class Meta:
-        unique_together = (('user', 'badge'),)
+        unique_together = (('badge_user', 'title'),)

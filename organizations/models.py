@@ -27,7 +27,7 @@ class Organization(Base):
     owner = models.ForeignKey(User, related_name="organizations",
                               on_delete=models.CASCADE)
     admins = models.ManyToManyField(User,
-                                    related_name="organ_admins",
+                                    related_name="organization_admins",
                                     blank=True)
     username = models.CharField(max_length=100, unique=True)
     nike_name = models.CharField(max_length=100, null=True, blank=True)
@@ -49,7 +49,7 @@ class Organization(Base):
         choices=BUSINESS_TYPES,
         max_length=30)
     )
-    logo = models.ForeignKey(
+    organization_logo = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
         null=True,
@@ -78,7 +78,7 @@ class Organization(Base):
 
 
 class StaffCount(Base):
-    organization = models.ForeignKey(Organization, related_name="staff_counts",
+    staff_count_organization = models.ForeignKey(Organization, related_name="staff_counts",
                                      on_delete=models.CASCADE)
     count = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
@@ -87,10 +87,10 @@ class StaffCount(Base):
         return '%s(%s)' % (self.organization.official_name, self.count)
 
 
-class Picture(Base):
-    organization = models.ForeignKey(Organization, related_name="pictures",
+class OrganizationPicture(Base):
+    picture_organization = models.ForeignKey(Organization, related_name="organization_pictures",
                                      on_delete=models.CASCADE)
-    picture = models.ForeignKey(Media, on_delete=models.CASCADE)
+    picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="organization_picture_media")
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
@@ -104,13 +104,13 @@ class Post(Base):
         ('offer', 'تقاضا'),
         ('request', 'عرضه')
     )
-    organization = models.ForeignKey(Organization, related_name="posts", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE)
+    post_organization = models.ForeignKey(Organization, related_name="posts", on_delete=models.CASCADE)
+    post_user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE)
 
     title = models.CharField(max_length=100)
     text = models.TextField()
     type = models.CharField(choices=POST_TYPES, max_length=10)
-    picture = models.ForeignKey(Media, on_delete=models.CASCADE)
+    post_picture = models.ForeignKey(Media, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -122,27 +122,27 @@ class Post(Base):
 
 
 class Staff(Base):
-    organization = models.ForeignKey(Organization, related_name='staffs', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
+    staff_organization = models.ForeignKey(Organization, related_name='staffs', on_delete=models.CASCADE)
+    staff_user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
 
     position = models.CharField(max_length=50)
     post_permission = models.BooleanField(default=False)
 
 
 class Follow(Base):
-    identity = models.ForeignKey('users.Identity', related_name='followers', on_delete=models.CASCADE)
-    follower = models.ForeignKey('users.Identity', related_name='following', on_delete=models.CASCADE)
+    follow_identity = models.ForeignKey('users.Identity', related_name='followers', on_delete=models.CASCADE)
+    follow_follower = models.ForeignKey('users.Identity', related_name='following', on_delete=models.CASCADE)
 
 
 class Ability(Base):
-    organization = models.ForeignKey(Organization, related_name='abilities', on_delete=models.CASCADE)
+    ability_organization = models.ForeignKey(Organization, related_name='abilities', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     text = models.TextField()
 
 
 class Confirmation(Base):
-    corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant', on_delete=models.CASCADE)
-    confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', on_delete=models.CASCADE)
+    confirmation_corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant', on_delete=models.CASCADE)
+    confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.TextField()
     link = models.CharField(max_length=200)
@@ -150,7 +150,7 @@ class Confirmation(Base):
 
 
 class Customer(Base):
-    organization = models.ForeignKey(Organization, related_name='customer_organization', on_delete=models.CASCADE)
+    customer_organization = models.ForeignKey(Organization, related_name='customer_organization', on_delete=models.CASCADE)
     related_customer = models.ForeignKey('users.Identity', related_name='customers', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    picture = models.ForeignKey(Media, on_delete=models.CASCADE)
+    customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE)

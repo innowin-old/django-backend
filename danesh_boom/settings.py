@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'graphene_django',
+    'base',
     'users',
     'organizations',
     'media',
