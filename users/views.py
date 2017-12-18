@@ -62,7 +62,7 @@ class ResearchViewset(ModelViewSet):
         return ResearchSerializer
 
 
-class CertificateSerializer(ModelViewSet):
+class CertificateViewset(ModelViewSet):
     queryset = Certificate.objects.all()
     permission_classes = [AllowAny]
 
@@ -94,9 +94,9 @@ class BadgeViewset(ModelViewSet):
         return BadgeSerializer
 
 
-@ensure_csrf_cookie
-def index(request):
-    return render(request, "index.html")
+#@ensure_csrf_cookie
+#def index(request):
+#    return render(request, "index.html")
 
 
 def login_page(request):
