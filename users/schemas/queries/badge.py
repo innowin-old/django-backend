@@ -12,7 +12,6 @@ class BadgeFilter(django_filters.FilterSet):
         model = Badge
         fields = {
             'title': ['exact', 'icontains', 'istartswith'],
-            'create_time': ['exact', 'gte', 'lte'],
         }
 
     order_by = OrderingFilter(fields=('id', 'title', 'create_time'))

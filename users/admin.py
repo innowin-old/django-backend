@@ -45,7 +45,7 @@ class SkillAdmin(admin.ModelAdmin):
 
 class BadgeAdmin(admin.ModelAdmin):
     model = Badge
-    list_display = ['badge_user', 'badge', 'create_time']
+    list_display = ['badge_user', 'badge']
 
 
 admin.site.unregister(User)

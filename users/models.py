@@ -26,14 +26,16 @@ class Identity(Base):
         related_name="identity",
         on_delete=models.CASCADE,
         null=True,
-        blank=True)
+        blank=True,
+        help_text='Integer')
     identity_organization = models.OneToOneField(
         Organization,
         related_name="identity",
         on_delete=models.CASCADE,
         null=True,
-        blank=True)
-    name = models.CharField(max_length=150, unique=True)
+        blank=True,
+        help_text='Integer')
+    name = models.CharField(max_length=150, unique=True, help_text='String(150)')
 
     def clean(self):
         if not self.user and not self.organization:
@@ -87,19 +89,19 @@ def create_profile(sender, instance, created, **kwargs):
 
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
-                                on_delete=models.CASCADE)
-    public_email = models.EmailField(null=True, blank=True)
+                                on_delete=models.CASCADE, help_text='Integer')
+    public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
-                                     validators=[RegexValidator('^\d{10}$')])
-    birth_date = models.CharField(max_length=10, blank=True, null=True)
-    web_site = ArrayField(models.URLField(), blank=True, default=[])
-    phone = ArrayField(PhoneField(), blank=True, default=[])
-    mobile = ArrayField(PhoneField(), blank=True, default=[])
-    fax = PhoneField(blank=True)
+                                     validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
+    birth_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
+    web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
+    phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
+    mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
+    fax = PhoneField(blank=True, help_text='Phone')
     telegram_account = models.CharField(
         max_length=256, blank=True, validators=[
-            RegexValidator('^@[\w\d_]+$')])
-    description = models.TextField(blank=True)
+            RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
         return self.user.username
@@ -117,19 +119,20 @@ class Profile(Base):
 
 class Education(Base):
     education_user = models.ForeignKey(User, related_name="educations",
-                             on_delete=models.CASCADE)
-    grade = models.CharField(max_length=100)
-    university = models.CharField(max_length=100)
-    field_of_study = models.CharField(max_length=100)
-    from_date = models.CharField(max_length=7, blank=True, null=True)
-    to_date = models.CharField(max_length=7, blank=True, null=True)
+                             on_delete=models.CASCADE, help_text='Integer')
+    grade = models.CharField(max_length=100, help_text='String(100)')
+    university = models.CharField(max_length=100, help_text='String(100)')
+    field_of_study = models.CharField(max_length=100, help_text='String(100)')
+    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
+    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
     average = models.FloatField(
         validators=[
             MaxValueValidator(20),
             MinValueValidator(0)],
         null=True,
-        blank=True)
-    description = models.TextField(blank=True)
+        blank=True,
+        help_text='Float')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
         return "%s(%s - %s)" % (
@@ -157,13 +160,13 @@ class Education(Base):
 
 class Research(Base):
     research_user = models.ForeignKey(User, related_name="researches",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
-    url = models.URLField(blank=True)
-    author = ArrayField(models.CharField(max_length=100), blank=True)
-    publication = models.CharField(max_length=100, blank=True)
-    year = models.IntegerField(null=True, blank=True)
-    page_count = models.IntegerField(null=True, blank=True)
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+    url = models.URLField(blank=True, help_text='URL')
+    author = ArrayField(models.CharField(max_length=100), blank=True, help_text='Array(String(100))')
+    publication = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    year = models.IntegerField(null=True, blank=True, help_text='Integer')
+    page_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
@@ -171,13 +174,14 @@ class Research(Base):
 
 class Certificate(Base):
     certificate_user = models.ForeignKey(User, related_name="certificates",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
     picture_media = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
         blank=True,
-        null=True)
+        null=True,
+        help_text='Integer')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
@@ -192,21 +196,23 @@ class WorkExperience(Base):
     )
 
     work_experience_user = models.ForeignKey(User, related_name="work_experiences",
-                             on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, blank=True)
+                             on_delete=models.CASCADE, help_text='Integer')
+    name = models.CharField(max_length=100, blank=True, help_text='String(100)')
     work_experience_organization = models.ForeignKey(
         Organization,
         related_name="work_experience_organization",
         on_delete=models.CASCADE,
         blank=True,
-        null=True)
-    position = models.CharField(max_length=100, blank=True)
-    from_date = models.CharField(max_length=7, blank=True, null=True)
-    to_date = models.CharField(max_length=7, blank=True, null=True)
+        null=True,
+        help_text='Integer')
+    position = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(100)')
+    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
     status = models.CharField(
         choices=STATUSES,
         max_length=20,
-        default='WITHOUT_CONFIRM')
+        default='WITHOUT_CONFIRM',
+        help_text='WITHOUT_CONFIRM | WAIT_FOR_CONFIRM | CONFIRMED | UNCONFIRMED')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.name)
@@ -239,10 +245,10 @@ class WorkExperience(Base):
 
 class Skill(Base):
     skill_user = models.ForeignKey(User, related_name="skills",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
-    tag = ArrayField(models.CharField(max_length=50), blank=True)
-    description = models.TextField(blank=True)
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+    tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.title)
@@ -250,9 +256,8 @@ class Skill(Base):
 
 class Badge(Base):
     badge_user = models.ForeignKey(User, related_name="badges",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
-    create_time = models.DateTimeField(auto_now_add=True)
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=100, help_text='String(100)')
 
     def __str__(self):
         return "%s(%s)" % (self.user.username, self.badge)

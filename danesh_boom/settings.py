@@ -155,7 +155,7 @@ FRONTEND_BUILD_ROOT = os.path.join(
     FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    #os.path.join(BASE_DIR, 'static'),
 ]
 #STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
 

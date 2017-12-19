@@ -36,7 +36,7 @@ class PictureAdmin(admin.ModelAdmin):
 
 class CommentAdmin(admin.ModelAdmin):
     model = Comment
-    list_display = ['comment_product', 'comment_user', 'create_time']
+    list_display = ['comment_product', 'comment_user']
 
 
 admin.site.register(Category, CategoryAdmin)

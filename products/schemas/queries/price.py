@@ -11,7 +11,6 @@ class PriceFilter(FilterSet):
         fields = {
             'id': ['exact'],
             'value': ['exact', 'gte', 'lte'],
-            'create_time': ['exact', 'gte', 'lte'],
         }
 
     order_by = OrderingFilter(fields=('id', 'value', 'create_time'))

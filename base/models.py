@@ -14,17 +14,17 @@ class Base(models.Model):
 
 
 class HashtagParent(Base):
-    title = models.CharField(db_index=True, max_length=50)
+    title = models.CharField(db_index=True, max_length=50, help_text='String(50)')
 
 
 class Hashtag(Base):
-    title = models.CharField(db_index=True, max_length=50)
-    related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True, db_index=True)
-    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True, null=True, db_index=True)
+    title = models.CharField(db_index=True, max_length=50, help_text='String(50)')
+    related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True, db_index=True, on_delete=models.CASCADE, help_text='String(50)')
+    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True, null=True, db_index=True, help_text='Integer')
 
 
 class BaseComment(Base):
-    comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True)
-    comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True)
-    comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture")
-    text = models.TextField()
+    comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture", help_text='Integer')
+    text = models.TextField(help_text='Text')
