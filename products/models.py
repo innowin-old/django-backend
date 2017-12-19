@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-
 from django.contrib.auth.models import User
+
 from media.models import Media
 from users.models import Identity
 from base.models import Base
