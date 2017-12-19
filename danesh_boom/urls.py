@@ -24,15 +24,15 @@ from danesh_boom.schema import schema
 from .views import SafeGraphQLView
 
 urlpatterns = [
-    url(r'^api/v1/users/', include('users.urls')),
-    url(r'^api/v1/organizations/', include('organizations.urls')),
-    url(r'^api/v1/products/', include('products.urls')),
-    url(r'^api/v1/base/', include('base.urls')),
+    url(r'^users/', include('users.urls')),
+    url(r'^organizations/', include('organizations.urls')),
+    url(r'^products/', include('products.urls')),
+    url(r'^base/', include('base.urls')),
     url(r'^docs/', include_docs_urls(title='Danesh Boom Documentation')),
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
-    url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema)),
-    url(r'^', include('users.urls')),
+    url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))
+    #url(r'^', include('users.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
