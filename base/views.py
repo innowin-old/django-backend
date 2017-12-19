@@ -4,14 +4,26 @@ from rest_framework.permissions import AllowAny
 
 
 from .models import (
+    Base,
     Hashtag,
-    HashtagParent
+    HashtagParent,
+    BaseComment
 )
 
 from .serializers import (
+    BaseSerializer,
     HashtagSerializer,
-    HashtagParentSerializer
+    HashtagParentSerializer,
+    BaseCommentSerializer
 )
+
+
+class BaseViewset(ModelViewSet):
+    queryset = Base.objects.all()
+    permission_classes = ""
+
+    def get_serializer_class(self):
+        return BaseSerializer
 
 
 class HashtagParentViewset(ModelViewSet):
@@ -50,3 +62,28 @@ class HashtagViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return HashtagSerializer
+
+
+class BaseCommentViewset(ModelViewSet):
+    queryset = BaseComment.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BaseComment.objects.all()
+
+        comment_parent = self.request.query_params.get('comment_parent', None)
+        if comment_parent is not None:
+            queryset = queryset.filter(comment_parent_id=comment_parent)
+
+        comment_sender = self.request.query_params.get('comment_sender', None)
+        if comment_sender is not None:
+            queryset = queryset.filter(comment_sender_id=comment_sender)
+        
+        text = self.request.query_params.get('text', None)
+        if text is not None:
+            queryset = queryset.filter(text=text)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return BaseCommentSerializer

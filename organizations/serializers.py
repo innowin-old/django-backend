@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from base.serializers import BaseSerializer
 from .models import (
         Organization,
         StaffCount,
@@ -12,55 +13,82 @@ from .models import (
     )
 
 
-class OrganizationSerializer(ModelSerializer):
+class OrganizationSerializer(BaseSerializer):
     class Meta:
         model = Organization
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class StaffCountSerializer(ModelSerializer):
+class StaffCountSerializer(BaseSerializer):
     class Meta:
         model = StaffCount
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class OrganizationPictureSerializer(ModelSerializer):
+class OrganizationPictureSerializer(BaseSerializer):
     class Meta:
         model = OrganizationPicture
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class PostSerializer(ModelSerializer):
+class PostSerializer(BaseSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class StaffSerializer(ModelSerializer):
+class StaffSerializer(BaseSerializer):
     class Meta:
         model = Staff
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class FollowSerializer(ModelSerializer):
+class FollowSerializer(BaseSerializer):
     class Meta:
         model = Follow
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class AbilitySerializer(ModelSerializer):
+class AbilitySerializer(BaseSerializer):
     class Meta:
         model = Ability
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class ConfirmationSerializer(ModelSerializer):
+class ConfirmationSerializer(BaseSerializer):
     class Meta:
         model = Confirmation
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class CustomerSerializer(ModelSerializer):
+class CustomerSerializer(BaseSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }

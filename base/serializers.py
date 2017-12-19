@@ -1,17 +1,31 @@
 from rest_framework.serializers import ModelSerializer, CharField
 from .models import (
+        Base,
         HashtagParent,
-        Hashtag
+        Hashtag,
+        BaseComment
     )
 
 
-class HashtagParentSerializer(ModelSerializer):
+class BaseSerializer(ModelSerializer):
+    class Meta:
+        model = Base
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
+class HashtagParentSerializer(BaseSerializer):
     class Meta:
         model = HashtagParent
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class HashtagSerializer(ModelSerializer):
+class HashtagSerializer(BaseSerializer):
     class Meta:
         model = Hashtag
         fields = '__all__'
@@ -30,3 +44,12 @@ class HashtagSerializer(ModelSerializer):
         instance.related_parent = parent_instance
         instance.save()
         return instance
+
+
+class BaseCommentSerializer(BaseSerializer):
+    class Meta:
+        model = BaseComment
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }

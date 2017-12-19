@@ -19,5 +19,12 @@ class HashtagParent(Base):
 
 class Hashtag(Base):
     title = models.CharField(db_index=True, max_length=50)
-    related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True)
-    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True, null=True)
+    related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True, db_index=True)
+    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True, null=True, db_index=True)
+
+
+class BaseComment(Base):
+    comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True)
+    comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True)
+    comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture")
+    text = models.TextField()
