@@ -1,8 +1,10 @@
 config.yml
 *pyc
 *sw[pomnlkj]
-organization/migrations/
+organizations/migrations/
 products/migrations/
 users/migrations/
 media/migrations/
+base/migrations/
+chats/migrations/
 .idea/*
