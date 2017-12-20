@@ -17,6 +17,7 @@ from .models import (
         Skill,
         Badge
     )
+<<<<<<< HEAD
 
 from .serializers import (
         IdentitySerializer,
@@ -93,10 +94,88 @@ class BadgeViewset(ModelViewSet):
     def get_serializer_class(self):
         return BadgeSerializer
 
+=======
+>>>>>>> saeid
 
-@ensure_csrf_cookie
-def index(request):
-    return render(request, "index.html")
+from .serializers import (
+        IdentitySerializer,
+        ProfileSerializer,
+        EducationSerializer,
+        ResearchSerializer,
+        CertificateSerializer,
+        WorkExperienceSerializer,
+        SkillSerializer,
+        BadgeSerializer
+    )
+
+
+class IdentityViewset(ModelViewSet):
+    queryset = Identity.objects.all()
+    permission_classes = [AllowAny]
+    
+    def get_serializer_class(self):
+        return IdentitySerializer
+
+
+class ProfileViewset(ModelViewSet):
+    queryset = Profile.objects.all()
+    permission_classes = [AllowAny]
+    
+    def get_serializer_class(self):
+        return ProfileSerializer
+
+
+class EducationViewset(ModelViewSet):
+    queryset = Education.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        return EducationSerializer
+
+
+class ResearchViewset(ModelViewSet):
+    queryset = Research.objects.all()
+    permission_classes = [AllowAny]
+    
+    def get_serializer_class(self):
+        return ResearchSerializer
+
+
+class CertificateViewset(ModelViewSet):
+    queryset = Certificate.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        return CertificateSerializer
+
+
+class WorkExperienceViewset(ModelViewSet):
+    queryset = WorkExperience.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        return WorkExperienceSerializer
+
+
+class SkillViewset(ModelViewSet):
+    queryset = Skill.objects.all()
+    permisison_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        return SkillSerializer
+
+
+class BadgeViewset(ModelViewSet):
+    queryset = Badge.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        return BadgeSerializer
+
+
+#@ensure_csrf_cookie
+#def index(request):
+#    return render(request, "index.html")
 
 
 def login_page(request):

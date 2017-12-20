@@ -6,7 +6,7 @@ from graphene import relay
 from organizations.models import OrganizationPicture
 
 
-class PictureFilter(django_filters.FilterSet):
+class OrganizationPictureFilter(django_filters.FilterSet):
 
     class Meta:
         model = OrganizationPicture
