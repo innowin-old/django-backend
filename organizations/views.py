@@ -2,44 +2,34 @@ from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from .models import (
-        Organization,
-        StaffCount,
-<<<<<<< HEAD
-        Picture
-=======
-        OrganizationPicture,
-        Post,
-        Staff,
-        Follow,
-        Ability,
-        Confirmation,
-        Customer
->>>>>>> saeid
-    )
+    Organization,
+    StaffCount,
+    OrganizationPicture,
+    Post,
+    Staff,
+    Follow,
+    Ability,
+    Confirmation,
+    Customer
+)
 
 from .serializers import (
-        OrganizationSerializer,
-        StaffCountSerializer,
-<<<<<<< HEAD
-        PictureSerializer
-=======
-        OrganizationPictureSerializer,
-        PostSerializer,
-        StaffSerializer,
-        FollowSerializer,
-        AbilitySerializer,
-        ConfirmationSerializer,
-        CustomerSerializer
->>>>>>> saeid
-    )
+    OrganizationSerializer,
+    StaffCountSerializer,
+    OrganizationPictureSerializer,
+    PostSerializer,
+    StaffSerializer,
+    FollowSerializer,
+    AbilitySerializer,
+    ConfirmationSerializer,
+    CustomerSerializer
+)
 
 
 class OrganizationViewset(ModelViewSet):
     queryset = Organization.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Organization.objects.all()
 
@@ -101,7 +91,6 @@ class OrganizationViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return OrganizationSerializer
 
@@ -110,30 +99,19 @@ class StaffCountViewset(ModelViewSet):
     queryset = StaffCount.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = StaffCount.objects.all()
-        
+
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization_id=organization)
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return StaffCountSerializer
 
 
-<<<<<<< HEAD
-class PictureViewset(ModelViewSet):
-    queryset = Picture.objects.all()
-    permission_classes = [AllowAny]
-
-    def get_serializer_class(self):
-        return PictureSerializer
-=======
 class OrganizationPictureViewset(ModelViewSet):
     queryset = OrganizationPicture.objects.all()
     permission_classes = [AllowAny]
@@ -257,7 +235,7 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
-        
+
         corroborant = self.request.query_params.get('corroborant', None)
         if corroborant is not None:
             queryset = queryset.filter(corroborant_id=corroborant)
@@ -290,7 +268,7 @@ class CustomerViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Customer.objects.all()
-        
+
         related_customer = self.request.query_params.get('related_customer', None)
         if related_customer is not None:
             queryset = queryset.filter(related_customer_id=related_customer)
@@ -303,4 +281,3 @@ class CustomerViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return CustomerSerializer
->>>>>>> saeid

@@ -1,29 +1,4 @@
 from rest_framework.serializers import ModelSerializer
-<<<<<<< HEAD
-from .models import (
-        Organization,
-        StaffCount,
-        Picture
-    )
-
-
-class OrganizationSerializer(ModelSerializer):
-    class Meta:
-        model = Organization
-        fields = '__all__'
-
-
-class StaffCountSerializer(ModelSerializer):
-    class Meta:
-        model = StaffCount
-        fields = '__all__'
-
-
-class PictureSerializer(ModelSerializer):
-    class Meta:
-        model = Picture
-        fields = '__all__'
-=======
 from base.serializers import BaseSerializer
 from .models import (
         Organization,
@@ -117,4 +92,3 @@ class CustomerSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
->>>>>>> saeid

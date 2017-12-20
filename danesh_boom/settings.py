@@ -48,11 +48,8 @@ INSTALLED_APPS = [
     'organizations',
     'media',
     'products',
-<<<<<<< HEAD
     'chats',
-=======
     'rest_framework',
->>>>>>> saeid
 ]
 
 MIDDLEWARE = [

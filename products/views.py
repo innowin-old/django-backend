@@ -3,37 +3,35 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
 from .models import (
-        Category,
-        CategoryField,
-        Product,
-        Price,
-        Picture,
-        Comment
-    )
+    Category,
+    CategoryField,
+    Product,
+    Price,
+    Picture,
+    Comment
+)
 
 from .serializers import (
-        CategorySerializer,
-        CategoryFieldSerializer,
-        ProductSerializer,
-        PriceSerializer,
-        PictureSerializer,
-        CommentSerializer
-    )
+    CategorySerializer,
+    CategoryFieldSerializer,
+    ProductSerializer,
+    PriceSerializer,
+    PictureSerializer,
+    CommentSerializer
+)
 
 
 class CategoryViewset(ModelViewSet):
     queryset = Category.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Category.objects.all()
 
         parent = self.request.query_params.get('parent', None)
         if parent is not None:
             queryset = queryset.filter(parent_id=parent)
-        
+
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name=name)
@@ -44,7 +42,6 @@ class CategoryViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return CategorySerializer
 
@@ -53,11 +50,9 @@ class CategoryFieldViewset(ModelViewSet):
     queryset = CategoryField.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = CategoryField.objects.all()
-        
+
         category = self.request.query_params.get('category', None)
         if category is not None:
             queryset = queryset.filter(category_id=category)
@@ -72,7 +67,6 @@ class CategoryFieldViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return CategoryFieldSerializer
 
@@ -81,8 +75,6 @@ class ProductViewset(ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Product.objects.all()
 
@@ -116,7 +108,6 @@ class ProductViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return ProductSerializer
 
@@ -125,8 +116,6 @@ class PriceViewset(ModelViewSet):
     queryset = Price.objects.all()
     permisison_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Price.objects.all()
 
@@ -136,7 +125,6 @@ class PriceViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return PriceSerializer
 
@@ -145,8 +133,6 @@ class PictureViewset(ModelViewSet):
     queryset = Picture.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Picture.objects.all()
 
@@ -160,7 +146,6 @@ class PictureViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return PictureSerializer
 
@@ -169,8 +154,6 @@ class CommentViewset(ModelViewSet):
     queryset = Comment.objects.all()
     permission_classes = [AllowAny]
 
-<<<<<<< HEAD
-=======
     def get_queryset(self):
         queryset = Comment.objects.all()
 
@@ -188,6 +171,5 @@ class CommentViewset(ModelViewSet):
 
         return queryset
 
->>>>>>> saeid
     def get_serializer_class(self):
         return CommentSerializer
