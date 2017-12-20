@@ -13,7 +13,6 @@ class StaffCountFilter(django_filters.FilterSet):
         fields = {
             'id': ['exact'],
             'count': ['exact', 'gte', 'lte'],
-            'create_time': ['exact', 'gte', 'lte'],
         }
 
     order_by = OrderingFilter(fields=('id', 'count', 'create_time'))

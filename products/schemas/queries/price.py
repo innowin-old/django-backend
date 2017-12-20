@@ -10,11 +10,10 @@ class PriceFilter(FilterSet):
         model = Price
         fields = {
             'id': ['exact'],
-            'price': ['exact', 'gte', 'lte'],
-            'create_time': ['exact', 'gte', 'lte'],
+            'value': ['exact', 'gte', 'lte'],
         }
 
-    order_by = OrderingFilter(fields=('id', 'price', 'create_time'))
+    order_by = OrderingFilter(fields=('id', 'value', 'create_time'))
 
 
 class PriceNode(DjangoObjectType):
