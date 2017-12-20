@@ -43,11 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'graphene_django',
+    'base',
     'users',
     'organizations',
     'media',
     'products',
     'chats',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -154,10 +156,9 @@ FRONTEND_BUILD_ROOT = os.path.join(
     FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(FRONTEND_BUILD_ROOT, 'static'),
+    #os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
+#STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
 
 STATIC_ASSET_MANIFEST = load_static_asset_manifest(
     FRONTEND_BUILD_ROOT, FRONTEND_DEV)
@@ -193,3 +194,5 @@ SENDFILE_ROOT = os.path.normpath(
 SENDFILE_URL = CONFIG.get('SENDFILE_URL')
 # not MEDIA_ROOT. this is media app settings
 MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

@@ -4,12 +4,24 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     OrganizationViewset,
     StaffCountViewset,
-    PictureViewset
+    OrganizationPictureViewset,
+    PostViewset,
+    StaffViewset,
+    FollowViewset,
+    AbilityViewset,
+    ConfirmationViewset,
+    CustomerViewset
 )
 
 router = DefaultRouter()
 router.register(r'staff-counts', StaffCountViewset)
-router.register(r'pictures', PictureViewset)
+router.register(r'pictures', OrganizationPictureViewset)
+router.register(r'posts', PostViewset)
+router.register(r'staff', StaffViewset)
+router.register(r'followers', FollowViewset)
+router.register(r'abilities', AbilityViewset)
+router.register(r'confirmations', ConfirmationViewset)
+router.register(r'customers', CustomerViewset)
 router.register(r'', OrganizationViewset)
 
 urlpatterns = [

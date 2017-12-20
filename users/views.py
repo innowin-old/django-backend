@@ -8,32 +8,32 @@ from utils.token import validate_token
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from .models import (
-        Identity,
-        Profile,
-        Education,
-        Research,
-        Certificate,
-        WorkExperience,
-        Skill,
-        Badge
-    )
+    Identity,
+    Profile,
+    Education,
+    Research,
+    Certificate,
+    WorkExperience,
+    Skill,
+    Badge
+)
 
 from .serializers import (
-        IdentitySerializer,
-        ProfileSerializer,
-        EducationSerializer,
-        ResearchSerializer,
-        CertificateSerializer,
-        WorkExperienceSerializer,
-        SkillSerializer,
-        BadgeSerializer
-    )
+    IdentitySerializer,
+    ProfileSerializer,
+    EducationSerializer,
+    ResearchSerializer,
+    CertificateSerializer,
+    WorkExperienceSerializer,
+    SkillSerializer,
+    BadgeSerializer
+)
 
 
 class IdentityViewset(ModelViewSet):
     queryset = Identity.objects.all()
     permission_classes = [AllowAny]
-    
+
     def get_serializer_class(self):
         return IdentitySerializer
 
@@ -41,7 +41,7 @@ class IdentityViewset(ModelViewSet):
 class ProfileViewset(ModelViewSet):
     queryset = Profile.objects.all()
     permission_classes = [AllowAny]
-    
+
     def get_serializer_class(self):
         return ProfileSerializer
 
@@ -57,12 +57,12 @@ class EducationViewset(ModelViewSet):
 class ResearchViewset(ModelViewSet):
     queryset = Research.objects.all()
     permission_classes = [AllowAny]
-    
+
     def get_serializer_class(self):
         return ResearchSerializer
 
 
-class CertificateSerializer(ModelViewSet):
+class CertificateViewset(ModelViewSet):
     queryset = Certificate.objects.all()
     permission_classes = [AllowAny]
 
@@ -94,9 +94,9 @@ class BadgeViewset(ModelViewSet):
         return BadgeSerializer
 
 
-@ensure_csrf_cookie
-def index(request):
-    return render(request, "index.html")
+# @ensure_csrf_cookie
+# def index(request):
+#    return render(request, "index.html")
 
 
 def login_page(request):

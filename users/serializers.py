@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
+from base.serializers import BaseSerializer
 from .models import (
         Identity,
         Profile,
@@ -18,49 +19,73 @@ class UserSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class IdentitySerializer(ModelSerializer):
+class IdentitySerializer(BaseSerializer):
     class Meta:
         model = Identity
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class ProfileSerializer(ModelSerializer):
+class ProfileSerializer(BaseSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class EducationSerializer(ModelSerializer):
+class EducationSerializer(BaseSerializer):
     class Meta:
         model = Education
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class ResearchSerializer(ModelSerializer):
+class ResearchSerializer(BaseSerializer):
     class Meta:
         model = Research
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class CertificateSerializer(ModelSerializer):
+class CertificateSerializer(BaseSerializer):
     class Meta:
         model = Certificate
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class WorkExperienceSerializer(ModelSerializer):
+class WorkExperienceSerializer(BaseSerializer):
     class Meta:
         model = WorkExperience
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class SkillSerializer(ModelSerializer):
+class SkillSerializer(BaseSerializer):
     class Meta:
         model = Skill
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
-class BadgeSerializer(ModelSerializer):
+class BadgeSerializer(BaseSerializer):
     class Meta:
         model = Badge
         fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
