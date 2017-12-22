@@ -38,24 +38,24 @@ class Identity(Base):
     name = models.CharField(max_length=150, unique=True, help_text='String(150)')
 
     def clean(self):
-        if not self.user and not self.organization:
+        if not self.identity_user and not self.identity_organization:
             raise ValidationError(_('User or Organization should be set'))
-        if self.user and self.organization:
+        if self.identity_user and self.identity_organization:
             raise ValidationError(
                 _('Only on of User or Organization should be set'))
 
     def __str__(self):
         return self.name
 
-    def validate_user(self, user):
-        if self.user and self.user == user:
+    def validate_user(self, identity_user):
+        if self.identity_user and self.identity_user == identity_user:
             return True
-        elif self.organization and self.organization.owner == user:
+        elif self.identity_organization and self.identity_organization.owner == identity_user:
             return True
         return False
 
-    def validate_organization(self, organization):
-        if self.organization == organization:
+    def validate_organization(self, identity_organization):
+        if self.identity_organization == identity_organization:
             return True
         return False
 
@@ -73,7 +73,7 @@ def user_save(self, *args, **kwargs):
         if hasattr(self, 'identity'):
             identity = self.identity
         else:
-            identity = Identity(user=self)
+            identity = Identity(identity_user=self)
         identity.name = self.username
         identity.save()
 
@@ -84,7 +84,7 @@ User.save = user_save
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(profile_user=instance)
 
 
 class Profile(Base):
@@ -104,7 +104,7 @@ class Profile(Base):
     description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
-        return self.user.username
+        return self.profile_user.username
 
     def clean(self):
         if self.birth_date:
@@ -136,7 +136,7 @@ class Education(Base):
 
     def __str__(self):
         return "%s(%s - %s)" % (
-            self.user.username,
+            self.education_user.username,
             self.grade,
             self.field_of_study
         )
@@ -169,7 +169,7 @@ class Research(Base):
     page_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.research_user.username, self.title)
 
 
 class Certificate(Base):
@@ -184,7 +184,7 @@ class Certificate(Base):
         help_text='Integer')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.certificate_user.username, self.title)
 
 
 class WorkExperience(Base):
@@ -215,13 +215,13 @@ class WorkExperience(Base):
         help_text='WITHOUT_CONFIRM | WAIT_FOR_CONFIRM | CONFIRMED | UNCONFIRMED')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.name)
+        return "%s(%s)" % (self.work_experience_user.username, self.name)
 
     def clean(self):
-        if not self.organization and not self.name:
+        if not self.work_experience_organization and not self.name:
             raise ValidationError(_('Please enter name or organization'))
 
-        if self.organization and self.name:
+        if self.work_experience_organization and self.name:
             raise ValidationError(_('Please enter name or organization'))
 
         if self.name and self.status != 'WITHOUT_CONFIRM':
@@ -251,7 +251,7 @@ class Skill(Base):
     description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.skill_user.username, self.title)
 
 
 class Badge(Base):
@@ -260,7 +260,7 @@ class Badge(Base):
     title = models.CharField(max_length=100, help_text='String(100)')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.badge)
+        return "%s(%s)" % (self.badge_user.username, self.badge)
 
     class Meta:
         unique_together = (('badge_user', 'title'),)

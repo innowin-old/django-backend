@@ -3,8 +3,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import media.MediaStorage
-import media.models
 
 
 class Migration(migrations.Migration):
@@ -16,12 +14,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Media',
+            name='Message',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(storage=media.MediaStorage.MediaStorage(location='/Users/saeid/Projects/danesh_boom_env/danesh-boom-backend/media'), upload_to=media.models.get_upload_path)),
-                ('create_time', models.DateTimeField(auto_now_add=True)),
-                ('info', models.TextField(default='{}')),
+                ('send_date', models.DateTimeField(auto_now_add=True)),
+                ('seen_date', models.DateTimeField(blank=True, default=None, null=True)),
+                ('body', models.TextField(blank=True, default=None, null=True)),
+                ('seen', models.BooleanField(default=False)),
             ],
         ),
     ]

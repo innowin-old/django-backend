@@ -32,7 +32,8 @@ urlpatterns = [
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
-    url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))
-    #url(r'^', include('users.urls')),
+    url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema)),
+    url(r'^messages/', include('chats.urls')),
+    # url(r'^', include('users.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

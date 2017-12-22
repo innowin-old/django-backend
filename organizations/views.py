@@ -101,7 +101,6 @@ class StaffCountViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = StaffCount.objects.all()
-        
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization_id=organization)
@@ -119,7 +118,7 @@ class OrganizationPictureViewset(ModelViewSet):
     def get_queryset(self):
         queryset = OrganizationPicture.objects.all()
 
-        organization = slef.request.query_params.get('organization', None)
+        organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization_id=organization)
 
@@ -235,7 +234,6 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
-        
         corroborant = self.request.query_params.get('corroborant', None)
         if corroborant is not None:
             queryset = queryset.filter(corroborant_id=corroborant)
@@ -268,7 +266,7 @@ class CustomerViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Customer.objects.all()
-        
+
         related_customer = self.request.query_params.get('related_customer', None)
         if related_customer is not None:
             queryset = queryset.filter(related_customer_id=related_customer)
