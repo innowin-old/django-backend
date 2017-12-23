@@ -3,13 +3,13 @@ from django_filters import OrderingFilter
 from graphene_django import DjangoObjectType
 from graphene import relay
 
-from organizations.models import Picture
+from organizations.models import OrganizationPicture
 
 
 class PictureFilter(django_filters.FilterSet):
 
     class Meta:
-        model = Picture
+        model = OrganizationPicture
         fields = {
             'id': ['exact'],
         }
@@ -20,5 +20,5 @@ class PictureFilter(django_filters.FilterSet):
 class PictureNode(DjangoObjectType):
 
     class Meta:
-        model = Picture
+        model = OrganizationPicture
         interfaces = (relay.Node, )

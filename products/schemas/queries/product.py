@@ -18,11 +18,11 @@ class ProductFilter(FilterSet):
             'province': ['exact', 'icontains', 'istartswith'],
             'city': ['exact', 'gte', 'lte'],
             # ---------- Category ------------
-            'category__name': ['exact', 'icontains', 'istartswith'],
-            'category__title': ['exact', 'icontains', 'istartswith'],
+            'product_category__name': ['exact', 'icontains', 'istartswith'],
+            'product_category__title': ['exact', 'icontains', 'istartswith'],
         }
 
-    order_by = OrderingFilter(fields=('id', 'name', 'owner__name', 'category__name', 'province'))
+    order_by = OrderingFilter(fields=('id', 'name', 'owner__name', 'product_category__name', 'province'))
 
 
 class ProductNode(DjangoObjectType):

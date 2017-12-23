@@ -5,7 +5,7 @@ from graphene import relay, Field, resolve_only_args, String
 from django.contrib.postgres.fields import ArrayField
 from graphene_django.filter import DjangoFilterConnectionField
 
-from organizations.models import Organization, StaffCount, Picture
+from organizations.models import Organization, StaffCount, OrganizationPicture
 from organizations.schemas.queries.picture import PictureFilter, PictureNode
 from organizations.schemas.queries.staff_count import StaffCountFilter, StaffCountNode
 from users.models import WorkExperience
@@ -78,7 +78,7 @@ class OrganizationNode(DjangoObjectType):
 
     @resolve_only_args
     def resolve_organization_pictures(self, **args):
-        pictures = Picture.objects.filter(organization=self)
+        pictures = OrganizationPicture.objects.filter(organization=self)
         return PictureFilter(args, queryset=pictures).qs
 
     @resolve_only_args

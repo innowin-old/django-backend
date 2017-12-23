@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from danesh_boom.forms.fields import ArrayField
-from organizations.models import Organization, StaffCount, Picture
+from organizations.models import Organization, StaffCount, OrganizationPicture
 
 
 def distinct_list(original_list):
@@ -16,7 +16,7 @@ def distinct_list(original_list):
 
 class PictureForm(ModelForm):
     class Meta:
-        model = Picture
+        model = OrganizationPicture
         exclude = ['organization', 'picture']
 
 

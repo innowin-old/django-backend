@@ -1,10 +1,14 @@
 import os
 import uuid
+import json
 from os.path import basename
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.postgres.fields import JSONField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from media.MediaStorage import MediaStorage
 
@@ -22,14 +26,26 @@ class Media(models.Model):
     identity = models.ForeignKey(
         'users.Identity',
         related_name="identity_medias",
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        db_index=True)
     file = models.FileField(
         upload_to=get_upload_path,
         storage=media_file_storage)
     uploader = models.ForeignKey(User, related_name="medias",
                                  on_delete=models.SET_NULL,
-                                 null=True, blank=True)
+                                 null=True, blank=True,
+                                 db_index=True)
     create_time = models.DateTimeField(auto_now_add=True)
+    info = models.TextField(default='{}')
 
     def __str__(self):
         return basename(self.file.file.name)
+
+
+def update_meta(sender, instance, **kwargs):
+    post_save.disconnect(update_meta, sender=Media)
+    data = {'size': os.path.getsize(instance.file.path)}
+    instance.info = json.dumps(data)
+    instance.save()
+    post_save.connect(update_meta, sender=Media)
+post_save.connect(update_meta, sender=Media)

@@ -12,46 +12,50 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 from danesh_boom.models import PhoneField
 from media.models import Media
 from organizations.models import Organization
+from base.models import Base
 
 
-class Identity(models.Model):
-    user = models.OneToOneField(
+class Identity(Base):
+    identity_user = models.OneToOneField(
         User,
         related_name="identity",
         on_delete=models.CASCADE,
         null=True,
-        blank=True)
-    organization = models.OneToOneField(
+        blank=True,
+        help_text='Integer')
+    identity_organization = models.OneToOneField(
         Organization,
         related_name="identity",
         on_delete=models.CASCADE,
         null=True,
-        blank=True)
-    name = models.CharField(max_length=150, unique=True)
+        blank=True,
+        help_text='Integer')
+    name = models.CharField(max_length=150, unique=True, help_text='String(150)')
 
     def clean(self):
-        if not self.user and not self.organization:
+        if not self.identity_user and not self.identity_organization:
             raise ValidationError(_('User or Organization should be set'))
-        if self.user and self.organization:
+        if self.identity_user and self.identity_organization:
             raise ValidationError(
                 _('Only on of User or Organization should be set'))
 
     def __str__(self):
         return self.name
 
-    def validate_user(self, user):
-        if self.user and self.user == user:
+    def validate_user(self, identity_user):
+        if self.identity_user and self.identity_user == identity_user:
             return True
-        elif self.organization and self.organization.owner == user:
+        elif self.identity_organization and self.identity_organization.owner == identity_user:
             return True
         return False
 
-    def validate_organization(self, organization):
-        if self.organization == organization:
+    def validate_organization(self, identity_organization):
+        if self.identity_organization == identity_organization:
             return True
         return False
 
@@ -69,7 +73,7 @@ def user_save(self, *args, **kwargs):
         if hasattr(self, 'identity'):
             identity = self.identity
         else:
-            identity = Identity(user=self)
+            identity = Identity(identity_user=self)
         identity.name = self.username
         identity.save()
 
@@ -80,27 +84,27 @@ User.save = user_save
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(profile_user=instance)
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, related_name="profile",
-                                on_delete=models.CASCADE)
-    public_email = models.EmailField(null=True, blank=True)
+class Profile(Base):
+    profile_user = models.OneToOneField(User, related_name="profile",
+                                on_delete=models.CASCADE, help_text='Integer')
+    public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
-                                     validators=[RegexValidator('^\d{10}$')])
-    birth_date = models.CharField(max_length=10, blank=True, null=True)
-    web_site = ArrayField(models.URLField(), blank=True, default=[])
-    phone = ArrayField(PhoneField(), blank=True, default=[])
-    mobile = ArrayField(PhoneField(), blank=True, default=[])
-    fax = PhoneField(blank=True)
+                                     validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
+    birth_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
+    web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
+    phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
+    mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
+    fax = PhoneField(blank=True, help_text='Phone')
     telegram_account = models.CharField(
         max_length=256, blank=True, validators=[
-            RegexValidator('^@[\w\d_]+$')])
-    description = models.TextField(blank=True)
+            RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
-        return self.user.username
+        return self.profile_user.username
 
     def clean(self):
         if self.birth_date:
@@ -113,25 +117,26 @@ class Profile(models.Model):
                 raise ValidationError(_('Invalid birth date'))
 
 
-class Education(models.Model):
-    user = models.ForeignKey(User, related_name="educations",
-                             on_delete=models.CASCADE)
-    grade = models.CharField(max_length=100)
-    university = models.CharField(max_length=100)
-    field_of_study = models.CharField(max_length=100)
-    from_date = models.CharField(max_length=7, blank=True, null=True)
-    to_date = models.CharField(max_length=7, blank=True, null=True)
+class Education(Base):
+    education_user = models.ForeignKey(User, related_name="educations",
+                             on_delete=models.CASCADE, help_text='Integer')
+    grade = models.CharField(max_length=100, help_text='String(100)')
+    university = models.CharField(max_length=100, help_text='String(100)')
+    field_of_study = models.CharField(max_length=100, help_text='String(100)')
+    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
+    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
     average = models.FloatField(
         validators=[
             MaxValueValidator(20),
             MinValueValidator(0)],
         null=True,
-        blank=True)
-    description = models.TextField(blank=True)
+        blank=True,
+        help_text='Float')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
         return "%s(%s - %s)" % (
-            self.user.username,
+            self.education_user.username,
             self.grade,
             self.field_of_study
         )
@@ -153,35 +158,36 @@ class Education(models.Model):
             raise ValidationError(_('To date must be greater than from date'))
 
 
-class Research(models.Model):
-    user = models.ForeignKey(User, related_name="researches",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
-    url = models.URLField(blank=True)
-    author = ArrayField(models.CharField(max_length=100), blank=True)
-    publication = models.CharField(max_length=100, blank=True)
-    year = models.IntegerField(null=True, blank=True)
-    page_count = models.IntegerField(null=True, blank=True)
+class Research(Base):
+    research_user = models.ForeignKey(User, related_name="researches",
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+    url = models.URLField(blank=True, help_text='URL')
+    author = ArrayField(models.CharField(max_length=100), blank=True, help_text='Array(String(100))')
+    publication = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    year = models.IntegerField(null=True, blank=True, help_text='Integer')
+    page_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.research_user.username, self.title)
 
 
-class Certificate(models.Model):
-    user = models.ForeignKey(User, related_name="certificates",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
-    picture = models.ForeignKey(
+class Certificate(Base):
+    certificate_user = models.ForeignKey(User, related_name="certificates",
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+    picture_media = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
         blank=True,
-        null=True)
+        null=True,
+        help_text='Integer')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.certificate_user.username, self.title)
 
 
-class WorkExperience(models.Model):
+class WorkExperience(Base):
     STATUSES = (
         ('WITHOUT_CONFIRM', 'بدون تایید'),
         ('WAIT_FOR_CONFIRM', 'منتظر تایید'),
@@ -189,31 +195,33 @@ class WorkExperience(models.Model):
         ('UNCONFIRMED', 'تایید نشده'),
     )
 
-    user = models.ForeignKey(User, related_name="work_experiences",
-                             on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, blank=True)
-    organization = models.ForeignKey(
+    work_experience_user = models.ForeignKey(User, related_name="work_experiences",
+                             on_delete=models.CASCADE, help_text='Integer')
+    name = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    work_experience_organization = models.ForeignKey(
         Organization,
         related_name="work_experience_organization",
         on_delete=models.CASCADE,
         blank=True,
-        null=True)
-    position = models.CharField(max_length=100, blank=True)
-    from_date = models.CharField(max_length=7, blank=True, null=True)
-    to_date = models.CharField(max_length=7, blank=True, null=True)
+        null=True,
+        help_text='Integer')
+    position = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(100)')
+    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
     status = models.CharField(
         choices=STATUSES,
         max_length=20,
-        default='WITHOUT_CONFIRM')
+        default='WITHOUT_CONFIRM',
+        help_text='WITHOUT_CONFIRM | WAIT_FOR_CONFIRM | CONFIRMED | UNCONFIRMED')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.name)
+        return "%s(%s)" % (self.work_experience_user.username, self.name)
 
     def clean(self):
-        if not self.organization and not self.name:
+        if not self.work_experience_organization and not self.name:
             raise ValidationError(_('Please enter name or organization'))
 
-        if self.organization and self.name:
+        if self.work_experience_organization and self.name:
             raise ValidationError(_('Please enter name or organization'))
 
         if self.name and self.status != 'WITHOUT_CONFIRM':
@@ -235,25 +243,24 @@ class WorkExperience(models.Model):
             raise ValidationError(_('To date must be greater than from date'))
 
 
-class Skill(models.Model):
-    user = models.ForeignKey(User, related_name="skills",
-                             on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
-    tag = ArrayField(models.CharField(max_length=50), blank=True)
-    description = models.TextField(blank=True)
+class Skill(Base):
+    skill_user = models.ForeignKey(User, related_name="skills",
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+    tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
+    description = models.TextField(blank=True, help_text='Text')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.title)
+        return "%s(%s)" % (self.skill_user.username, self.title)
 
 
-class Badge(models.Model):
-    user = models.ForeignKey(User, related_name="badges",
-                             on_delete=models.CASCADE)
-    badge = models.CharField(max_length=100)
-    create_time = models.DateTimeField(auto_now_add=True)
+class Badge(Base):
+    badge_user = models.ForeignKey(User, related_name="badges",
+                             on_delete=models.CASCADE, help_text='Integer')
+    title = models.CharField(max_length=100, help_text='String(100)')
 
     def __str__(self):
-        return "%s(%s)" % (self.user.username, self.badge)
+        return "%s(%s)" % (self.badge_user.username, self.badge)
 
     class Meta:
-        unique_together = (('user', 'badge'),)
+        unique_together = (('badge_user', 'title'),)
