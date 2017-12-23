@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
     url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema)),
     url(r'^messages/', include('chats.urls')),
+    url(r'^exchanges/', include('exchanges.urls', namespace="exchanges")),
     # url(r'^', include('users.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'media',
     'products',
     'chats',
+    'exchanges',
     'rest_framework',
 ]
 

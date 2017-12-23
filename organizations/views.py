@@ -119,7 +119,7 @@ class OrganizationPictureViewset(ModelViewSet):
     def get_queryset(self):
         queryset = OrganizationPicture.objects.all()
 
-        organization = slef.request.query_params.get('organization', None)
+        organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization_id=organization)
 
