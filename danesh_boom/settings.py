@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'users',
     'organizations',
     'media',
-    'products'
+    'products',
     'chats',
     'rest_framework',
 ]
