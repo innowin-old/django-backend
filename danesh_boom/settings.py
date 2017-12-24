@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'products',
     'chats',
     'exchanges',
+    'forms',
     'rest_framework',
 ]
 
