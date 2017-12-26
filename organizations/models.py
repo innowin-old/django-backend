@@ -100,28 +100,6 @@ class OrganizationPicture(Base):
         return self.organization.official_name
 
 
-class Post(Base):
-    POST_TYPES = (
-        ('post', 'پست'),
-        ('offer', 'تقاضا'),
-        ('request', 'عرضه')
-    )
-    post_organization = models.ForeignKey(Organization, related_name="posts", on_delete=models.CASCADE, help_text='Integer')
-    post_user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE, help_text='Integer')
-
-    title = models.CharField(max_length=100, help_text='String(100)')
-    text = models.TextField(help_text='Text')
-    type = models.CharField(choices=POST_TYPES, max_length=10, help_text='post | offer | request')
-    post_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer')
-
-    def __str__(self):
-        return self.user.username
-
-    @property
-    def user_username(self):
-        return self.user.username
-
-
 class Staff(Base):
     staff_organization = models.ForeignKey(Organization, related_name='staffs', on_delete=models.CASCADE, help_text='Integer')
     staff_user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE, help_text='Integer')

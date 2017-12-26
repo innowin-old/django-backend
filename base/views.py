@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
@@ -7,14 +6,16 @@ from .models import (
     Base,
     Hashtag,
     HashtagParent,
-    BaseComment
+    BaseComment,
+    Post
 )
 
 from .serializers import (
     BaseSerializer,
     HashtagSerializer,
     HashtagParentSerializer,
-    BaseCommentSerializer
+    BaseCommentSerializer,
+    PostSerializer
 )
 
 
@@ -87,3 +88,44 @@ class BaseCommentViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return BaseCommentSerializer
+
+
+class PostViewSet(ModelViewSet):
+    queryset = Post.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+
+        post_type = self.request.query_params.get('post_type', None)
+        if post_type is not None:
+            queryset = queryset.filter(post_type=post_type)
+
+        post_user_id = self.request.query_params.get('post_user_id', None)
+        if post_user_id is not None:
+            queryset = queryset.filter(post_user_id=post_user_id)
+
+        post_user_username = self.request.query_params.get('post_user_username', None)
+        if post_user_username is not None:
+            queryset = queryset.filter(post_user__username__contains=post_user_username)
+
+        post_title = self.request.query_params.get('post_title', None)
+        if post_title is not None:
+            queryset = queryset.filter(post_title__contains=post_title)
+
+        post_description = self.request.query_params.get('post_description', None)
+        if post_description is not None:
+            queryset = queryset.filter(post_description__contains=post_description)
+
+        post_parent = self.request.query_params.get('post_parent', None)
+        if post_parent is not None:
+            queryset = queryset.filter(post_parent_id=post_parent)
+
+        post_pinned = self.request.query_params.get('post_pinned', None)
+        if post_pinned is not None:
+            queryset = queryset.filter(post_pinned=post_pinned)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return PostSerializer

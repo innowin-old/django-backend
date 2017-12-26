@@ -5,7 +5,6 @@ from .models import (
     Organization,
     StaffCount,
     OrganizationPicture,
-    Post,
     Staff,
     Follow,
     Ability,
@@ -17,7 +16,6 @@ from .serializers import (
     OrganizationSerializer,
     StaffCountSerializer,
     OrganizationPictureSerializer,
-    PostSerializer,
     StaffSerializer,
     FollowSerializer,
     AbilitySerializer,
@@ -127,35 +125,6 @@ class OrganizationPictureViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return OrganizationPictureSerializer
-
-
-class PostViewset(ModelViewSet):
-    queryset = Post.objects.all()
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        queryset = Post.objects.all()
-
-        organization = self.request.query_params.get('organization', None)
-        if organization is not None:
-            queryset = queryset.filter(organization_id=organization)
-
-        user = self.request.query_params.get('user', None)
-        if user is not None:
-            queryset = queryset.filter(user_id=user)
-
-        title = self.request.query_params.get('title', None)
-        if title is not None:
-            queryset = queryset.filter(title=title)
-
-        type = self.request.query_params.get('type', None)
-        if type is not None:
-            queryset = queryset.filter(type=type)
-
-        return queryset
-
-    def get_serializer_class(self):
-        return PostSerializer
 
 
 class StaffViewset(ModelViewSet):

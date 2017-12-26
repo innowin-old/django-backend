@@ -5,11 +5,13 @@ from .views import (
         BaseViewset,
         HashtagParentViewset,
         HashtagViewset,
-        BaseCommentViewset
+        BaseCommentViewset,
+        PostViewSet
     )
 
 
 router = DefaultRouter()
+router.register(r'posts', PostViewSet)
 router.register(r'hashtag-parents', HashtagParentViewset)
 router.register(r'hashtags', HashtagViewset)
 router.register(r'comments', BaseCommentViewset)

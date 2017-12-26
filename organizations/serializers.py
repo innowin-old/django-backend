@@ -4,7 +4,6 @@ from .models import (
         Organization,
         StaffCount,
         OrganizationPicture,
-        Post,
         Staff,
         Follow,
         Ability,
@@ -34,15 +33,6 @@ class StaffCountSerializer(BaseSerializer):
 class OrganizationPictureSerializer(BaseSerializer):
     class Meta:
         model = OrganizationPicture
-        fields = '__all__'
-        extra_kwargs = {
-            'updated_time': {'read_only': True}
-        }
-
-
-class PostSerializer(BaseSerializer):
-    class Meta:
-        model = Post
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True}

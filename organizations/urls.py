@@ -5,7 +5,6 @@ from .views import (
     OrganizationViewset,
     StaffCountViewset,
     OrganizationPictureViewset,
-    PostViewset,
     StaffViewset,
     FollowViewset,
     AbilityViewset,
@@ -16,7 +15,6 @@ from .views import (
 router = DefaultRouter()
 router.register(r'staff-counts', StaffCountViewset)
 router.register(r'pictures', OrganizationPictureViewset)
-router.register(r'posts', PostViewset)
 router.register(r'staff', StaffViewset)
 router.register(r'followers', FollowViewset)
 router.register(r'abilities', AbilityViewset)

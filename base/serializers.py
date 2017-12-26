@@ -3,7 +3,8 @@ from .models import (
         Base,
         HashtagParent,
         Hashtag,
-        BaseComment
+        BaseComment,
+        Post
     )
 
 
@@ -52,4 +53,15 @@ class BaseCommentSerializer(BaseSerializer):
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True}
+        }
+
+
+class PostSerializer(BaseSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'post_seen_count': {'read_only': True},
+            'post_click_count': {'read_only': True}
         }
