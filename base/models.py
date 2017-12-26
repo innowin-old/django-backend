@@ -49,8 +49,6 @@ class Post(Base):
     post_parent = models.ForeignKey(Base, related_name='base_posts', db_index=True, on_delete=models.CASCADE, help_text='integer')
     post_pinned = models.BooleanField(default=False, help_text='Boolean')
     post_promote = UnixTimeStampField(auto_now_add=True, use_numeric=True, help_text='Unix Time Stamp', db_index=True)
-    post_seen_count = models.BigIntegerField(default=0, help_text='Integer')
-    post_click_count = models.BigIntegerField(default=0, help_text='Integer')
 
     def __str__(self):
         return self.post_user.username

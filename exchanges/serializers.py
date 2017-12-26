@@ -1,15 +1,14 @@
-from rest_framework.serializers import ModelSerializer
-
-from .models import Exchange, Exchange_Identity
+from base.serializers import BaseSerializer
+from .models import Exchange, ExchangeIdentity
 
 # Create Serializers Here
-class ExchangeSerilizer(ModelSerializer):
+class ExchangeSerilizer(BaseSerializer):
     class Meta:
         model = Exchange
         fields = '__all__'
 
 
-class ExchangeIdentitySerializer(ModelSerializer):
+class ExchangeIdentitySerializer(BaseSerializer):
     class Meta:
-        model=Exchange_Identity
+        model=ExchangeIdentity
         fields = '__all___'

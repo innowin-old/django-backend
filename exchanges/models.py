@@ -7,7 +7,7 @@ from users.models import Identity
 
 # Create your models here.
 class Exchange(Base):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, db_index=True)
     exchange_image = models.ForeignKey(
         Media,
         related_name="exchange",
@@ -17,19 +17,22 @@ class Exchange(Base):
     link = models.URLField(blank=True)
     description = models.TextField(
         max_length=300,
-        blank=True
+        blank=True,
+        db_index=True,
     )
     exchange_hashtag = models.ForeignKey(
         Hashtag,
         related_name="exchange",
         blank=True,
         null=True,
+        db_index=True,
     )
     private = models.BooleanField(default=False)
     members_count = models.IntegerField(default=100)
+    active_flag = models.BooleanField(default=True)
 
 
-class Exchange_Identity(Base):
+class ExchangeIdentity(Base):
     JOIN_TYPES = (
         ('join', 'عضو'),
         ('quest', 'مهمان'),

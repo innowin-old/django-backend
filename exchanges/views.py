@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
-from .models import Exchange, Exchange_Identity
+from .models import Exchange, ExchangeIdentity
 from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
 
 # Create your views here.
@@ -17,7 +17,11 @@ class ExchangeViewSet(ModelViewSet):
 
         name = self.request.query_params.get('name', None)
         if name is not None:
-            queryset = queryset.filter(name=name)
+            queryset = queryset.filter(name__contains=name)
+
+        description = self.request.query_params.get('description', None)
+        if description is not None:
+            queryset = queryset.filter(description=description)
 
         hashtag_id = self.request.query_params.get('exchange_hashtag', None)
         if hashtag_id is not None:
@@ -44,23 +48,32 @@ class ExchangeViewSet(ModelViewSet):
     def get_serializer_class(self):
         return ExchangeSerilizer
 
+
 class ExchangeIdentityViewSet(ModelViewSet):
     """
         A ViewSet for Handle Identity Exchange Views
     """
-    queryset = Exchange_Identity.objects.all()
+    queryset = ExchangeIdentity.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Exchange_Identity.objects.all()
+        queryset = ExchangeIdentity.objects.all()
 
-        exchanges_identity_id = self.request.query_params.get('exchange_id', None)
-        if exchanges_identity_id is not  None:
-            queryset = queryset.filter(exchanges_identity_id=exchanges_identity_id)
+        exchange_id = self.request.query_params.get('exchange_id', None)
+        if exchange_id is not  None:
+            queryset = queryset.filter(exchanges_identity_id=exchange_id)
 
-        identities_exchange_id = self.request.query_params.get('identity_id', None)
-        if identities_exchange_id is not None:
-            queryset = queryset.filter(identities_exchange_id=identities_exchange_id)
+        exchange_name = self.request.query_params.get('exchange_name', None)
+        if exchange_name is not  None:
+            queryset = queryset.filter(exchanges_identity__name__contains=exchange_name)
+
+        identity_id = self.request.query_params.get('identity_id', None)
+        if identity_id is not None:
+            queryset = queryset.filter(identities_exchange_id=identity_id)
+
+        identity_name = self.request.query_params.get('identity_name', None)
+        if identity_name is not None:
+            queryset = queryset.filter(identities_exchange__name__contains=identity_name)
 
         join_type = self.request.query_params.get('join_type', None)
         if join_type is not None:

@@ -62,6 +62,4 @@ class PostSerializer(BaseSerializer):
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True},
-            'post_seen_count': {'read_only': True},
-            'post_click_count': {'read_only': True}
         }

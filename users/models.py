@@ -25,6 +25,7 @@ class Identity(Base):
         User,
         related_name="identity",
         on_delete=models.CASCADE,
+        db_index=True,
         null=True,
         blank=True,
         help_text='Integer')
@@ -32,10 +33,11 @@ class Identity(Base):
         Organization,
         related_name="identity",
         on_delete=models.CASCADE,
+        db_index=True,
         null=True,
         blank=True,
         help_text='Integer')
-    name = models.CharField(max_length=150, unique=True, help_text='String(150)')
+    name = models.CharField(max_length=150, db_index=True, unique=True, help_text='String(150)')
 
     def clean(self):
         if not self.identity_user and not self.identity_organization:
@@ -260,7 +262,7 @@ class Badge(Base):
     title = models.CharField(max_length=100, help_text='String(100)')
 
     def __str__(self):
-        return "%s(%s)" % (self.badge_user.username, self.badge)
+        return "%s(%s)" % (self.badge_user.username, self.badge_user)
 
     class Meta:
         unique_together = (('badge_user', 'title'),)

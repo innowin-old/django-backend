@@ -60,7 +60,7 @@ class Price(Base):
     value = models.FloatField(help_text='Float')
 
     def __str__(self):
-        return '%s(%s)' % (self.product.name, self.price)
+        return '%s(%s)' % (self.price_product.name, self.price_product)
 
 
 class Picture(Base):
@@ -70,7 +70,7 @@ class Picture(Base):
     description = models.TextField(blank=True, db_index=True, help_text='Text')
 
     def __str__(self):
-        return self.product.name
+        return self.picture_product.name
 
 
 class Comment(Base):
@@ -79,4 +79,4 @@ class Comment(Base):
     text = models.TextField(db_index=True, help_text='Text')
 
     def __str__(self):
-        return '%s(%s)' % (self.product.name, self.user.username)
+        return '%s(%s)' % (self.comment_product.name, self.comment_user.username)
