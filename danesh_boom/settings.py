@@ -114,6 +114,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': 'unix:/tmp/memcached.sock',
+    }
+}
+
+CACHE_TIMEOUT = 60 * 60 * 24 
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 

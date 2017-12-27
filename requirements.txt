@@ -24,3 +24,4 @@ social-auth-core==1.2.0
 typing==3.5.3.0
 djangorestframework
 coreapi
+python-memcached==1.59

@@ -19,8 +19,11 @@ from .serializers import (
 
 
 class BaseViewset(ModelViewSet):
-    queryset = Base.objects.all()
+    # queryset = Base.objects.all()
     permission_classes = ""
+
+    def get_queryset(self):
+        return Base.objects.all()
 
     def get_serializer_class(self):
         return BaseSerializer
