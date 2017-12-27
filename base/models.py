@@ -1,10 +1,23 @@
 from django.db import models
 from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
+<<<<<<< HEAD
 
 from unixtimestampfield.fields import UnixTimeStampField
 
 from media.models import Media
+=======
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.core.cache import cache
+from django.conf import settings
+
+
+class BaseManager(models.Manager):
+    def get_queryset(self):
+        if not cache.get(self.model._meta.db_table):
+            cache.set(self.model._meta.db_table, super(BaseManager, self).get_queryset().filter(delete_flag=False), settings.CACHE_TIMEOUT)
+        return cache.get(self.model._meta.db_table)
+>>>>>>> saeid
 
 
 class Base(models.Model):
@@ -14,6 +27,9 @@ class Base(models.Model):
 
     created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
     updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
+    delete_flag = models.BooleanField(db_index=True, default=False)
+
+    objects = BaseManager()
 
 
 class HashtagParent(Base):
