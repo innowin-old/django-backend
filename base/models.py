@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.cache import cache
 from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class BaseManager(models.Manager):
@@ -40,3 +42,8 @@ class BaseComment(Base):
     comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture", help_text='Integer')
     text = models.TextField(help_text='Text')
+
+
+@receiver(post_save, sender=Base)
+def update_cache(sender, instance, **kwargs):
+    cache.set(instance._meta.db_table, sender.objects.filter(delete_flag=False), settings.CACHE_TIMEOUT)
