@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.auth.models import User
 
 from unixtimestampfield.fields import UnixTimeStampField
 
@@ -42,7 +40,7 @@ class Post(Base):
         ('post', 'پست'),
     )
     post_type = models.CharField(choices=POST_TYPES, default='post', max_length=10, help_text='supply | demand | post')
-    post_user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
+    post_user = models.ForeignKey('users.Identity', related_name="user_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
     post_title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     post_description = models.TextField(max_length=300, db_index=True, help_text='String(300)', blank=True, null=True)
     post_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer', blank=True, null=True)
@@ -51,8 +49,8 @@ class Post(Base):
     post_promote = UnixTimeStampField(auto_now_add=True, use_numeric=True, help_text='Unix Time Stamp', db_index=True)
 
     def __str__(self):
-        return self.post_user.username
+        return self.post_user.name
 
     @property
     def user_username(self):
-        return self.post_user.username
+        return self.post_user.name

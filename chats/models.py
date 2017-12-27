@@ -12,6 +12,7 @@ class Message(Base):
         on_delete=models.CASCADE,
         default=None,
         db_index=True,
+        help_text='Integer',
     )
     message_receiver = models.ForeignKey(
         Identity,
@@ -19,6 +20,7 @@ class Message(Base):
         on_delete=models.CASCADE,
         default=None,
         db_index=True,
+        help_text='Integer',
     )
     message_replay = models.ForeignKey(
         'self',
@@ -28,6 +30,7 @@ class Message(Base):
         blank=True,
         null=True,
         db_index=True,
+        help_text='Integer',
     )
     message_forward = models.ForeignKey(
         'self',
@@ -37,11 +40,12 @@ class Message(Base):
         blank=True,
         null=True,
         db_index=True,
+        help_text='Integer',
     )
     send_date = models.DateTimeField(auto_now_add=True)
     seen_date = models.DateTimeField(blank=True, null=True, default=None)
-    body = models.TextField(blank=True, null=True, default=None, db_index=True)
-    seen = models.BooleanField(default=False)
+    body = models.TextField(blank=True, null=True, default=None, db_index=True, help_text='Text')
+    seen = models.BooleanField(default=False, help_text='Boolean')
     message_file = models.ForeignKey(
         Media,
         related_name="message",
@@ -49,4 +53,5 @@ class Message(Base):
         default=None,
         blank=True,
         null=True,
+        help_text='Integer',
     )

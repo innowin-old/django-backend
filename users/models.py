@@ -2,17 +2,15 @@ from __future__ import unicode_literals
 
 import re
 
+from django.db import models, transaction
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, \
-    MinValueValidator, RegexValidator
-from django.db import models, transaction
-from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.timezone import now
 
 from danesh_boom.models import PhoneField
 from media.models import Media

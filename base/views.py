@@ -101,13 +101,13 @@ class PostViewSet(ModelViewSet):
         if post_type is not None:
             queryset = queryset.filter(post_type=post_type)
 
-        post_user_id = self.request.query_params.get('post_user_id', None)
-        if post_user_id is not None:
-            queryset = queryset.filter(post_user_id=post_user_id)
+        post_identity_id = self.request.query_params.get('post_identity_id', None)
+        if post_identity_id is not None:
+            queryset = queryset.filter(post_identity_id=post_identity_id)
 
-        post_user_username = self.request.query_params.get('post_user_username', None)
-        if post_user_username is not None:
-            queryset = queryset.filter(post_user__username__contains=post_user_username)
+        post_identity_name = self.request.query_params.get('post_identity_name', None)
+        if post_identity_name is not None:
+            queryset = queryset.filter(post_identity__name__contains=post_identity_name)
 
         post_title = self.request.query_params.get('post_title', None)
         if post_title is not None:
