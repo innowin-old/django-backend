@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
@@ -22,7 +21,7 @@ from .serializers import (
 
 
 class CategoryViewset(ModelViewSet):
-    queryset = Category.objects.all()
+    # queryset = Category.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -47,7 +46,7 @@ class CategoryViewset(ModelViewSet):
 
 
 class CategoryFieldViewset(ModelViewSet):
-    queryset = CategoryField.objects.all()
+    # queryset = CategoryField.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -83,7 +82,7 @@ class CategoryFieldViewset(ModelViewSet):
 
 
 class ProductViewset(ModelViewSet):
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -146,7 +145,7 @@ class ProductViewset(ModelViewSet):
 
 
 class PriceViewset(ModelViewSet):
-    queryset = Price.objects.all()
+    # queryset = Price.objects.all()
     permisison_classes = [AllowAny]
 
     def get_queryset(self):
@@ -209,7 +208,7 @@ class PriceViewset(ModelViewSet):
 
 
 class PictureViewset(ModelViewSet):
-    queryset = Picture.objects.all()
+    # queryset = Picture.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -230,7 +229,7 @@ class PictureViewset(ModelViewSet):
 
 
 class CommentViewset(ModelViewSet):
-    queryset = Comment.objects.all()
+    # queryset = Comment.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

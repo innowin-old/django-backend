@@ -13,14 +13,14 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'staff-counts', StaffCountViewset)
-router.register(r'pictures', OrganizationPictureViewset)
-router.register(r'staff', StaffViewset)
-router.register(r'followers', FollowViewset)
-router.register(r'abilities', AbilityViewset)
-router.register(r'confirmations', ConfirmationViewset)
-router.register(r'customers', CustomerViewset)
-router.register(r'', OrganizationViewset)
+router.register(r'staff-counts', StaffCountViewset, 'staff-counts')
+router.register(r'pictures', OrganizationPictureViewset, 'organization-pictures')
+router.register(r'staff', StaffViewset, 'staffs')
+router.register(r'followers', FollowViewset, 'followers')
+router.register(r'abilities', AbilityViewset, 'abilities')
+router.register(r'confirmations', ConfirmationViewset, 'confirmations')
+router.register(r'customers', CustomerViewset, 'customers')
+router.register(r'', OrganizationViewset, 'organizations')
 
 urlpatterns = [
     url(r'^', include(router.urls))

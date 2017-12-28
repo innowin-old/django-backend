@@ -23,7 +23,7 @@ class FormViewSet(ModelViewSet):
     """
         A ViewSet for Handle Form Views
     """
-    queryset = Form.objects.all()
+    # queryset = Form.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -47,7 +47,7 @@ class GroupViewSet(ModelViewSet):
     """
         A ViewSet for Handle Group Views
     """
-    queryset = Group.objects.all()
+    # queryset = Group.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -67,7 +67,7 @@ class FormGroupViewSet(ModelViewSet):
     """
         A ViewSet for Handle Form Group Views
     """
-    queryset = FormGroup.objects.all()
+    # queryset = FormGroup.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -103,7 +103,7 @@ class ElementViewSet(ModelViewSet):
     """
         A ViewSet for Handle Element Views
     """
-    queryset = Element.objects.all()
+    # queryset = Element.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -123,7 +123,7 @@ class FormGroupElementViewSet(ModelViewSet):
     """
         A ViewSet for Handle FormGroupElement Views
     """
-    queryset = FormGroupElement.objects.all()
+    # queryset = FormGroupElement.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -155,7 +155,7 @@ class DataViewSet(ModelViewSet):
     """
         A ViewSet for Handle Data Views
     """
-    queryset = Data.objects.all()
+    # queryset = Data.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

@@ -9,7 +9,7 @@ class ExchangeViewSet(ModelViewSet):
     """
         A ViewSet for Handle Exchange Views
     """
-    queryset = Exchange.objects.all()
+    # queryset = Exchange.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -53,7 +53,7 @@ class ExchangeIdentityViewSet(ModelViewSet):
     """
         A ViewSet for Handle Identity Exchange Views
     """
-    queryset = ExchangeIdentity.objects.all()
+    # queryset = ExchangeIdentity.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

@@ -31,7 +31,7 @@ class BaseViewset(ModelViewSet):
 
 
 class HashtagParentViewset(ModelViewSet):
-    queryset = HashtagParent.objects.all()
+    # queryset = HashtagParent.objects.all()
     permisison_classes = ""
 
     def get_queryset(self):
@@ -48,7 +48,7 @@ class HashtagParentViewset(ModelViewSet):
 
     
 class HashtagViewset(ModelViewSet):
-    queryset = Hashtag.objects.all()
+    # queryset = Hashtag.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -69,7 +69,7 @@ class HashtagViewset(ModelViewSet):
 
 
 class BaseCommentViewset(ModelViewSet):
-    queryset = BaseComment.objects.all()
+    # queryset = BaseComment.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -94,7 +94,7 @@ class BaseCommentViewset(ModelViewSet):
 
 
 class PostViewSet(ModelViewSet):
-    queryset = Post.objects.all()
+    # queryset = Post.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

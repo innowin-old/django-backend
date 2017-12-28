@@ -1,8 +1,11 @@
 from django.db import models
+from django.db.models.signals import post_save
 
-from base.models import Base
+from base.models import Base, BaseManager
+from base.signals import update_cache
 from users.models import Identity
 from media.models import Media
+
 
 # Create your models here.
 class Message(Base):
@@ -55,3 +58,8 @@ class Message(Base):
         null=True,
         help_text='Integer',
     )
+
+    objects = BaseManager()
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Message)

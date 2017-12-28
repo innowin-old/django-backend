@@ -1,10 +1,12 @@
 from django.db import models, transaction
+from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 
 from danesh_boom.models import PhoneField
 from media.models import Media
-from base.models import Base
+from base.models import Base, BaseManager
+from base.signals import update_cache
 
 
 class Organization(Base):
@@ -63,6 +65,8 @@ class Organization(Base):
     social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[], help_text='Array(String(100))')
     staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.official_name
 
@@ -78,6 +82,10 @@ class Organization(Base):
             identity.save()
             if self.staff_count:
                 StaffCount.objects.create(organization=self, count=self.staff_count)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Organization)
 
 
 class StaffCount(Base):
@@ -99,6 +107,12 @@ class OrganizationPicture(Base):
     def __str__(self):
         return self.picture_organization.official_name
 
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=OrganizationPicture)
+
 
 class Staff(Base):
     staff_organization = models.ForeignKey(Organization, related_name='staffs', db_index=True, on_delete=models.CASCADE, help_text='Integer')
@@ -107,16 +121,34 @@ class Staff(Base):
     position = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     post_permission = models.BooleanField(default=False, help_text='Boolean')
 
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Staff)
+
 
 class Follow(Base):
     follow_identity = models.ForeignKey('users.Identity', related_name='followers', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     follow_follower = models.ForeignKey('users.Identity', related_name='following', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Follow)
 
 
 class Ability(Base):
     ability_organization = models.ForeignKey(Organization, db_index=True, related_name='abilities', on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     text = models.TextField(help_text='Text', db_index=True)
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Ability)
 
 
 class Confirmation(Base):
@@ -127,9 +159,21 @@ class Confirmation(Base):
     link = models.CharField(max_length=200, help_text='String(200)')
     confirm_flag = models.BooleanField(default=False, help_text='Boolean')
 
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, Confirmation)
+
 
 class Customer(Base):
     customer_organization = models.ForeignKey(Organization, related_name='customer_organization', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     related_customer = models.ForeignKey('users.Identity', related_name='customers', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer')
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Customer)

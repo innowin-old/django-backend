@@ -1,6 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
 
-from base.models import Base, Hashtag
+from base.models import Base, Hashtag, BaseManager
+from base.signals import update_cache
 from media.models import Media
 from users.models import Identity
 
@@ -34,6 +36,12 @@ class Exchange(Base):
     members_count = models.IntegerField(default=100, help_text='Boolean')
     active_flag = models.BooleanField(default=True, help_text='Boolean')
 
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Exchange)
+
 
 class ExchangeIdentity(Base):
     JOIN_TYPES = (
@@ -57,3 +65,9 @@ class ExchangeIdentity(Base):
         help_text='join | quest'
     )
     active_flag = models.BooleanField(default=True, help_text='Boolean')
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=ExchangeIdentity)

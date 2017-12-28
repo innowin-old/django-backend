@@ -9,7 +9,7 @@ class MessageViewSet(ModelViewSet):
     """
         A ViewSet for Handle Message Views
     """
-    queryset = Message.objects.all()
+    # queryset = Message.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

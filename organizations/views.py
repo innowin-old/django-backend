@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from .models import (
@@ -25,7 +24,7 @@ from .serializers import (
 
 
 class OrganizationViewset(ModelViewSet):
-    queryset = Organization.objects.all()
+    # queryset = Organization.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -94,7 +93,7 @@ class OrganizationViewset(ModelViewSet):
 
 
 class StaffCountViewset(ModelViewSet):
-    queryset = StaffCount.objects.all()
+    # queryset = StaffCount.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -111,7 +110,7 @@ class StaffCountViewset(ModelViewSet):
 
 
 class OrganizationPictureViewset(ModelViewSet):
-    queryset = OrganizationPicture.objects.all()
+    # queryset = OrganizationPicture.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -128,7 +127,7 @@ class OrganizationPictureViewset(ModelViewSet):
 
 
 class StaffViewset(ModelViewSet):
-    queryset = Staff.objects.all()
+    # queryset = Staff.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -183,7 +182,7 @@ class StaffViewset(ModelViewSet):
 
 
 class FollowViewset(ModelViewSet):
-    queryset = Follow.objects.all()
+    # queryset = Follow.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -226,7 +225,7 @@ class FollowViewset(ModelViewSet):
 
 
 class AbilityViewset(ModelViewSet):
-    queryset = Ability.objects.all()
+    # queryset = Ability.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -266,7 +265,7 @@ class AbilityViewset(ModelViewSet):
 
 
 class ConfirmationViewset(ModelViewSet):
-    queryset = Confirmation.objects.all()
+    # queryset = Confirmation.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -321,7 +320,7 @@ class ConfirmationViewset(ModelViewSet):
 
 
 class CustomerViewset(ModelViewSet):
-    queryset = Customer.objects.all()
+    # queryset = Customer.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):

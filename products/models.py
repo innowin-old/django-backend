@@ -1,10 +1,12 @@
 from django.db import models
+from django.db.models.signals import post_save
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 
+from base.models import Base, BaseManager
+from base.signals import update_cache
 from media.models import Media
 from users.models import Identity
-from base.models import Base
 
 
 class Category(Base):
@@ -13,9 +15,14 @@ class Category(Base):
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     creatable = models.BooleanField(default=False, help_text='Boolean')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.name
 
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Category)
 
 class CategoryField(Base):
     STRING = 'string'
@@ -36,8 +43,14 @@ class CategoryField(Base):
     order = models.IntegerField(default=0, db_index=True, help_text='Integer')
     option = JSONField(null=True, blank=True, db_index=True, help_text='JSON')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.name
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=CategoryField)
 
 
 class Product(Base):
@@ -51,16 +64,28 @@ class Product(Base):
     attrs = JSONField(null=True, blank=True, help_text='JSON')
     custom_attrs = JSONField(null=True, blank=True, help_text='JSON')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.name
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Product)
 
 
 class Price(Base):
     price_product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True, help_text='Integer')
     value = models.FloatField(help_text='Float')
 
+    objects = BaseManager()
+
     def __str__(self):
         return '%s(%s)' % (self.price_product.name, self.price_product)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Price)
 
 
 class Picture(Base):
@@ -69,8 +94,14 @@ class Picture(Base):
     order = models.IntegerField(default=0, help_text='Integer')
     description = models.TextField(blank=True, db_index=True, help_text='Text')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.picture_product.name
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Picture)
 
 
 class Comment(Base):
@@ -78,5 +109,11 @@ class Comment(Base):
     comment_user = models.ForeignKey(User, related_name="user_product_comments", on_delete=models.CASCADE, db_index=True, help_text='Integer')
     text = models.TextField(db_index=True, help_text='Text')
 
+    objects = BaseManager()
+
     def __str__(self):
         return '%s(%s)' % (self.comment_product.name, self.comment_user.username)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Comment)
