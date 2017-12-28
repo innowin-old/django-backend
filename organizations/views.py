@@ -1,30 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from .models import (
-<<<<<<< HEAD
-        Organization,
-        StaffCount,
-        OrganizationPicture,
-        Post,
-        Staff,
-        Follow,
-        Ability,
-        Confirmation,
-        Customer
-    )
-
-from .serializers import (
-        OrganizationSerializer,
-        StaffCountSerializer,
-        OrganizationPictureSerializer,
-        PostSerializer,
-        StaffSerializer,
-        FollowSerializer,
-        AbilitySerializer,
-        ConfirmationSerializer,
-        CustomerSerializer
-    )
-=======
     Organization,
     StaffCount,
     OrganizationPicture,
@@ -34,7 +10,6 @@ from .serializers import (
     Confirmation,
     Customer
 )
-
 from .serializers import (
     OrganizationSerializer,
     StaffCountSerializer,
@@ -45,7 +20,6 @@ from .serializers import (
     ConfirmationSerializer,
     CustomerSerializer
 )
->>>>>>> amir
 
 
 class OrganizationViewset(ModelViewSet):
@@ -294,12 +268,6 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
-<<<<<<< HEAD
-        corroborant = self.request.query_params.get('corroborant', None)
-        if corroborant is not None:
-            queryset = queryset.filter(corroborant_id=corroborant)
-=======
-
         """
             Corroborant Filter Options
         """
@@ -314,7 +282,6 @@ class ConfirmationViewset(ModelViewSet):
         corroborant_username = self.request.query_params.get('corroborant_username', None)
         if corroborant_username is not None:
             queryset = queryset.filter(confirmation_corroborant__identity_user__username__contains=corroborant_username)
->>>>>>> amir
 
         """
             Confirmed Filter Options

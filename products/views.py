@@ -27,16 +27,10 @@ class CategoryViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Category.objects.all()
 
-<<<<<<< HEAD
-        parent = self.request.query_params.get('parent', None)
-        if parent is not None:
-            queryset = queryset.filter(parent_id=parent)
-=======
         parent_id = self.request.query_params.get('parent_id', None)
         if parent_id is not None:
             queryset = queryset.filter(category_parent_id=parent_id)
 
->>>>>>> amir
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name__contains=name)
@@ -57,11 +51,6 @@ class CategoryFieldViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = CategoryField.objects.all()
-<<<<<<< HEAD
-        category = self.request.query_params.get('category', None)
-        if category is not None:
-            queryset = queryset.filter(category_id=category)
-=======
 
         """
             Category Filter Options
@@ -77,7 +66,6 @@ class CategoryFieldViewset(ModelViewSet):
         category_title = self.request.query_params.get('category_title', None)
         if category_title is not None:
             queryset = queryset.filter(field_category__title__contains=category_title)
->>>>>>> amir
 
         name = self.request.query_params.get('name', None)
         if name is not None:
@@ -158,7 +146,7 @@ class ProductViewset(ModelViewSet):
 
 class PriceViewset(ModelViewSet):
     # queryset = Price.objects.all()
-    permisison_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Price.objects.all()

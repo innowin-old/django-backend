@@ -125,12 +125,6 @@ class BadgeViewset(ModelViewSet):
     def get_serializer_class(self):
         return BadgeSerializer
 
-<<<<<<< HEAD
-#@ensure_csrf_cookie
-#def index(request):
-#    return render(request, "index.html")
-=======
->>>>>>> amir
 
 def login_page(request):
     logout(request)
