@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-from django.views.decorators.csrf import ensure_csrf_cookie
 
 from utils.token import validate_token
 
@@ -31,15 +30,24 @@ from .serializers import (
 
 
 class IdentityViewset(ModelViewSet):
-    queryset = Identity.objects.all()
+    # queryset = Identity.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Identity.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return IdentitySerializer
 
 
 class ProfileViewset(ModelViewSet):
-    queryset = Profile.objects.all()
+    # queryset = Profile.objects.all()
+
+    def get_queryset(self):
+        queryset = Profile.objects.all()
+        return queryset
+
     permission_classes = [AllowAny]
 
     def get_serializer_class(self):
@@ -47,55 +55,82 @@ class ProfileViewset(ModelViewSet):
 
 
 class EducationViewset(ModelViewSet):
-    queryset = Education.objects.all()
+    # queryset = Education.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Education.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return EducationSerializer
 
 
 class ResearchViewset(ModelViewSet):
-    queryset = Research.objects.all()
+    # queryset = Research.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Research.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return ResearchSerializer
 
 
 class CertificateViewset(ModelViewSet):
-    queryset = Certificate.objects.all()
+    # queryset = Certificate.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Certificate.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return CertificateSerializer
 
 
 class WorkExperienceViewset(ModelViewSet):
-    queryset = WorkExperience.objects.all()
+    # queryset = WorkExperience.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = WorkExperience.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return WorkExperienceSerializer
 
 
 class SkillViewset(ModelViewSet):
-    queryset = Skill.objects.all()
-    permisison_classes = [AllowAny]
+    # queryset = Skill.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Skill.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return SkillSerializer
 
 
 class BadgeViewset(ModelViewSet):
-    queryset = Badge.objects.all()
+    # queryset = Badge.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Badge.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         return BadgeSerializer
 
+<<<<<<< HEAD
 #@ensure_csrf_cookie
 #def index(request):
 #    return render(request, "index.html")
+=======
+>>>>>>> amir
 
 def login_page(request):
     logout(request)

@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
@@ -7,27 +6,32 @@ from .models import (
     Base,
     Hashtag,
     HashtagParent,
-    BaseComment
+    BaseComment,
+    Post
 )
 
 from .serializers import (
     BaseSerializer,
     HashtagSerializer,
     HashtagParentSerializer,
-    BaseCommentSerializer
+    BaseCommentSerializer,
+    PostSerializer
 )
 
 
 class BaseViewset(ModelViewSet):
-    queryset = Base.objects.all()
+    # queryset = Base.objects.all()
     permission_classes = ""
+
+    def get_queryset(self):
+        return Base.objects.all()
 
     def get_serializer_class(self):
         return BaseSerializer
 
 
 class HashtagParentViewset(ModelViewSet):
-    queryset = HashtagParent.objects.all()
+    # queryset = HashtagParent.objects.all()
     permisison_classes = ""
 
     def get_queryset(self):
@@ -44,7 +48,7 @@ class HashtagParentViewset(ModelViewSet):
 
     
 class HashtagViewset(ModelViewSet):
-    queryset = Hashtag.objects.all()
+    # queryset = Hashtag.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -65,7 +69,7 @@ class HashtagViewset(ModelViewSet):
 
 
 class BaseCommentViewset(ModelViewSet):
-    queryset = BaseComment.objects.all()
+    # queryset = BaseComment.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -87,3 +91,44 @@ class BaseCommentViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return BaseCommentSerializer
+
+
+class PostViewSet(ModelViewSet):
+    # queryset = Post.objects.all()
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+
+        post_type = self.request.query_params.get('post_type', None)
+        if post_type is not None:
+            queryset = queryset.filter(post_type=post_type)
+
+        post_identity_id = self.request.query_params.get('post_identity_id', None)
+        if post_identity_id is not None:
+            queryset = queryset.filter(post_identity_id=post_identity_id)
+
+        post_identity_name = self.request.query_params.get('post_identity_name', None)
+        if post_identity_name is not None:
+            queryset = queryset.filter(post_identity__name__contains=post_identity_name)
+
+        post_title = self.request.query_params.get('post_title', None)
+        if post_title is not None:
+            queryset = queryset.filter(post_title__contains=post_title)
+
+        post_description = self.request.query_params.get('post_description', None)
+        if post_description is not None:
+            queryset = queryset.filter(post_description__contains=post_description)
+
+        post_parent = self.request.query_params.get('post_parent', None)
+        if post_parent is not None:
+            queryset = queryset.filter(post_parent_id=post_parent)
+
+        post_pinned = self.request.query_params.get('post_pinned', None)
+        if post_pinned is not None:
+            queryset = queryset.filter(post_pinned=post_pinned)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return PostSerializer

@@ -19,14 +19,14 @@ from .views import (
 
 
 router = DefaultRouter()
-router.register(r'identities', IdentityViewset)
-router.register(r'profiles', ProfileViewset)
-router.register(r'educations', EducationViewset)
-router.register(r'researches', ResearchViewset)
-router.register(r'certificates', CertificateViewset)
-router.register(r'work-experiences', WorkExperienceViewset)
-router.register(r'skills', SkillViewset)
-router.register(r'badges', BadgeViewset)
+router.register(r'identities', IdentityViewset, 'identities')
+router.register(r'profiles', ProfileViewset, 'profiles')
+router.register(r'educations', EducationViewset, 'educations')
+router.register(r'researches', ResearchViewset, 'researches')
+router.register(r'certificates', CertificateViewset, 'certificates')
+router.register(r'work-experiences', WorkExperienceViewset, 'work-experiences')
+router.register(r'skills', SkillViewset, 'skills')
+router.register(r'badges', BadgeViewset, 'badges')
 
 
 urlpatterns = [

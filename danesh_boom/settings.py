@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'media',
     'products'
     'chats',
+    'exchanges',
+    'forms',
     'rest_framework',
 ]
 
@@ -114,6 +116,15 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+CACHE_TIMEOUT = 60 * 60 * 24 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

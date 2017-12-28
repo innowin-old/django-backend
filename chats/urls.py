@@ -5,7 +5,7 @@ from .views import MessageViewSet
 
 router = DefaultRouter()
 
-router.register(r'', MessageViewSet)
+router.register(r'', MessageViewSet, 'messages')
 
 urlpatterns = [
     url('^', include(router.urls))

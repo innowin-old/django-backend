@@ -1,9 +1,9 @@
-from rest_framework.serializers import ModelSerializer, FileField
+from base.serializers import BaseSerializer
 
 from .models import Message
 
 # define serializers here
-class MessageSerializer(ModelSerializer):
+class MessageSerializer(BaseSerializer):
     class Meta:
         model = Message
         fields = '__all__'

@@ -5,15 +5,17 @@ from .views import (
         BaseViewset,
         HashtagParentViewset,
         HashtagViewset,
-        BaseCommentViewset
+        BaseCommentViewset,
+        PostViewSet
     )
 
 
 router = DefaultRouter()
-router.register(r'hashtag-parents', HashtagParentViewset)
-router.register(r'hashtags', HashtagViewset)
-router.register(r'comments', BaseCommentViewset)
-router.register(r'', BaseViewset)
+router.register(r'hashtag-parents', HashtagParentViewset, 'Hashtag Parents')
+router.register(r'hashtags', HashtagViewset, 'Hashtag')
+router.register(r'comments', BaseCommentViewset, 'Comments')
+router.register(r'posts', PostViewSet, 'posts')
+router.register(r'', BaseViewset, 'Base')
 
 urlpatterns = [
     url(r'^', include(router.urls))
