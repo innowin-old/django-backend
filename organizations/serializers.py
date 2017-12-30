@@ -1,4 +1,3 @@
-from rest_framework.serializers import ModelSerializer
 from base.serializers import BaseSerializer
 from .models import (
         Organization,

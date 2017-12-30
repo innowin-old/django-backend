@@ -77,11 +77,11 @@ class Organization(Base):
             if hasattr(self, 'identity'):
                 identity = self.identity
             else:
-                identity = Identity(organization=self)
+                identity = Identity(identity_organization=self)
             identity.name = self.official_name
             identity.save()
             if self.staff_count:
-                StaffCount.objects.create(organization=self, count=self.staff_count)
+                StaffCount.objects.create(identity_rganization=self, staff_count=self.staff_count)
 
 
 # Cache Model Data After Update
