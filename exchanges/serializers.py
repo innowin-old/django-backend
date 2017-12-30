@@ -11,4 +11,4 @@ class ExchangeSerilizer(BaseSerializer):
 class ExchangeIdentitySerializer(BaseSerializer):
     class Meta:
         model=ExchangeIdentity
-        fields = '__all___'
+        fields = '__all__'

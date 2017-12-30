@@ -107,7 +107,7 @@ class ElementViewSet(ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = FormGroup.objects.all()
+        queryset = Element.objects.all()
 
         name = self.request.query_params.get('name', None)
         if name is not None:
