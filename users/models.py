@@ -50,15 +50,15 @@ class Identity(Base):
     def __str__(self):
         return self.name
 
-    def validate_user(self, identity_user):
-        if self.identity_user and self.identity_user == identity_user:
+    def validate_user(self, user):
+        if self.identity_user and self.identity_user == user:
             return True
-        elif self.identity_organization and self.identity_organization.owner == identity_user:
+        elif self.identity_organization and self.identity_organization.owner == user:
             return True
         return False
 
-    def validate_organization(self, identity_organization):
-        if self.identity_organization == identity_organization:
+    def validate_organization(self, organization):
+        if self.identity_organization == organization:
             return True
         return False
 
@@ -290,6 +290,7 @@ class Skill(Base):
     def __str__(self):
         return "%s(%s)" % (self.skill_user.username, self.title)
 
+
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Skill)
 
@@ -303,6 +304,7 @@ class Badge(Base):
 
     def __str__(self):
         return "%s(%s)" % (self.badge_user.username, self.badge_user)
+
 
     class Meta:
         unique_together = (('badge_user', 'title'),)

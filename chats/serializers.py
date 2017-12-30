@@ -1,9 +1,9 @@
-from base.serializers import BaseSerializer
+from rest_framework.serializers import ModelSerializer
 
 from .models import Message
 
 # define serializers here
-class MessageSerializer(BaseSerializer):
+class MessageSerializer(ModelSerializer):
     class Meta:
         model = Message
         fields = '__all__'
