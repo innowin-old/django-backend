@@ -38,9 +38,9 @@ class Identity(Base):
     name = models.CharField(max_length=150, unique=True, help_text='String(150)')
 
     def clean(self):
-        if not self.user and not self.organization:
+        if not self.identity_user and not self.identity_organization:
             raise ValidationError(_('User or Organization should be set'))
-        if self.user and self.organization:
+        if self.identity_user and self.identity_organization:
             raise ValidationError(
                 _('Only on of User or Organization should be set'))
 
@@ -48,14 +48,14 @@ class Identity(Base):
         return self.name
 
     def validate_user(self, user):
-        if self.user and self.user == user:
+        if self.identity_user and self.identity_user == user:
             return True
-        elif self.organization and self.organization.owner == user:
+        elif self.identity_organization and self.identity_organization.owner == user:
             return True
         return False
 
     def validate_organization(self, organization):
-        if self.organization == organization:
+        if self.identity_organization == organization:
             return True
         return False
 
@@ -73,7 +73,7 @@ def user_save(self, *args, **kwargs):
         if hasattr(self, 'identity'):
             identity = self.identity
         else:
-            identity = Identity(user=self)
+            identity = Identity(identity_user=self)
         identity.name = self.username
         identity.save()
 
