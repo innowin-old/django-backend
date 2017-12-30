@@ -22,7 +22,7 @@ class Base(models.Model):
 
     created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
     updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
-    delete_flag = models.BooleanField(db_index=True, default=False)
+    delete_flag = models.BooleanField(db_index=True, default=False, help_text="Boolean")
 
     objects = BaseManager()
 
