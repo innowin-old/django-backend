@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from media.models import Media
 from danesh_boom.models import PhoneField
-from base.models import Base
+from base.models import Base, BaseManager
 
 
 class Organization(Base):
@@ -62,6 +62,8 @@ class Organization(Base):
     correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[], help_text='Array(String(50))')
     social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[], help_text='Array(String(100))')
     staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
+
+    objects = BaseManager()
 
     def __str__(self):
         return self.official_name

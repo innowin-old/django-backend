@@ -234,6 +234,7 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
+
         corroborant = self.request.query_params.get('corroborant', None)
         if corroborant is not None:
             queryset = queryset.filter(corroborant_id=corroborant)

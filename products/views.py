@@ -31,6 +31,7 @@ class CategoryViewset(ModelViewSet):
         parent = self.request.query_params.get('parent', None)
         if parent is not None:
             queryset = queryset.filter(parent_id=parent)
+
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name=name)
@@ -51,6 +52,7 @@ class CategoryFieldViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = CategoryField.objects.all()
+
         category = self.request.query_params.get('category', None)
         if category is not None:
             queryset = queryset.filter(category_id=category)
