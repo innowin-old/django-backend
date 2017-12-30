@@ -26,12 +26,12 @@ import media.views
 # from .views import SafeGraphQLView
 
 urlpatterns = [
-    url(r'^users/', include('users.urls'), permission_classes=[AllowAny]),
-    url(r'^organizations/', include('organizations.urls'), permission_classes=[AllowAny]),
-    url(r'^products/', include('products.urls'), permission_classes=[AllowAny]),
-    url(r'^base/', include('base.urls'), permission_classes=[AllowAny]),
+    url(r'^users/', include('users.urls')),
+    url(r'^organizations/', include('organizations.urls')),
+    url(r'^products/', include('products.urls')),
+    url(r'^base/', include('base.urls')),
     url(r'^docs/', include_docs_urls(title='Danesh Boom Documentation', permission_classes=[AllowAny])),
-    url(r'^dev/', admin.site.urls, permission_classes=[AllowAny]),
+    url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
     url(r'^api-token-auth/', obtain_jwt_token),
