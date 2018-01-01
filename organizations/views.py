@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .permissions import OrganizationOwner
 from .models import (
         Organization,
         StaffCount,
@@ -28,7 +29,7 @@ from .serializers import (
 
 class OrganizationViewset(ModelViewSet):
     queryset = Organization.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, OrganizationOwner]
 
     def get_queryset(self):
         queryset = Organization.objects.all()
