@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.models import User
 from utils.token import validate_token
 
 from rest_framework.viewsets import ModelViewSet
@@ -25,8 +25,20 @@ from .serializers import (
         CertificateSerializer,
         WorkExperienceSerializer,
         SkillSerializer,
-        BadgeSerializer
+        BadgeSerializer,
+        UserSerializer,
     )
+
+
+class UserViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        return  queryset
+
+    def get_serializer_class(self):
+        return UserSerializer
 
 
 class IdentityViewset(ModelViewSet):
