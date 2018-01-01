@@ -5,7 +5,6 @@ from .views import (
     OrganizationViewset,
     StaffCountViewset,
     OrganizationPictureViewset,
-    PostViewset,
     StaffViewset,
     FollowViewset,
     AbilityViewset,
@@ -14,15 +13,14 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'staff-counts', StaffCountViewset, 'Staff Counts')
-router.register(r'pictures', OrganizationPictureViewset, 'Pictures')
-router.register(r'posts', PostViewset, 'Posts')
-router.register(r'staff', StaffViewset, 'Staff')
-router.register(r'followers', FollowViewset, 'Followers')
-router.register(r'abilities', AbilityViewset, 'Abilities')
-router.register(r'confirmations', ConfirmationViewset, 'Confirmations')
-router.register(r'customers', CustomerViewset, 'Customers')
-router.register(r'', OrganizationViewset, 'Organizations')
+router.register(r'staff-counts', StaffCountViewset, 'staff-counts')
+router.register(r'pictures', OrganizationPictureViewset, 'organization-pictures')
+router.register(r'staff', StaffViewset, 'staffs')
+router.register(r'followers', FollowViewset, 'followers')
+router.register(r'abilities', AbilityViewset, 'abilities')
+router.register(r'confirmations', ConfirmationViewset, 'confirmations')
+router.register(r'customers', CustomerViewset, 'customers')
+router.register(r'', OrganizationViewset, 'organizations')
 
 urlpatterns = [
     url(r'^', include(router.urls))

@@ -3,13 +3,13 @@ import uuid
 import json
 from os.path import basename
 
+from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.db.models.signals import post_save
-from django.dispatch import receiver
 
+from base.models import BaseManager
+from base.signals import update_cache
 from media.MediaStorage import MediaStorage
 
 
@@ -37,10 +37,16 @@ class Media(models.Model):
                                  db_index=True)
     create_time = models.DateTimeField(auto_now_add=True)
     info = models.TextField(default='{}')
+    delete_flag = models.BooleanField(db_index=True, default=False)
+
+    objects = BaseManager()
 
     def __str__(self):
         return basename(self.file.file.name)
 
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Media)
 
 def update_meta(sender, instance, **kwargs):
     post_save.disconnect(update_meta, sender=Media)

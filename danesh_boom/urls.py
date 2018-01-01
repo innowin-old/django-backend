@@ -34,6 +34,11 @@ urlpatterns = [
     url(r'^dev/', admin.site.urls),
     url('^soc/', include('social_django.urls', namespace='social')),
     url(r'^media/(?P<name>[^/]+)$', media.views.serve, name='media'),
+    #url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema)),
+    url(r'^messages/', include('chats.urls')),
+    url(r'^exchanges/', include('exchanges.urls', namespace="exchanges")),
+    url(r'^forms/', include('forms.urls', namespace="forms")),
+    # url(r'^', include('users.urls')),
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
     #url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))

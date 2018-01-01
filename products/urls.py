@@ -11,11 +11,11 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'category', CategoryViewset)
-router.register(r'category-field', CategoryFieldViewset)
-router.register(r'prices', PriceViewset)
-router.register(r'pictures', PictureViewset)
-router.register(r'comments', CommentViewset)
+router.register(r'category', CategoryViewset, 'categories')
+router.register(r'category-field', CategoryFieldViewset, 'category-fields')
+router.register(r'prices', PriceViewset, 'prices')
+router.register(r'pictures', PictureViewset, 'product-pictures')
+router.register(r'comments', CommentViewset, 'comments')
 
 urlpatterns = [
     url(r'^', include(router.urls))

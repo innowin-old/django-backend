@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'media',
     'products',
     'chats',
+    'exchanges',
+    'forms',
     'rest_framework',
 ]
 
@@ -129,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'unix:/tmp/memcached.sock',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 

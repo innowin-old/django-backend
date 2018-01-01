@@ -2,22 +2,21 @@ from __future__ import unicode_literals
 
 import re
 
+from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, \
-    MinValueValidator, RegexValidator
-from django.db import models, transaction
-from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.timezone import now
 
 from danesh_boom.models import PhoneField
 from media.models import Media
 from organizations.models import Organization
-from base.models import Base
+from base.models import Base, BaseManager
+from base.signals import update_cache
 
 
 class Identity(Base):
@@ -25,6 +24,7 @@ class Identity(Base):
         User,
         related_name="identity",
         on_delete=models.CASCADE,
+        db_index=True,
         null=True,
         blank=True,
         help_text='Integer')
@@ -32,10 +32,13 @@ class Identity(Base):
         Organization,
         related_name="identity",
         on_delete=models.CASCADE,
+        db_index=True,
         null=True,
         blank=True,
         help_text='Integer')
-    name = models.CharField(max_length=150, unique=True, help_text='String(150)')
+    name = models.CharField(max_length=150, db_index=True, unique=True, help_text='String(150)')
+
+    objects = BaseManager()
 
     def clean(self):
         if not self.identity_user and not self.identity_organization:
@@ -65,6 +68,8 @@ class Identity(Base):
 
 
 default_user_save = User.save
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Identity)
 
 
 def user_save(self, *args, **kwargs):
@@ -103,6 +108,8 @@ class Profile(Base):
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text')
 
+    objects = BaseManager()
+
     def __str__(self):
         return self.profile_user.username
 
@@ -115,6 +122,10 @@ class Profile(Base):
             now = timezone.now().date().strftime('%Y-%m-%d')
             if birth_date > now:
                 raise ValidationError(_('Invalid birth date'))
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Profile)
 
 
 class Education(Base):
@@ -133,6 +144,8 @@ class Education(Base):
         blank=True,
         help_text='Float')
     description = models.TextField(blank=True, help_text='Text')
+
+    objects = BaseManager()
 
     def __str__(self):
         return "%s(%s - %s)" % (
@@ -158,6 +171,10 @@ class Education(Base):
             raise ValidationError(_('To date must be greater than from date'))
 
 
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Education)
+
+
 class Research(Base):
     research_user = models.ForeignKey(User, related_name="researches",
                              on_delete=models.CASCADE, help_text='Integer')
@@ -168,8 +185,14 @@ class Research(Base):
     year = models.IntegerField(null=True, blank=True, help_text='Integer')
     page_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
+    objects = BaseManager()
+
     def __str__(self):
         return "%s(%s)" % (self.research_user.username, self.title)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Research)
 
 
 class Certificate(Base):
@@ -183,8 +206,14 @@ class Certificate(Base):
         null=True,
         help_text='Integer')
 
+    objects = BaseManager()
+
     def __str__(self):
         return "%s(%s)" % (self.certificate_user.username, self.title)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Certificate)
 
 
 class WorkExperience(Base):
@@ -213,6 +242,8 @@ class WorkExperience(Base):
         max_length=20,
         default='WITHOUT_CONFIRM',
         help_text='WITHOUT_CONFIRM | WAIT_FOR_CONFIRM | CONFIRMED | UNCONFIRMED')
+
+    objects = BaseManager()
 
     def __str__(self):
         return "%s(%s)" % (self.work_experience_user.username, self.name)
@@ -243,6 +274,10 @@ class WorkExperience(Base):
             raise ValidationError(_('To date must be greater than from date'))
 
 
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=WorkExperience)
+
+
 class Skill(Base):
     skill_user = models.ForeignKey(User, related_name="skills",
                              on_delete=models.CASCADE, help_text='Integer')
@@ -250,8 +285,14 @@ class Skill(Base):
     tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
     description = models.TextField(blank=True, help_text='Text')
 
+    objects = BaseManager()
+
     def __str__(self):
         return "%s(%s)" % (self.skill_user.username, self.title)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Skill)
 
 
 class Badge(Base):
@@ -259,8 +300,15 @@ class Badge(Base):
                              on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, help_text='String(100)')
 
+    objects = BaseManager()
+
     def __str__(self):
-        return "%s(%s)" % (self.badge_user.username, self.badge)
+        return "%s(%s)" % (self.badge_user.username, self.badge_user)
+
 
     class Meta:
         unique_together = (('badge_user', 'title'),)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Badge)
