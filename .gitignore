@@ -3,4 +3,6 @@ config.yml
 *sw[pomnlkj]
 __pycache__/
 */migrations/
+*/migrations
 .idea/
+.idea
