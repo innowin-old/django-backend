@@ -101,6 +101,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler'
+}
+
 WSGI_APPLICATION = 'danesh_boom.wsgi.application'
 
 # Database

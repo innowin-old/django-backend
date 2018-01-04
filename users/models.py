@@ -79,7 +79,7 @@ def user_save(self, *args, **kwargs):
             identity = self.identity
         else:
             identity = Identity(identity_user=self)
-        identity.name = self.username
+        identity.identity_name = self.username
         identity.save()
 
 
@@ -89,7 +89,9 @@ User.save = user_save
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(profile_user=instance)
+        profile = Profile()
+        profile.profile_user = instance
+        profile.save()
 
 
 class Profile(Base):
