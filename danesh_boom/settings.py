@@ -103,7 +103,8 @@ AUTHENTICATION_BACKENDS = (
 
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler',
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30)
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7)
 }
 
 WSGI_APPLICATION = 'danesh_boom.wsgi.application'
