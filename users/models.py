@@ -79,7 +79,7 @@ def user_save(self, *args, **kwargs):
             identity = self.identity
         else:
             identity = Identity(identity_user=self)
-        identity.identity_name = self.username
+        identity.name = self.username
         identity.save()
 
 
