@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os
+import os, datetime
 from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
 from django.utils.translation import ugettext_lazy as _
 
@@ -102,7 +102,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler'
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler',
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30)
 }
 
 WSGI_APPLICATION = 'danesh_boom.wsgi.application'
