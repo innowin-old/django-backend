@@ -1,5 +1,7 @@
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
+from django.contrib.auth.models import User
+from users.models import Identity
 
 from base.models import Base, Hashtag, BaseManager
 from base.signals import update_cache
@@ -9,6 +11,7 @@ from users.models import Identity
 
 # Create your models here.
 class Exchange(Base):
+    owner = models.ForeignKey(Identity, related_name='exchanges', blank=True, null=True, db_index=True, on_delete=models.CASCADE, help_text='Integer')
     name = models.CharField(max_length=30, db_index=True, help_text='String(30)')
     exchange_image = models.ForeignKey(
         Media,
@@ -50,12 +53,12 @@ class ExchangeIdentity(Base):
     )
     exchanges_identity = models.ForeignKey(
         Exchange,
-        related_name="identities",
+        related_name="identities_exchange",
         help_text='Integer',
     )
     identities_exchange = models.ForeignKey(
         Identity,
-        related_name="exchanges",
+        related_name="exchanges_identities",
         help_text='Integer',
     )
     join_type = models.CharField(

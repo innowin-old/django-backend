@@ -1,7 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Exchange, ExchangeIdentity
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeIdentity
 from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
 
 # Create your views here.
@@ -10,10 +11,18 @@ class ExchangeViewSet(ModelViewSet):
         A ViewSet for Handle Exchange Views
     """
     # queryset = Exchange.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsExchangeOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Exchange.objects.all()
+
+        owner_id = self.request.query_params.get('owner_id')
+        if owner_id is not None:
+            queryset = queryset.filter(owner_id=owner_id)
+
+        owner_name = self.request.query_params.get('owner_name')
+        if owner_name is not None:
+            queryset = queryset.filter(owner__name__contains=owner_name)
 
         name = self.request.query_params.get('name', None)
         if name is not None:
@@ -54,7 +63,7 @@ class ExchangeIdentityViewSet(ModelViewSet):
         A ViewSet for Handle Identity Exchange Views
     """
     # queryset = ExchangeIdentity.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsExchangeIdentity]
 
     def get_queryset(self):
         queryset = ExchangeIdentity.objects.all()
