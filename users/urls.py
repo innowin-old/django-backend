@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 
 from .views import (
+    UserViewset,
     IdentityViewset,
     ProfileViewset,
     EducationViewset,
@@ -27,6 +28,7 @@ router.register(r'certificates', CertificateViewset, 'certificates')
 router.register(r'work-experiences', WorkExperienceViewset, 'work-experiences')
 router.register(r'skills', SkillViewset, 'skills')
 router.register(r'badges', BadgeViewset, 'badges')
+router.register(r'', UserViewset, 'users')
 
 
 urlpatterns = [
