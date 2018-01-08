@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from utils.token import validate_token
@@ -20,6 +21,8 @@ from .models import (
 )
 
 from .serializers import (
+    SuperAdminUserSerializer,
+    UserSerializer,
     IdentitySerializer,
     ProfileSerializer,
     EducationSerializer,
@@ -29,7 +32,83 @@ from .serializers import (
     SkillSerializer,
     BadgeSerializer
 )
-from .permissions import IsIdentityOwnerOrReadOnly
+from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
+
+
+class UserViewset(ModelViewSet):
+    #queryset = User.objects.all()
+    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return self.superuser_queryset()
+        else:
+            return self.user_queryset()
+
+    def get_serializer_class(self):
+        print(self.request.user.is_superuser)
+        if self.request.user.is_superuser:
+            return SuperAdminUserSerializer
+        else:
+            return UserSerializer
+
+    def superuser_queryset(self):
+        queryset = User.objects.all()
+
+        username = self.request.query_params.get('username')
+        if username is not None:
+            queryset = queryset.filter(username__contains=username)
+
+        first_name = self.request.query_params.get('first_name')
+        if first_name is not None:
+            queryset = queryset.filter(first_name__contains=first_name)
+
+        last_name = self.request.query_params.get('last_name')
+        if last_name is not None:
+            queryset = queryset.filter(last_name__contains=last_name)
+
+        email = self.request.query_params.get('email')
+        if email is not None:
+            queryset = queryset.filter(email__contains=email)
+
+        is_staff = self.request.query_params.get('is_staff')
+        if is_staff is not None:
+            queryset = queryset.filter(is_staff=is_staff)
+
+        is_superuser = self.request.query_params.get('is_superuser')
+        if is_superuser is not None:
+            queryset = queryset.filter(is_superuser=is_superuser)
+
+        is_active = self.request.query_params.get('is_active')
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active)
+
+        date_joined = self.request.query_params.get('date_joined')
+        if date_joined is not None:
+            queryset = queryset.filter(date_joined=date_joined)
+
+        return queryset
+
+    def user_queryset(self):
+        queryset = User.objects.filter(is_active=True)
+
+        username = self.request.query_params.get('username')
+        if username is not None:
+            queryset = queryset.filter(username__contains=username)
+
+        first_name = self.request.query_params.get('first_name')
+        if first_name is not None:
+            queryset = queryset.filter(first_name__contains=first_name)
+
+        last_name = self.request.query_params.get('last_name')
+        if last_name is not None:
+            queryset = queryset.filter(last_name__contains=last_name)
+
+        email = self.request.query_params.get('email')
+        if email is not None:
+            queryset = queryset.filter(email__contains=email)
+
+        return queryset
 
 
 class IdentityViewset(ModelViewSet):
