@@ -44,4 +44,5 @@ urlpatterns = [
     #url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))
     #url(r'^', include('users.urls')),
 ]
+
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

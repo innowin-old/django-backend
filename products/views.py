@@ -1,6 +1,9 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 
+from base.permissions import IsAdminUserOrReadOnly
+
+from .permissions import IsProductOwnerOrReadOnly
 from .models import (
         Category,
         CategoryField,
@@ -22,7 +25,7 @@ from .serializers import (
 
 class CategoryViewset(ModelViewSet):
     # queryset = Category.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = Category.objects.all()
@@ -47,7 +50,7 @@ class CategoryViewset(ModelViewSet):
 
 class CategoryFieldViewset(ModelViewSet):
     # queryset = CategoryField.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         queryset = CategoryField.objects.all()
@@ -83,7 +86,7 @@ class CategoryFieldViewset(ModelViewSet):
 
 class ProductViewset(ModelViewSet):
     # queryset = Product.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Product.objects.all()

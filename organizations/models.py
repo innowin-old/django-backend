@@ -81,7 +81,7 @@ class Organization(Base):
             identity.name = self.official_name
             identity.save()
             if self.staff_count:
-                StaffCount.objects.create(identity_rganization=self, staff_count=self.staff_count)
+                StaffCount.objects.create(identity_organization=self, staff_count=self.staff_count)
 
 
 # Cache Model Data After Update

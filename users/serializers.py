@@ -13,7 +13,7 @@ from .models import (
     )
 
 
-class UserSerializer(ModelSerializer):
+class SuperAdminUserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
@@ -23,6 +23,12 @@ class UserSerializer(ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
 
 
 class IdentitySerializer(BaseSerializer):

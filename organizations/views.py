@@ -1,6 +1,15 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import OrganizationOwner
+from rest_framework.permissions import IsAuthenticated
+
+from base.permissions import IsOwnerOrReadOnly
+from .permissions import (
+    StaffOrganizationOwner,
+    StaffCountOrganizationOwner,
+    PictureOrganizationOwner,
+    FollowOwner,
+    CustomerOrganizationOwner,
+    ConfirmationOwner
+)
 from .models import (
     Organization,
     StaffCount,
@@ -25,7 +34,8 @@ from .serializers import (
 
 class OrganizationViewset(ModelViewSet):
     # queryset = Organization.objects.all()
-    permission_classes = [IsAuthenticated, OrganizationOwner]
+    owner_field = 'owner'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Organization.objects.all()
@@ -94,13 +104,22 @@ class OrganizationViewset(ModelViewSet):
 
 class StaffCountViewset(ModelViewSet):
     # queryset = StaffCount.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, StaffCountOrganizationOwner]
 
     def get_queryset(self):
         queryset = StaffCount.objects.all()
-        organization = self.request.query_params.get('organization', None)
-        if organization is not None:
-            queryset = queryset.filter(organization_id=organization)
+
+        organization_id = self.request.query_params.get('organization_id', None)
+        if organization_id is not None:
+            queryset = queryset.filter(staff_count_organization_id=organization_id)
+
+        organization_nike_name = self.request.query_params.get('organization_nike_name')
+        if organization_nike_name is not None:
+            queryset = queryset.filter(staff_count_organization__nike_name__contains=organization_nike_name)
+
+        organization_username = self.request.query_params.get('organization_username')
+        if organization_username is not None:
+            queryset = queryset.filter(staff_count_organization__username__contains=organization_username)
 
         return queryset
 
@@ -110,14 +129,22 @@ class StaffCountViewset(ModelViewSet):
 
 class OrganizationPictureViewset(ModelViewSet):
     # queryset = OrganizationPicture.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, PictureOrganizationOwner]
 
     def get_queryset(self):
         queryset = OrganizationPicture.objects.all()
 
-        organization = self.request.query_params.get('organization', None)
-        if organization is not None:
-            queryset = queryset.filter(organization_id=organization)
+        organization_id = self.request.query_params.get('organization_id', None)
+        if organization_id is not None:
+            queryset = queryset.filter(picture_organization_id=organization_id)
+
+        organization_nike_name = self.request.query_params.get('organization_nike_name')
+        if organization_nike_name is not None:
+            queryset = queryset.filter(staff_count_organization__nike_name__contains=organization_nike_name)
+
+        organization_username = self.request.query_params.get('organization_username')
+        if organization_username is not None:
+            queryset = queryset.filter(staff_count_organization__username__contains=organization_username)
 
         return queryset
 
@@ -127,7 +154,7 @@ class OrganizationPictureViewset(ModelViewSet):
 
 class StaffViewset(ModelViewSet):
     # queryset = Staff.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, StaffOrganizationOwner]
 
     def get_queryset(self):
         queryset = Staff.objects.all()
@@ -182,7 +209,7 @@ class StaffViewset(ModelViewSet):
 
 class FollowViewset(ModelViewSet):
     # queryset = Follow.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, FollowOwner]
 
     def get_queryset(self):
         queryset = Follow.objects.all()
@@ -225,7 +252,8 @@ class FollowViewset(ModelViewSet):
 
 class AbilityViewset(ModelViewSet):
     # queryset = Ability.objects.all()
-    permission_classes = [AllowAny]
+    owner_field = 'ability_organization'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Ability.objects.all()
@@ -265,7 +293,7 @@ class AbilityViewset(ModelViewSet):
 
 class ConfirmationViewset(ModelViewSet):
     # queryset = Confirmation.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, ConfirmationOwner]
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
@@ -319,7 +347,7 @@ class ConfirmationViewset(ModelViewSet):
 
 class CustomerViewset(ModelViewSet):
     # queryset = Customer.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, CustomerOrganizationOwner]
 
     def get_queryset(self):
         queryset = Customer.objects.all()

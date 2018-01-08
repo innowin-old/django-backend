@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Message
 from .serializers import MessageSerializer
@@ -10,7 +10,7 @@ class MessageViewSet(ModelViewSet):
         A ViewSet for Handle Message Views
     """
     # queryset = Message.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Message.objects.all()

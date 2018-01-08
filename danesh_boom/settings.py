@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os, datetime
 from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
 from django.utils.translation import ugettext_lazy as _
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from danesh_boom.social_auth_pipeline import LOCAL_SOCIAL_AUTH_PIPELINE
@@ -66,6 +67,12 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7)
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -100,12 +107,6 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
-
-JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.views.jwt_response_payload_handler',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7)
-}
 
 WSGI_APPLICATION = 'danesh_boom.wsgi.application'
 
