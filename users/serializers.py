@@ -28,7 +28,7 @@ class SuperAdminUserSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'date_joined']
 
 
 class IdentitySerializer(BaseSerializer):
