@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from base.permissions import IsOwnerOrReadOnly
 from .permissions import (
@@ -35,7 +35,7 @@ from .serializers import (
 class OrganizationViewset(ModelViewSet):
     # queryset = Organization.objects.all()
     owner_field = 'owner'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Organization.objects.all()
@@ -104,7 +104,7 @@ class OrganizationViewset(ModelViewSet):
 
 class StaffCountViewset(ModelViewSet):
     # queryset = StaffCount.objects.all()
-    permission_classes = [IsAuthenticated, StaffCountOrganizationOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = StaffCount.objects.all()
@@ -129,7 +129,7 @@ class StaffCountViewset(ModelViewSet):
 
 class OrganizationPictureViewset(ModelViewSet):
     # queryset = OrganizationPicture.objects.all()
-    permission_classes = [IsAuthenticated, PictureOrganizationOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = OrganizationPicture.objects.all()
@@ -154,7 +154,7 @@ class OrganizationPictureViewset(ModelViewSet):
 
 class StaffViewset(ModelViewSet):
     # queryset = Staff.objects.all()
-    permission_classes = [IsAuthenticated, StaffOrganizationOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Staff.objects.all()
@@ -209,7 +209,7 @@ class StaffViewset(ModelViewSet):
 
 class FollowViewset(ModelViewSet):
     # queryset = Follow.objects.all()
-    permission_classes = [IsAuthenticated, FollowOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Follow.objects.all()
@@ -253,7 +253,7 @@ class FollowViewset(ModelViewSet):
 class AbilityViewset(ModelViewSet):
     # queryset = Ability.objects.all()
     owner_field = 'ability_organization'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Ability.objects.all()
@@ -293,7 +293,7 @@ class AbilityViewset(ModelViewSet):
 
 class ConfirmationViewset(ModelViewSet):
     # queryset = Confirmation.objects.all()
-    permission_classes = [IsAuthenticated, ConfirmationOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
@@ -347,7 +347,7 @@ class ConfirmationViewset(ModelViewSet):
 
 class CustomerViewset(ModelViewSet):
     # queryset = Customer.objects.all()
-    permission_classes = [IsAuthenticated, CustomerOrganizationOwner]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Customer.objects.all()

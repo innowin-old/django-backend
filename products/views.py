@@ -25,7 +25,7 @@ from .serializers import (
 
 class CategoryViewset(ModelViewSet):
     # queryset = Category.objects.all()
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Category.objects.all()
@@ -50,7 +50,7 @@ class CategoryViewset(ModelViewSet):
 
 class CategoryFieldViewset(ModelViewSet):
     # queryset = CategoryField.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = CategoryField.objects.all()
@@ -86,7 +86,7 @@ class CategoryFieldViewset(ModelViewSet):
 
 class ProductViewset(ModelViewSet):
     # queryset = Product.objects.all()
-    permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Product.objects.all()

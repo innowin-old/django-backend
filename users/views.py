@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from utils.token import validate_token
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
 from .models import (
@@ -36,7 +36,7 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
 
 class UserViewset(ModelViewSet):
     #queryset = User.objects.all()
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -45,8 +45,8 @@ class UserViewset(ModelViewSet):
             return self.user_queryset()
 
     def get_serializer_class(self):
-        print(self.request.user.is_superuser)
-        if self.request.user.is_superuser:
+        #print(self.request.user.is_superuser)
+        if self.request and self.request.user.is_superuser:
             return SuperAdminUserSerializer
         else:
             return UserSerializer
@@ -56,7 +56,7 @@ class UserViewset(ModelViewSet):
 
         username = self.request.query_params.get('username')
         if username is not None:
-            queryset = queryset.filter(username__contains=username)
+            queryset = queryset.filter(username=username)
 
         first_name = self.request.query_params.get('first_name')
         if first_name is not None:
@@ -113,7 +113,7 @@ class UserViewset(ModelViewSet):
 class IdentityViewset(ModelViewSet):
     # queryset = Identity.objects.all()
     owner_field = 'identity_user'
-    permission_classes = [BlockPostMethod, IsIdentityOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Identity.objects.all()
@@ -126,7 +126,7 @@ class IdentityViewset(ModelViewSet):
 class ProfileViewset(ModelViewSet):
     # queryset = Profile.objects.all()
     owner_field = 'profile_user'
-    permission_classes = [BlockPostMethod, IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Profile.objects.all()
@@ -139,7 +139,7 @@ class ProfileViewset(ModelViewSet):
 class EducationViewset(ModelViewSet):
     # queryset = Education.objects.all()
     owner_field = 'education_user'
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Education.objects.all()
@@ -152,10 +152,15 @@ class EducationViewset(ModelViewSet):
 class ResearchViewset(ModelViewSet):
     # queryset = Research.objects.all()
     owner_field = 'research_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Research.objects.all()
+
+        research_user = self.request.query_params.get('research_user')
+        if research_user is not None:
+            queryset = queryset.filter(research_user_id=research_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -165,10 +170,15 @@ class ResearchViewset(ModelViewSet):
 class CertificateViewset(ModelViewSet):
     # queryset = Certificate.objects.all()
     owner_field = 'certificate_user'
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Certificate.objects.all()
+
+        certificate_user = self.request.query_params.get('certificate_user')
+        if certificate_user is not None:
+            queryset = queryset.filter(certificate_user_id=certificate_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -178,10 +188,15 @@ class CertificateViewset(ModelViewSet):
 class WorkExperienceViewset(ModelViewSet):
     # queryset = WorkExperience.objects.all()
     owner_field = 'work_experience_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = WorkExperience.objects.all()
+
+        work_experience_user = self.request.query_params.get('work_experience_user')
+        if work_experience_user is not None:
+            queryset = queryset.filter(work_experience_user_id=work_experience_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -191,10 +206,15 @@ class WorkExperienceViewset(ModelViewSet):
 class SkillViewset(ModelViewSet):
     # queryset = Skill.objects.all()
     owner_field = 'skill_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Skill.objects.all()
+
+        skill_user = self.request.query_params.get('skill_user')
+        if skill_user is not None:
+            queryset = queryset.filter(skill_user_id=skill_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -204,10 +224,15 @@ class SkillViewset(ModelViewSet):
 class BadgeViewset(ModelViewSet):
     # queryset = Badge.objects.all()
     owner_field = 'badge_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Badge.objects.all()
+
+        badge_user = self.request.query_params.get('badge_user')
+        if badge_user is not None:
+            queryset = queryset.filter(badge_user_id=badge_user)
+
         return queryset
 
     def get_serializer_class(self):

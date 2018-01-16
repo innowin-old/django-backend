@@ -109,6 +109,12 @@ class Profile(Base):
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text')
+    profile_media = models.ForeignKey(
+        Media,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text='Integer')
 
     objects = BaseManager()
 

@@ -22,7 +22,7 @@ class ExchangeSerilizer(BaseSerializer):
 class ExchangeIdentitySerializer(BaseSerializer):
     class Meta:
         model=ExchangeIdentity
-        fields = '__all___'
+        fields = '__all__'
 
     def create(self, validated_data):
         request = self.context.get("request")
