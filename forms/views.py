@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny
 from .models import (
     Form,
     Group,
-    Element,
     FormGroup,
     FormGroupElement,
     Data
@@ -17,6 +16,7 @@ from .serializers import (
     FormGroupElementSerializer,
     DataSerializer
 )
+
 
 # Create your views here.
 class FormViewSet(ModelViewSet):
@@ -107,7 +107,7 @@ class ElementViewSet(ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Element.objects.all()
+        queryset = FormGroup.objects.all()
 
         name = self.request.query_params.get('name', None)
         if name is not None:
@@ -150,6 +150,7 @@ class FormGroupElementViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return FormGroupElementSerializer
+
 
 class DataViewSet(ModelViewSet):
     """

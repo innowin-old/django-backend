@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+
 from utils.token import validate_token
 
 from rest_framework.viewsets import ModelViewSet
@@ -9,15 +10,15 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
 from .models import (
-        Identity,
-        Profile,
-        Education,
-        Research,
-        Certificate,
-        WorkExperience,
-        Skill,
-        Badge
-    )
+    Identity,
+    Profile,
+    Education,
+    Research,
+    Certificate,
+    WorkExperience,
+    Skill,
+    Badge
+)
 
 from .serializers import (
     SuperAdminUserSerializer,
@@ -35,8 +36,7 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
 
 
 class UserViewset(ModelViewSet):
-    #queryset = User.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -45,8 +45,8 @@ class UserViewset(ModelViewSet):
             return self.user_queryset()
 
     def get_serializer_class(self):
-        #print(self.request.user.is_superuser)
-        if self.request and self.request.user.is_superuser:
+        print(self.request.user.is_superuser)
+        if self.request.user.is_superuser:
             return SuperAdminUserSerializer
         else:
             return UserSerializer
@@ -56,7 +56,7 @@ class UserViewset(ModelViewSet):
 
         username = self.request.query_params.get('username')
         if username is not None:
-            queryset = queryset.filter(username=username)
+            queryset = queryset.filter(username__contains=username)
 
         first_name = self.request.query_params.get('first_name')
         if first_name is not None:
@@ -111,9 +111,8 @@ class UserViewset(ModelViewSet):
 
 
 class IdentityViewset(ModelViewSet):
-    # queryset = Identity.objects.all()
     owner_field = 'identity_user'
-    permission_classes = [AllowAny]
+    permission_classes = [BlockPostMethod, IsIdentityOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Identity.objects.all()
@@ -129,9 +128,8 @@ class IdentityViewset(ModelViewSet):
 
 
 class ProfileViewset(ModelViewSet):
-    # queryset = Profile.objects.all()
     owner_field = 'profile_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Profile.objects.all()
@@ -147,9 +145,8 @@ class ProfileViewset(ModelViewSet):
 
 
 class EducationViewset(ModelViewSet):
-    # queryset = Education.objects.all()
     owner_field = 'education_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Education.objects.all()
@@ -160,9 +157,8 @@ class EducationViewset(ModelViewSet):
 
 
 class ResearchViewset(ModelViewSet):
-    # queryset = Research.objects.all()
     owner_field = 'research_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Research.objects.all()
@@ -178,9 +174,8 @@ class ResearchViewset(ModelViewSet):
 
 
 class CertificateViewset(ModelViewSet):
-    # queryset = Certificate.objects.all()
     owner_field = 'certificate_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Certificate.objects.all()
@@ -196,9 +191,8 @@ class CertificateViewset(ModelViewSet):
 
 
 class WorkExperienceViewset(ModelViewSet):
-    # queryset = WorkExperience.objects.all()
     owner_field = 'work_experience_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = WorkExperience.objects.all()
@@ -214,9 +208,8 @@ class WorkExperienceViewset(ModelViewSet):
 
 
 class SkillViewset(ModelViewSet):
-    # queryset = Skill.objects.all()
     owner_field = 'skill_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Skill.objects.all()
@@ -232,9 +225,8 @@ class SkillViewset(ModelViewSet):
 
 
 class BadgeViewset(ModelViewSet):
-    # queryset = Badge.objects.all()
     owner_field = 'badge_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Badge.objects.all()

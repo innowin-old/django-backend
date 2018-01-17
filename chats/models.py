@@ -61,5 +61,6 @@ class Message(Base):
 
     objects = BaseManager()
 
+
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Message)

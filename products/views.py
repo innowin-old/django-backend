@@ -5,27 +5,27 @@ from base.permissions import IsAdminUserOrReadOnly
 
 from .permissions import IsProductOwnerOrReadOnly
 from .models import (
-        Category,
-        CategoryField,
-        Product,
-        Price,
-        Picture,
-        Comment
-    )
+    Category,
+    CategoryField,
+    Product,
+    Price,
+    Picture,
+    Comment
+)
 
 from .serializers import (
-        CategorySerializer,
-        CategoryFieldSerializer,
-        ProductSerializer,
-        PriceSerializer,
-        PictureSerializer,
-        CommentSerializer
-    )
+    CategorySerializer,
+    CategoryFieldSerializer,
+    ProductSerializer,
+    PriceSerializer,
+    PictureSerializer,
+    CommentSerializer
+)
 
 
 class CategoryViewset(ModelViewSet):
     # queryset = Category.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = Category.objects.all()
@@ -50,7 +50,7 @@ class CategoryViewset(ModelViewSet):
 
 class CategoryFieldViewset(ModelViewSet):
     # queryset = CategoryField.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         queryset = CategoryField.objects.all()
@@ -86,7 +86,7 @@ class CategoryFieldViewset(ModelViewSet):
 
 class ProductViewset(ModelViewSet):
     # queryset = Product.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -149,7 +149,7 @@ class ProductViewset(ModelViewSet):
 
 class PriceViewset(ModelViewSet):
     # queryset = Price.objects.all()
-    permission_classes = [AllowAny]
+    permisison_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Price.objects.all()

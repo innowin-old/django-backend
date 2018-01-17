@@ -1,11 +1,13 @@
 from rest_framework import permissions
 
+
 class StaffOrganizationOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == 'GET':
             return True
         else:
-            if obj and (request.user == obj.staff_organization.owner or request.user == obj.staff_organization.admins or request.user.is_superuser):
+            if obj and (
+                    request.user == obj.staff_organization.owner or request.user == obj.staff_organization.admins or request.user.is_superuser):
                 return False
         return False
 
@@ -15,7 +17,8 @@ class StaffCountOrganizationOwner(permissions.BasePermission):
         if request.method == 'GET':
             return True
         else:
-            if obj and (request.user == obj.staff_count_organization.owner or request.user == obj.staff_count_organization.admins or request.user.is_superuser):
+            if obj and (
+                    request.user == obj.staff_count_organization.owner or request.user == obj.staff_count_organization.admins or request.user.is_superuser):
                 return False
         return False
 
@@ -25,7 +28,8 @@ class PictureOrganizationOwner(permissions.BasePermission):
         if request.method == 'GET':
             return True
         else:
-            if obj and (request.user == obj.picture_organization.owner or request.user == obj.picture_organization.admins or request.user.is_superuser):
+            if obj and (
+                    request.user == obj.picture_organization.owner or request.user == obj.picture_organization.admins or request.user.is_superuser):
                 return False
         return False
 
@@ -42,9 +46,11 @@ class CustomerOrganizationOwner(permissions.BasePermission):
         if request.method == 'GET':
             return True
         else:
-            if obj and (request.user == obj.customer_organization.owner or request.user == obj.customer_organization.admins or request.user.is_superuser):
+            if obj and (
+                    request.user == obj.customer_organization.owner or request.user == obj.customer_organization.admins or request.user.is_superuser):
                 return False
         return False
+
 
 class ConfirmationOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

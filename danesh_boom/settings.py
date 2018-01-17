@@ -10,11 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os, datetime
-from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
-from django.utils.translation import ugettext_lazy as _
 import datetime
+import datetime
+import os
 
+from django.utils.translation import ugettext_lazy as _
+
+from danesh_boom.settings_helpers import get_config, get_db_settings, load_static_asset_manifest
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from danesh_boom.social_auth_pipeline import LOCAL_SOCIAL_AUTH_PIPELINE
 
