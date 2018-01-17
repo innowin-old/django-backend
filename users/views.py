@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from utils.token import validate_token
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
 from .models import (
@@ -36,7 +36,6 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
 
 
 class UserViewset(ModelViewSet):
-    #queryset = User.objects.all()
     permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
@@ -112,7 +111,6 @@ class UserViewset(ModelViewSet):
 
 
 class IdentityViewset(ModelViewSet):
-    # queryset = Identity.objects.all()
     owner_field = 'identity_user'
     permission_classes = [BlockPostMethod, IsIdentityOwnerOrReadOnly, IsAuthenticated]
 
@@ -125,9 +123,8 @@ class IdentityViewset(ModelViewSet):
 
 
 class ProfileViewset(ModelViewSet):
-    # queryset = Profile.objects.all()
     owner_field = 'profile_user'
-    permission_classes = [BlockPostMethod, IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Profile.objects.all()
@@ -138,7 +135,6 @@ class ProfileViewset(ModelViewSet):
 
 
 class EducationViewset(ModelViewSet):
-    # queryset = Education.objects.all()
     owner_field = 'education_user'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
@@ -151,7 +147,6 @@ class EducationViewset(ModelViewSet):
 
 
 class ResearchViewset(ModelViewSet):
-    # queryset = Research.objects.all()
     owner_field = 'research_user'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -164,7 +159,6 @@ class ResearchViewset(ModelViewSet):
 
 
 class CertificateViewset(ModelViewSet):
-    # queryset = Certificate.objects.all()
     owner_field = 'certificate_user'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
@@ -177,7 +171,6 @@ class CertificateViewset(ModelViewSet):
 
 
 class WorkExperienceViewset(ModelViewSet):
-    # queryset = WorkExperience.objects.all()
     owner_field = 'work_experience_user'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -190,7 +183,6 @@ class WorkExperienceViewset(ModelViewSet):
 
 
 class SkillViewset(ModelViewSet):
-    # queryset = Skill.objects.all()
     owner_field = 'skill_user'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -203,7 +195,6 @@ class SkillViewset(ModelViewSet):
 
 
 class BadgeViewset(ModelViewSet):
-    # queryset = Badge.objects.all()
     owner_field = 'badge_user'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
