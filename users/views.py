@@ -117,6 +117,11 @@ class IdentityViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Identity.objects.all()
+
+        identity_user = self.request.query_params.get('identity_user')
+        if identity_user is not None:
+            queryset = queryset.filter(identity_user_id=identity_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -130,6 +135,11 @@ class ProfileViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Profile.objects.all()
+
+        profile_user = self.request.query_params.get('profile_user')
+        if profile_user is not None:
+            queryset = queryset.filter(profile_user_id=profile_user)
+
         return queryset
 
     def get_serializer_class(self):
