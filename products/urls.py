@@ -7,7 +7,8 @@ from .views import (
     ProductViewset,
     PriceViewset,
     PictureViewset,
-    CommentViewset
+    CommentViewset,
+    insert_product_data
 )
 
 router = DefaultRouter()
@@ -18,5 +19,6 @@ router.register(r'pictures', PictureViewset, 'product-pictures')
 router.register(r'comments', CommentViewset, 'comments')
 
 urlpatterns = [
-    url(r'^', include(router.urls))
+    url(r'^', include(router.urls)),
+    url(r'insert-data', insert_product_data, name='insert-data')
 ]

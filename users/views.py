@@ -313,7 +313,8 @@ def insert_user_data(request):
             user_model.set_password(user["password"])
             user_model.save()
 
-    return HttpResponse(status=200)
+    message = " داده مورد نظر با موفقیت ذخیره گردید "
+    return HttpResponse(message, status=200)
 
 
 @require_POST
