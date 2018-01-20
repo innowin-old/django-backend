@@ -1,7 +1,11 @@
+import json
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
 
 from utils.token import validate_token
 
@@ -34,6 +38,8 @@ from .serializers import (
 )
 from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
 
+from django.shortcuts import HttpResponse
+
 
 class UserViewset(ModelViewSet):
     permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
@@ -45,7 +51,6 @@ class UserViewset(ModelViewSet):
             return self.user_queryset()
 
     def get_serializer_class(self):
-        print(self.request.user.is_superuser)
         if self.request.user.is_superuser:
             return SuperAdminUserSerializer
         else:
@@ -277,6 +282,48 @@ def jwt_response_payload_handler(token, user=None, request=None):
     identity = Identity.objects.get(identity_user=user)
     return {
         'token': token,
+        'user': UserSerializer(user, context={'request': request}).data,
+        'profile': ProfileSerializer(profile, context={'request': request}).data,
+        'identity': IdentitySerializer(identity, context={'request': request}).data
+    }
+
+
+@require_POST
+@csrf_exempt
+def insert_user_data(request):
+    users = json.loads(request.POST["users"])
+    with transaction.atomic():
+        for user in users:
+
+            if user["username"] is None or user["password"] is None:
+                return HttpResponse(status=500)
+
+            kwargs = {}
+
+            if hasattr(user, "first_name"):
+                kwargs["first_name"] = user["first_name"]
+
+            if hasattr(user, "last_name"):
+                kwargs["last_name"] = user["last_name"]
+
+            if hasattr(user, "email"):
+                kwargs["email"] = user["email"]
+
+            user_model = User(username=user["username"], **kwargs)
+            user_model.set_password(user["password"])
+            user_model.save()
+
+    return HttpResponse(status=200)
+
+
+@require_POST
+@csrf_exempt
+def get_user_data(request):
+    err, user = validate_token(request.POST["token"])
+    profile = Profile.objects.get(profile_user=user)
+    identity = Identity.objects.get(identity_user=user)
+    return {
+        'token': request.POST["token"],
         'user': UserSerializer(user, context={'request': request}).data,
         'profile': ProfileSerializer(profile, context={'request': request}).data,
         'identity': IdentitySerializer(identity, context={'request': request}).data

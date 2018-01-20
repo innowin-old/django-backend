@@ -15,7 +15,9 @@ from .views import (
     BadgeViewset,
     login_page,
     logout_page,
-    active_user
+    active_user,
+    insert_user_data,
+    get_user_data
 )
 
 
@@ -36,6 +38,8 @@ urlpatterns = [
     url(r'^logout$', logout_page, name='logout'),
     url(r'^login/$', login_page, name='login'),
     url(r'^active/(?P<token>[0-9A-Za-z:_\-]+)/$', active_user, name='active'),
+    url(r'^get-token-data$', get_user_data, name='get-data'),
+    url(r'^insert-data$', insert_user_data, name='insert-data')
 ]
 
 

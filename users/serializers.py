@@ -1,16 +1,17 @@
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
+from rest_framework import serializers
 from base.serializers import BaseSerializer
 from .models import (
-        Identity,
-        Profile,
-        Education,
-        Research,
-        Certificate,
-        WorkExperience,
-        Skill,
-        Badge
-    )
+    Identity,
+    Profile,
+    Education,
+    Research,
+    Certificate,
+    WorkExperience,
+    Skill,
+    Badge
+)
 
 
 class SuperAdminUserSerializer(ModelSerializer):
@@ -47,6 +48,8 @@ class IdentitySerializer(BaseSerializer):
 
 
 class ProfileSerializer(BaseSerializer):
+    image_url = serializers.RelatedField(source='profile_media', read_only=True)
+
     class Meta:
         model = Profile
         fields = '__all__'
