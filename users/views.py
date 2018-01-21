@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 
 from utils.token import validate_token
@@ -289,6 +290,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
 
 
 @require_POST
+@login_required
 @csrf_exempt
 def insert_user_data(request):
     users = json.loads(request.POST["users"])
