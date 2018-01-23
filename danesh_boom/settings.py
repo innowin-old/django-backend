@@ -100,13 +100,17 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'users.context_processors.static',
+
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.github.GithubOAuth2',
+
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -200,13 +204,23 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get(
 SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
+
+SOCIAL_AUTH_GITHUB_KEY = '67a98bf8d7882de6ce0f'
+SOCIAL_AUTH_GITHUB_SECRET = '753ee8b506b04f338f1b38234f4f05b30fbd2e4a'
+
+
 # TODO improve visible urls
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/#/auth/logged-in/'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/#/auth/login-error/'
-SOCIAL_AUTH_LOGIN_URL = '/#/auth/login/'
-SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/#/auth/new-association/'
-SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/#/auth/account-disconnected/'
-SOCIAL_AUTH_INACTIVE_USER_URL = '/#/auth/inactive-user/'
+'''SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth/logged-in/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/oauth/login-error/'
+SOCIAL_AUTH_LOGIN_URL = '/oauth/login/'
+SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/oauth/new-association/'
+SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/oauth/account-disconnected/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/oauth/inactive-user/'
+'''
+
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'
+LOGIN_REDIRECT_URL = '/home'
 
 GRAPHENE = {
     'SCHEMA': 'danesh_boom.schema.schema',
