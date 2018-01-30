@@ -43,6 +43,8 @@ urlpatterns = [
     url(r'^api-token-verify/', verify_jwt_token),
     #url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))
     #url(r'^', include('users.urls')),
+    url(r'^social-auth/login/', include('rest_social_auth.urls_jwt')),
+
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
