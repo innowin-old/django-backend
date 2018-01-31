@@ -50,15 +50,15 @@ class Identity(Base):
     def __str__(self):
         return self.name
 
-    def validate_user(self, user):
-        if self.identity_user and self.identity_user == user:
+    def validate_user(self, identity_user):
+        if self.identity_user and self.identity_user == identity_user:
             return True
-        elif self.identity_organization and self.identity_organization.owner == user:
+        elif self.identity_organization and self.identity_organization.owner == identity_user:
             return True
         return False
 
-    def validate_organization(self, organization):
-        if self.identity_organization == organization:
+    def validate_organization(self, identity_organization):
+        if self.identity_organization == identity_organization:
             return True
         return False
 
@@ -89,9 +89,7 @@ User.save = user_save
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        profile = Profile()
-        profile.profile_user = instance
-        profile.save()
+        Profile.objects.create(profile_user=instance)
 
 
 class Profile(Base):
@@ -109,12 +107,6 @@ class Profile(Base):
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text')
-    profile_media = models.ForeignKey(
-        Media,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        help_text='Integer')
 
     objects = BaseManager()
 
@@ -243,8 +235,8 @@ class WorkExperience(Base):
         null=True,
         help_text='Integer')
     position = models.CharField(max_length=100, blank=True, help_text='String(100)')
-    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(100)')
-    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
+    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(100)')
+    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
     status = models.CharField(
         choices=STATUSES,
         max_length=20,
@@ -298,7 +290,6 @@ class Skill(Base):
     def __str__(self):
         return "%s(%s)" % (self.skill_user.username, self.title)
 
-
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Skill)
 
@@ -312,7 +303,6 @@ class Badge(Base):
 
     def __str__(self):
         return "%s(%s)" % (self.badge_user.username, self.badge_user)
-
 
     class Meta:
         unique_together = (('badge_user', 'title'),)
