@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django',
     'graphene_django',
     'base',
     'users',
@@ -55,6 +54,9 @@ INSTALLED_APPS = [
     'exchanges',
     'forms',
     'rest_framework',
+    'rest_framework.authtoken',
+    'social_django',
+    'rest_social_auth',
 ]
 
 MIDDLEWARE = [
@@ -109,8 +111,11 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.github.GithubOAuth2',
-
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.instagram.InstagramOAuth2',
+    'social_core.backends.yahoo.YahooOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -198,25 +203,16 @@ STATICFILES_DIRS = [
 STATIC_ASSET_MANIFEST = load_static_asset_manifest(
     FRONTEND_BUILD_ROOT, FRONTEND_DEV)
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+'''SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get(
     'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False'''
 
 
 SOCIAL_AUTH_GITHUB_KEY = '67a98bf8d7882de6ce0f'
 SOCIAL_AUTH_GITHUB_SECRET = '753ee8b506b04f338f1b38234f4f05b30fbd2e4a'
 
-
-# TODO improve visible urls
-'''SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth/logged-in/'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/oauth/login-error/'
-SOCIAL_AUTH_LOGIN_URL = '/oauth/login/'
-SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/oauth/new-association/'
-SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/oauth/account-disconnected/'
-SOCIAL_AUTH_INACTIVE_USER_URL = '/oauth/inactive-user/'
-'''
 
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
@@ -241,3 +237,33 @@ SENDFILE_URL = CONFIG.get('SENDFILE_URL')
 MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+SOCIAL_AUTH_FACEBOOK_KEY = CONFIG.get('SOCIAL_AUTH_FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = CONFIG.get('SOCIAL_AUTH_FACEBOOK_SECRET')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]  # optional
+
+
+SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY')
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET')
+SOCIAL_AUTH_LINKEDIN_OAUTH2_REDIRECT_URI = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_REDIRECT_URI')
+# Add email to requested authorizations.
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress']
+# Add the fields so they will be requested from linkedin.
+SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address', 'headline', 'industry']
+# Arrange to add the fields to UserSocialAuth.extra_data
+SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA = [('id', 'id'),
+                                   ('firstName', 'first_name'),
+                                   ('lastName', 'last_name'),
+                                   ('emailAddress', 'email_address'),
+                                   ('headline', 'headline'),
+                                   ('industry', 'industry')]
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+SOCIAL_AUTH_INSTAGRAM_KEY = CONFIG.get('SOCIAL_AUTH_INSTAGRAM_KEY')
+SOCIAL_AUTH_INSTAGRAM_SECRET = CONFIG.get('SOCIAL_AUTH_INSTAGRAM_SECRET')
+
+SOCIAL_AUTH_YAHOO_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_KEY')
+SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_SECRET')
