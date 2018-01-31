@@ -2,8 +2,8 @@ import os
 
 from django.conf import settings
 
-from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 
 from sendfile import sendfile
 
@@ -12,15 +12,19 @@ from .serializers import MediaSeriaizer
 from .models import Media
 
 
-class MediaViewSet(ModelSerializer):
+class MediaViewSet(ModelViewSet):
     """
         A ViewSet for Handle Media Views
     """
-    queryset = Media.objects.all()
+    #queryset = Media.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         return MediaSeriaizer
+
+    def get_queryset(self):
+        queryset = Media.objects.all()
+        return queryset
 
 
 def serve(request, name):
