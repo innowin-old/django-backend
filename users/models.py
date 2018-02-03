@@ -95,6 +95,7 @@ def create_profile(sender, instance, created, **kwargs):
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
                                 on_delete=models.CASCADE, help_text='Integer')
+    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="profile_media", help_text='Integer')
     public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
                                      validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
