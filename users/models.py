@@ -235,8 +235,8 @@ class WorkExperience(Base):
         null=True,
         help_text='Integer')
     position = models.CharField(max_length=100, blank=True, help_text='String(100)')
-    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(100)')
-    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
+    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
+    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
     status = models.CharField(
         choices=STATUSES,
         max_length=20,

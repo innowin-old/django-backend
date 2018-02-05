@@ -4,7 +4,8 @@ from .models import (
         HashtagParent,
         Hashtag,
         BaseComment,
-        Post
+        Post,
+        BaseCertificate
     )
 
 
@@ -59,6 +60,15 @@ class BaseCommentSerializer(BaseSerializer):
 class PostSerializer(BaseSerializer):
     class Meta:
         model = Post
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class CertificateSerializer(BaseSerializer):
+    class Meta:
+        model = BaseCertificate
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True},

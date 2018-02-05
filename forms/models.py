@@ -5,6 +5,7 @@ from base.models import Base, BaseManager
 from base.signals import update_cache
 from media.models import Media
 
+
 # Create your models here.
 class Form(Base):
     title = models.CharField(max_length=50, db_index=True, help_text='String(50)')
@@ -66,7 +67,8 @@ post_save.connect(update_cache, sender=FormGroupElement)
 
 
 class Data(Base):
-    form_group_element = models.ForeignKey(FormGroupElement, related_name="form_group_element", db_index=True, help_text='Integer')
+    form_group_element = models.ForeignKey(FormGroupElement, related_name="form_group_element", db_index=True,
+                                           help_text='Integer')
     amount = models.TextField(blank=True, db_index=True, help_text='Text')
 
     objects = BaseManager()
