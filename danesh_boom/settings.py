@@ -154,7 +154,7 @@ CACHES = {
     }
 }
 
-CACHE_TIMEOUT = 60 * 60 * 24 
+CACHE_TIMEOUT = 60 * 60 * 24
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -197,9 +197,9 @@ FRONTEND_BUILD_ROOT = os.path.join(
     FRONTEND_ROOT, CONFIG.get('FRONTEND_BUILD_ROOT'))
 
 STATICFILES_DIRS = [
-    #os.path.join(BASE_DIR, 'static'),
+    # os.path.join(BASE_DIR, 'static'),
 ]
-#STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
+# STATIC_ROOT = os.path.join(BASE_DIR, CONFIG.get('STATIC_ROOT'))
 
 STATIC_ASSET_MANIFEST = load_static_asset_manifest(
     FRONTEND_BUILD_ROOT, FRONTEND_DEV)
@@ -243,7 +243,6 @@ SOCIAL_AUTH_FACEBOOK_KEY = CONFIG.get('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = CONFIG.get('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]  # optional
 
-
 SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY')
 SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET')
 SOCIAL_AUTH_LINKEDIN_OAUTH2_REDIRECT_URI = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_REDIRECT_URI')
@@ -253,12 +252,11 @@ SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress']
 SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address', 'headline', 'industry']
 # Arrange to add the fields to UserSocialAuth.extra_data
 SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA = [('id', 'id'),
-                                   ('firstName', 'first_name'),
-                                   ('lastName', 'last_name'),
-                                   ('emailAddress', 'email_address'),
-                                   ('headline', 'headline'),
-                                   ('industry', 'industry')]
-
+                                          ('firstName', 'first_name'),
+                                          ('lastName', 'last_name'),
+                                          ('emailAddress', 'email_address'),
+                                          ('headline', 'headline'),
+                                          ('industry', 'industry')]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
@@ -268,3 +266,19 @@ SOCIAL_AUTH_INSTAGRAM_SECRET = CONFIG.get('SOCIAL_AUTH_INSTAGRAM_SECRET')
 
 SOCIAL_AUTH_YAHOO_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_KEY')
 SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_SECRET')
+
+# SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'danesh_boom.pipeline.log'
+)
+
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False

@@ -1,15 +1,14 @@
-#from rest_framework.serializers import ModelSerializer
 from base.serializers import BaseSerializer
 from .models import (
-        Organization,
-        StaffCount,
-        OrganizationPicture,
-        Staff,
-        Follow,
-        Ability,
-        Confirmation,
-        Customer
-    )
+    Organization,
+    StaffCount,
+    OrganizationPicture,
+    Staff,
+    Follow,
+    Ability,
+    Confirmation,
+    Customer
+)
 
 
 class OrganizationSerializer(BaseSerializer):
@@ -19,6 +18,13 @@ class OrganizationSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request.user.is_superuser or 'owner' not in validated_data:
+            validated_data['owner'] = request.user
+        organization = Organization.objects.create(**validated_data)
+        return organization
 
 
 class StaffCountSerializer(BaseSerializer):

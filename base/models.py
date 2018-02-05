@@ -25,7 +25,7 @@ class Base(models.Model):
 
     created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
     updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
-    delete_flag = models.BooleanField(db_index=True, default=False, help_text="Boolean")
+    delete_flag = models.BooleanField(db_index=True, default=False)
 
     objects = BaseManager()
 
@@ -104,3 +104,24 @@ class Post(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Post)
+
+
+class BaseCertificate(Base):
+    certificate_parent = models.ForeignKey(Base, related_name='base_certificates', db_index=True,
+                                           on_delete=models.CASCADE,
+                                           help_text='Integer')
+    certificate_identity = models.ForeignKey('users.Identity', related_name='base_certificate_senders', db_index=True,
+                                             on_delete=models.CASCADE, help_text='Integer')
+    certificate_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE,
+                                            related_name="base_certificate_picture",
+                                            help_text='Integer')
+    title = models.CharField(max_length=250, help_text='String(250)')
+
+    objects = BaseManager()
+
+    def __str__(self):
+        return "%s(%s)" % (self.certificate_identity.name, self.title)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseCertificate)
