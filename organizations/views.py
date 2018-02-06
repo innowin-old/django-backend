@@ -24,9 +24,11 @@ from .models import (
 
 from .serializers import (
     OrganizationSerializer,
+    OrganizationListViewSerializer,
     StaffCountSerializer,
     OrganizationPictureSerializer,
     StaffSerializer,
+    StaffListViewSerializer,
     FollowSerializer,
     AbilitySerializer,
     ConfirmationSerializer,
@@ -100,6 +102,8 @@ class OrganizationViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+              return OrganizationListViewSerializer
         return OrganizationSerializer
 
 
@@ -203,6 +207,8 @@ class StaffViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return StaffListViewSerializer
         return StaffSerializer
 
 

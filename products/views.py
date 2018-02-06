@@ -28,6 +28,7 @@ from .serializers import (
     CategorySerializer,
     CategoryFieldSerializer,
     ProductSerializer,
+    ProductListViewSerializer,
     PriceSerializer,
     PictureSerializer,
     CommentSerializer
@@ -155,6 +156,8 @@ class ProductViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return ProductListViewSerializer
         return ProductSerializer
 
 

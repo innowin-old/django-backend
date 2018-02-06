@@ -17,6 +17,7 @@ router.register(r'category-field', CategoryFieldViewset, 'category-fields')
 router.register(r'prices', PriceViewset, 'prices')
 router.register(r'pictures', PictureViewset, 'product-pictures')
 router.register(r'comments', CommentViewset, 'comments')
+router.register(r'', ProductViewset, 'products')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
