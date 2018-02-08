@@ -50,6 +50,7 @@ class ExchangeIdentity(Base):
     JOIN_TYPES = (
         ('join', 'عضو'),
         ('quest', 'مهمان'),
+        ('admin', 'ادمین'),
     )
     exchanges_identity = models.ForeignKey(
         Exchange,

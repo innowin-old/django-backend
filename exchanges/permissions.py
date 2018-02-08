@@ -14,7 +14,7 @@ class IsExchangeOwnerOrReadOnly(permissions.BasePermission):
 
 class IsExchangeIdentity(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.user == obj.exchanges_identity.owner:
+        if request.user == obj.exchanges_identity.owner.identity_user:
             return True
         return False
 
