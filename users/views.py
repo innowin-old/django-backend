@@ -43,7 +43,7 @@ from django.shortcuts import HttpResponse
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = []
 
     def get_queryset(self):
         if self.request.user.is_superuser:
