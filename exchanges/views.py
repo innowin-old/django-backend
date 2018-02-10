@@ -71,19 +71,19 @@ class ExchangeIdentityViewSet(ModelViewSet):
 
         exchange_id = self.request.query_params.get('exchange_id', None)
         if exchange_id is not None:
-            queryset = queryset.filter(exchanges_identity_id=exchange_id)
+            queryset = queryset.filter(exchange_identity_related_exchange_id=exchange_id)
 
         exchange_name = self.request.query_params.get('exchange_name', None)
         if exchange_name is not None:
-            queryset = queryset.filter(exchanges_identity__name__contains=exchange_name)
+            queryset = queryset.filter(exchange_identity_related_exchange__name__contains=exchange_name)
 
         identity_id = self.request.query_params.get('identity_id', None)
         if identity_id is not None:
-            queryset = queryset.filter(identities_exchange_id=identity_id)
+            queryset = queryset.filter(exchange_identity_related_identity_id=identity_id)
 
         identity_name = self.request.query_params.get('identity_name', None)
         if identity_name is not None:
-            queryset = queryset.filter(identities_exchange__name__contains=identity_name)
+            queryset = queryset.filter(exchange_identity_related_identity__name__contains=identity_name)
 
         join_type = self.request.query_params.get('join_type', None)
         if join_type is not None:

@@ -52,12 +52,12 @@ class ExchangeIdentity(Base):
         ('quest', 'مهمان'),
         ('admin', 'ادمین'),
     )
-    exchanges_identity = models.ForeignKey(
+    exchange_identity_related_exchange = models.ForeignKey(
         Exchange,
         related_name="identities_exchange",
         help_text='Integer',
     )
-    identities_exchange = models.ForeignKey(
+    exchange_identity_related_identity = models.ForeignKey(
         Identity,
         related_name="exchanges_identities",
         help_text='Integer',
