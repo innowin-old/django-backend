@@ -15,8 +15,8 @@ class ExchangeSerilizer(BaseSerializer):
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['owner'] = identity
         exchange = Exchange.objects.create(**validated_data)
-        exchange_identity = ExchangeIdentity(identities_exchange_id=exchange.owner.id,
-                                             exchanges_identity_id=exchange.id)
+        exchange_identity = ExchangeIdentity(exchange_identity_related_identity_id=exchange.owner.id,
+                                             exchange_identity_related_exchange_id=exchange.id)
         exchange_identity.save()
         return exchange
 
@@ -30,6 +30,6 @@ class ExchangeIdentitySerializer(BaseSerializer):
         request = self.context.get("request")
         identity = Identity.objects.get(identity_user=request.user)
         exchange_identity = ExchangeIdentity.objects.create(**validated_data)
-        exchange_identity.identities_exchange = identity
+        exchange_identity.exchange_identity_related_identity = identity
         exchange_identity.save()
         return exchange_identity
