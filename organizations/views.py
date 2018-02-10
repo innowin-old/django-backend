@@ -21,6 +21,7 @@ from .models import (
     Confirmation,
     Customer
 )
+
 from .serializers import (
     OrganizationSerializer,
     StaffCountSerializer,
@@ -298,6 +299,7 @@ class ConfirmationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Confirmation.objects.all()
+
         """
             Corroborant Filter Options
         """

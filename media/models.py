@@ -27,10 +27,16 @@ class Media(models.Model):
         'users.Identity',
         related_name="identity_medias",
         on_delete=models.CASCADE,
-        db_index=True)
+        db_index=True,
+        blank=True,
+        null=True
+    )
     file = models.FileField(
         upload_to=get_upload_path,
-        storage=media_file_storage)
+        storage=media_file_storage,
+        blank=True,
+        null=True,
+    )
     uploader = models.ForeignKey(User, related_name="medias",
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True,

@@ -33,6 +33,7 @@ class Organization(Base):
                                     blank=True,
                                     help_text='Integer')
     username = models.CharField(max_length=100, unique=True, help_text='String(100)')
+    email = models.EmailField(blank=True, null=True, help_text='Text')
     nike_name = models.CharField(max_length=100, db_index=True, null=True, blank=True, help_text='String(100)')
     official_name = models.CharField(max_length=75, db_index=True, help_text='String(75)')
     national_code = models.CharField(max_length=20, db_index=True, help_text='String(20)')

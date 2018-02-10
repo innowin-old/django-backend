@@ -2,6 +2,7 @@ from base.serializers import BaseSerializer
 from .models import Exchange, ExchangeIdentity
 from users.models import Identity
 
+
 # Create Serializers Here
 class ExchangeSerilizer(BaseSerializer):
     class Meta:
@@ -14,14 +15,15 @@ class ExchangeSerilizer(BaseSerializer):
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['owner'] = identity
         exchange = Exchange.objects.create(**validated_data)
-        exchange_identity = ExchangeIdentity(identities_exchange_id=exchange.owner.id, exchanges_identity_id=exchange.id)
+        exchange_identity = ExchangeIdentity(identities_exchange_id=exchange.owner.id,
+                                             exchanges_identity_id=exchange.id)
         exchange_identity.save()
         return exchange
 
 
 class ExchangeIdentitySerializer(BaseSerializer):
     class Meta:
-        model=ExchangeIdentity
+        model = ExchangeIdentity
         fields = '__all___'
 
     def create(self, validated_data):

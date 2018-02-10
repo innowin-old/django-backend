@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 from .models import ExchangeIdentity
 
+
 class IsExchangeOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
@@ -10,9 +11,10 @@ class IsExchangeOwnerOrReadOnly(permissions.BasePermission):
             return True
         return False
 
+
 class IsExchangeIdentity(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.user == obj.exchanges_identity.owner:
+        if request.user == obj.exchanges_identity.owner.identity_user:
             return True
         return False
 

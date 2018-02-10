@@ -94,7 +94,7 @@ def create_profile(sender, instance, created, **kwargs):
 
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
-                                on_delete=models.CASCADE, help_text='Integer')
+                                        on_delete=models.CASCADE, help_text='Integer')
     public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
                                      validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
@@ -130,7 +130,7 @@ post_save.connect(update_cache, sender=Profile)
 
 class Education(Base):
     education_user = models.ForeignKey(User, related_name="educations",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                       on_delete=models.CASCADE, help_text='Integer')
     grade = models.CharField(max_length=100, help_text='String(100)')
     university = models.CharField(max_length=100, help_text='String(100)')
     field_of_study = models.CharField(max_length=100, help_text='String(100)')
@@ -177,7 +177,7 @@ post_save.connect(update_cache, sender=Education)
 
 class Research(Base):
     research_user = models.ForeignKey(User, related_name="researches",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                      on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     url = models.URLField(blank=True, help_text='URL')
     author = ArrayField(models.CharField(max_length=100), blank=True, help_text='Array(String(100))')
@@ -197,7 +197,7 @@ post_save.connect(update_cache, sender=Research)
 
 class Certificate(Base):
     certificate_user = models.ForeignKey(User, related_name="certificates",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                         on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     picture_media = models.ForeignKey(
         Media,
@@ -225,7 +225,7 @@ class WorkExperience(Base):
     )
 
     work_experience_user = models.ForeignKey(User, related_name="work_experiences",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                             on_delete=models.CASCADE, help_text='Integer')
     name = models.CharField(max_length=100, blank=True, help_text='String(100)')
     work_experience_organization = models.ForeignKey(
         Organization,
@@ -235,8 +235,8 @@ class WorkExperience(Base):
         null=True,
         help_text='Integer')
     position = models.CharField(max_length=100, blank=True, help_text='String(100)')
-    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(100)')
-    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
+    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
+    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
     status = models.CharField(
         choices=STATUSES,
         max_length=20,
@@ -280,7 +280,7 @@ post_save.connect(update_cache, sender=WorkExperience)
 
 class Skill(Base):
     skill_user = models.ForeignKey(User, related_name="skills",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                   on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
     description = models.TextField(blank=True, help_text='Text')
@@ -290,13 +290,14 @@ class Skill(Base):
     def __str__(self):
         return "%s(%s)" % (self.skill_user.username, self.title)
 
+
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Skill)
 
 
 class Badge(Base):
     badge_user = models.ForeignKey(User, related_name="badges",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                   on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, help_text='String(100)')
 
     objects = BaseManager()

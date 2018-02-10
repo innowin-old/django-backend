@@ -7,7 +7,8 @@ from .models import (
     Hashtag,
     HashtagParent,
     BaseComment,
-    Post
+    Post,
+    BaseCertificate
 )
 
 from .serializers import (
@@ -15,7 +16,8 @@ from .serializers import (
     HashtagSerializer,
     HashtagParentSerializer,
     BaseCommentSerializer,
-    PostSerializer
+    PostSerializer,
+    CertificateSerializer
 )
 
 
@@ -132,3 +134,25 @@ class PostViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return PostSerializer
+
+
+class CertificateViewSet(ModelViewSet):
+    #queryset = BaseCertificate.objects.all()
+
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BaseCertificate.objects.all()
+
+        certificate_identity = self.request.query_params.get('certificate_identity', None)
+        if certificate_identity is not None:
+            queryset = queryset.filter(certificate_identity=certificate_identity)
+
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title__contains=title)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return CertificateSerializer

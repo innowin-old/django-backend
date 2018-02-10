@@ -5,6 +5,7 @@ from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeIdentity
 from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
 
+
 # Create your views here.
 class ExchangeViewSet(ModelViewSet):
     """
@@ -41,7 +42,7 @@ class ExchangeViewSet(ModelViewSet):
             queryset = queryset.filter(hashtag__title=hashtag_title)
 
         private = self.request.query_params.get('private', None)
-        if private is not  None:
+        if private is not None:
             queryset = queryset.filter(private=private)
 
         member_count = self.request.query_params.get('member_count', None)
@@ -69,11 +70,11 @@ class ExchangeIdentityViewSet(ModelViewSet):
         queryset = ExchangeIdentity.objects.all()
 
         exchange_id = self.request.query_params.get('exchange_id', None)
-        if exchange_id is not  None:
+        if exchange_id is not None:
             queryset = queryset.filter(exchanges_identity_id=exchange_id)
 
         exchange_name = self.request.query_params.get('exchange_name', None)
-        if exchange_name is not  None:
+        if exchange_name is not None:
             queryset = queryset.filter(exchanges_identity__name__contains=exchange_name)
 
         identity_id = self.request.query_params.get('identity_id', None)
