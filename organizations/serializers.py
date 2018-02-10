@@ -9,7 +9,7 @@ from .models import (
     Confirmation,
     Customer
 )
-from users.serializers import UserMiniSerializer
+from users.serializers import UserMiniSerializer, IdentityMiniSerializer
 
 
 class OrganizationSerializer(BaseSerializer):
@@ -28,9 +28,11 @@ class OrganizationSerializer(BaseSerializer):
         return organization
 
 class OrganizationListViewSerializer(BaseSerializer):
+    owner = UserMiniSerializer()
+
     class Meta:
         model = Organization
-        fields = ['owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code']
+        fields = ['id', 'owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code']
 
 
 class StaffCountSerializer(BaseSerializer):
@@ -92,6 +94,14 @@ class ConfirmationSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+
+class ConfirmationListViewSerializer(BaseSerializer):
+    confirmation_corroborant = IdentityMiniSerializer()
+
+    class Meta:
+        model = Confirmation
+        exclude = ['updated_time']
 
 
 class CustomerSerializer(BaseSerializer):

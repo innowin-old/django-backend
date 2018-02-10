@@ -37,6 +37,12 @@ class UserSerializer(ModelSerializer):
         user.save()
         return user
 
+class UserListViewSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
+
 class UserMiniSerializer(ModelSerializer):
     class Meta:
         model = User
@@ -50,6 +56,13 @@ class IdentitySerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+class IdentityMiniSerializer(BaseSerializer):
+    identity_user = UserMiniSerializer()
+
+    class Meta:
+        model = Identity
+        exclude = ['updated_time']
 
 
 class ProfileSerializer(BaseSerializer):

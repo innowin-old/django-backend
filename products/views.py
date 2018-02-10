@@ -11,8 +11,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly
+from base.views import BaseModelViewSet
 
 from .permissions import IsProductOwnerOrReadOnly
 from .models import (
@@ -35,12 +38,12 @@ from .serializers import (
 )
 
 
-class CategoryViewset(ModelViewSet):
+class CategoryViewset(BaseModelViewSet):
     # queryset = Category.objects.all()
     permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
-        queryset = Category.objects.all()
+        queryset = Category.objects.filter(delete_flag=False)
 
         parent_id = self.request.query_params.get('parent_id', None)
         if parent_id is not None:
@@ -60,12 +63,12 @@ class CategoryViewset(ModelViewSet):
         return CategorySerializer
 
 
-class CategoryFieldViewset(ModelViewSet):
+class CategoryFieldViewset(BaseModelViewSet):
     # queryset = CategoryField.objects.all()
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        queryset = CategoryField.objects.all()
+        queryset = CategoryField.objects.filter(delete_flag=False)
 
         """
             Category Filter Options
@@ -96,12 +99,12 @@ class CategoryFieldViewset(ModelViewSet):
         return CategoryFieldSerializer
 
 
-class ProductViewset(ModelViewSet):
+class ProductViewset(BaseModelViewSet):
     # queryset = Product.objects.all()
     permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Product.objects.all()
+        queryset = Product.objects.filter(delete_flag=False)
 
         """
             Owner Filter Options
@@ -160,13 +163,44 @@ class ProductViewset(ModelViewSet):
             return ProductListViewSerializer
         return ProductSerializer
 
+    @list_route(
+      permission_classes=[AllowAny],
+      methods=['post']
+    )
+    def import_products(self, request):
+        jsonString = request.data.get('records', None)
+        data = json.loads(jsonString)
+        errors = []
+        for record in data:
+            try :
+                product = Product.objects.create(
+                    name=record.get('name', None),
+                    country=record.get('country', None),
+                    province=record.get('province', None),
+                    city=record.get('city', None),
+                    description=record.get('description', None),
+                    attrs=record.get('attrs', None),
+                    custom_attrs=record.get('custom_attrs', None),
+                    product_owner=record.get('product_owner', None),
+                    product_category=record.get('product_category', None)
+                )
+            except Exception as e:
+                errors.append({
+                    'data': record,
+                    'status': str(e)
+                })
+        response = {
+            'errors': errors
+        }
+        return Response(response)
 
-class PriceViewset(ModelViewSet):
+
+class PriceViewset(BaseModelViewSet):
     # queryset = Price.objects.all()
     permisison_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Price.objects.all()
+        queryset = Price.objects.filter(delete_flag=False)
 
         """
             Product Filter Options
@@ -224,12 +258,12 @@ class PriceViewset(ModelViewSet):
         return PriceSerializer
 
 
-class PictureViewset(ModelViewSet):
+class PictureViewset(BaseModelViewSet):
     # queryset = Picture.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Picture.objects.all()
+        queryset = Picture.objects.filter(delete_flag=False)
 
         product = self.request.query_params.get('product', None)
         if product is not None:
@@ -245,12 +279,12 @@ class PictureViewset(ModelViewSet):
         return PictureSerializer
 
 
-class CommentViewset(ModelViewSet):
+class CommentViewset(BaseModelViewSet):
     # queryset = Comment.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Comment.objects.all()
+        queryset = Comment.objects.filter(delete_flag=False)
 
         product = self.request.query_params.get('product', None)
         if product is not None:

@@ -1,6 +1,13 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ModelSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from django.http import HttpResponse
+from .serializers import BaseSerializer
 
+import json
 
 from .models import (
     Base,
@@ -21,6 +28,42 @@ from .serializers import (
 )
 
 
+class BaseModelViewSet(ModelViewSet):
+    def destroy(self, request, *args, **kwargs):
+        """class DynamicDeleteSerializer(ModelSerializer, BaseSerializer):
+            class Meta:
+                model = self.get_serializer_class().Meta.model
+                fields = []
+
+            def validate(self, attrs):
+                if self.instance.delete_flag:
+                    raise ValidationError('Ths selected object does not exist or already deleted.')
+                return attrs"""
+
+        try:
+            instance = self.get_object()
+            # serializer = DynamicDeleteSerializer(instance, request.data)
+            # serializer.is_valid(raise_exception=True)
+            instance.delete_flag = True
+            instance.save()
+            #return Response({status: "SUCCESS"}, status=status.HTTP_200_OK)
+            response = HttpResponse(json.dumps({'message': 'record deleted.'}), 
+                content_type='application/json')
+            response.status_code = 200
+            return response
+        except Exception as e:
+            if type(e) is ValidationError:
+                raise e
+
+        return Response({
+            "errors": [{
+                "status": 1,
+                "key": "non_field_errors",
+                "detail": "The selected object does not exist or already deleted."
+            }]
+        })
+
+
 class BaseViewset(ModelViewSet):
     # queryset = Base.objects.all()
     permission_classes = ""
@@ -32,7 +75,7 @@ class BaseViewset(ModelViewSet):
         return BaseSerializer
 
 
-class HashtagParentViewset(ModelViewSet):
+class HashtagParentViewset(BaseModelViewSet):
     # queryset = HashtagParent.objects.all()
     permisison_classes = ""
 
@@ -49,7 +92,7 @@ class HashtagParentViewset(ModelViewSet):
         return HashtagParentSerializer
 
     
-class HashtagViewset(ModelViewSet):
+class HashtagViewset(BaseModelViewSet):
     # queryset = Hashtag.objects.all()
     permission_classes = [AllowAny]
 
@@ -70,7 +113,7 @@ class HashtagViewset(ModelViewSet):
         return HashtagSerializer
 
 
-class BaseCommentViewset(ModelViewSet):
+class BaseCommentViewset(BaseModelViewSet):
     # queryset = BaseComment.objects.all()
     permission_classes = [AllowAny]
 
@@ -95,12 +138,12 @@ class BaseCommentViewset(ModelViewSet):
         return BaseCommentSerializer
 
 
-class PostViewSet(ModelViewSet):
+class PostViewSet(BaseModelViewSet):
     # queryset = Post.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Post.objects.all()
+        queryset = Post.objects.filter(delete_flag=False)
 
         post_type = self.request.query_params.get('post_type', None)
         if post_type is not None:
@@ -136,7 +179,7 @@ class PostViewSet(ModelViewSet):
         return PostSerializer
 
 
-class CertificateViewSet(ModelViewSet):
+class CertificateViewSet(BaseModelViewSet):
     #queryset = BaseCertificate.objects.all()
 
     permission_classes = [AllowAny]

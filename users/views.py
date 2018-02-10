@@ -12,6 +12,8 @@ from utils.token import validate_token
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
 
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
 from .models import (
@@ -28,6 +30,7 @@ from .models import (
 from .serializers import (
     SuperAdminUserSerializer,
     UserSerializer,
+    UserListViewSerializer,
     IdentitySerializer,
     ProfileSerializer,
     EducationSerializer,
@@ -43,7 +46,7 @@ from django.shortcuts import HttpResponse
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -54,6 +57,8 @@ class UserViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.request and self.request.user.is_superuser:
             return SuperAdminUserSerializer
+        elif self.action == 'list':
+            return UserListViewSerializer
         else:
             return UserSerializer
 
@@ -114,6 +119,30 @@ class UserViewset(ModelViewSet):
             queryset = queryset.filter(email__contains=email)
 
         return queryset
+
+    @list_route(methods=['post'])
+    def import_users(self, request):
+        jsonString = request.data.get('records', None)
+        data  = json.loads(jsonString)
+        errors = []
+        for record in data:
+            try:
+                user = User.objects.create_user(
+                    first_name=record.get('first_name', None),
+                    last_name=record.get('last_name', None),
+                    username=record.get('username', None),
+                    password=record.get('password', None),
+                    email=record.get('email', None)
+                )
+            except Exception as e:
+                errors.append({
+                    'data': record,
+                    'status': str(e)
+                })
+        response = {
+            'errors': errors
+        }
+        return Response(response)
 
 
 class IdentityViewset(ModelViewSet):

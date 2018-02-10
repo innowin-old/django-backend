@@ -1,13 +1,16 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
 
 from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeIdentity
-from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
-
+from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer
+from base.views import BaseModelViewSet
+import json
 
 # Create your views here.
-class ExchangeViewSet(ModelViewSet):
+class ExchangeViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Exchange Views
     """
@@ -58,20 +61,51 @@ class ExchangeViewSet(ModelViewSet):
     def get_serializer_class(self):
         return ExchangeSerilizer
 
+    @list_route(
+      permission_classes = [AllowAny],
+      methods = ['post']
+    )
+    def import_exchanges(self, request):
+        jsonString = request.data.get('records', None)
+        data = json.loads(jsonString)
+        errors = []
+        for record in data:
+            try :
+                exchange = Exchange.objects.create(
+                    name=record.get('name', None),
+                    link=record.get('link', None),
+                    description=record.get('description', None),
+                    private=record.get('private', None),
+                    members_count=record.get('members_count', None),
+                    active_flag=record.get('active_flag', None),
+                    owner=record.get('owner', None),
+                    exchange_image=record.get('exchange_image', None),
+                    exchange_hashtag=record.get('exchange_hashtag', None)
+                )
+            except Exception as e:
+                errors.append({
+                    'data': record,
+                    'status': str(e)
+                })
+        response = {
+            'errors': errors
+        }
+        return Response(response)
 
-class ExchangeIdentityViewSet(ModelViewSet):
+
+class ExchangeIdentityViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Identity Exchange Views
     """
     # queryset = ExchangeIdentity.objects.all()
-    permission_classes = [IsAuthenticated, IsExchangeIdentity]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = ExchangeIdentity.objects.all()
 
         exchange_id = self.request.query_params.get('exchange_id', None)
         if exchange_id is not None:
-            queryset = queryset.filter(exchanges_identity_id=exchange_id)
+            queryset = queryset.filter(exchange_identity_related_exchange_id=exchange_id)
 
         exchange_name = self.request.query_params.get('exchange_name', None)
         if exchange_name is not None:
@@ -79,7 +113,7 @@ class ExchangeIdentityViewSet(ModelViewSet):
 
         identity_id = self.request.query_params.get('identity_id', None)
         if identity_id is not None:
-            queryset = queryset.filter(identities_exchange_id=identity_id)
+            queryset = queryset.filter(exchange_identity_related_identity_id=identity_id)
 
         identity_name = self.request.query_params.get('identity_name', None)
         if identity_name is not None:
@@ -96,4 +130,6 @@ class ExchangeIdentityViewSet(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return ExchangeIdentityListViewSerializer
         return ExchangeIdentitySerializer
