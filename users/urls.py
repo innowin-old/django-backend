@@ -1,5 +1,4 @@
 from django.conf.urls import url, include
-from django.contrib.auth import views as auth_views
 from rest_framework.routers import DefaultRouter
 
 
@@ -13,6 +12,7 @@ from .views import (
     WorkExperienceViewset,
     SkillViewset,
     BadgeViewset,
+    IdentityUrlViewset,
     login_page,
     logout_page,
     active_user
@@ -28,6 +28,7 @@ router.register(r'certificates', CertificateViewset, 'certificates')
 router.register(r'work-experiences', WorkExperienceViewset, 'work-experiences')
 router.register(r'skills', SkillViewset, 'skills')
 router.register(r'badges', BadgeViewset, 'badges')
+router.register(r'urls', IdentityUrlViewset, 'urls')
 router.register(r'', UserViewset, 'users')
 
 

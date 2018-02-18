@@ -17,7 +17,8 @@ from .models import (
     Certificate,
     WorkExperience,
     Skill,
-    Badge
+    Badge,
+    IdentityUrl
 )
 
 from .serializers import (
@@ -30,9 +31,10 @@ from .serializers import (
     CertificateSerializer,
     WorkExperienceSerializer,
     SkillSerializer,
-    BadgeSerializer
+    BadgeSerializer,
+    IdentityUrlSerilizer
 )
-from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
+from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly
 
 
 class UserViewset(ModelViewSet):
@@ -204,6 +206,17 @@ class BadgeViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return BadgeSerializer
+
+
+class IdentityUrlViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsUrlOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = IdentityUrl.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return IdentityUrlSerilizer
 
 
 def login_page(request):
