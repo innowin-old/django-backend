@@ -9,7 +9,8 @@ from .models import (
     Certificate,
     WorkExperience,
     Skill,
-    Badge
+    Badge,
+    IdentityUrl
 )
 
 
@@ -212,3 +213,12 @@ class BadgeSerializer(BaseSerializer):
         instance.title = validated_data['title']
         instance.save()
         return instance
+
+
+class IdentityUrlSerilizer(BaseSerializer):
+    class Meta:
+        model = IdentityUrl
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }

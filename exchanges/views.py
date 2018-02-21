@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeIdentity
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull
 from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
 
 
@@ -64,7 +64,7 @@ class ExchangeIdentityViewSet(ModelViewSet):
         A ViewSet for Handle Identity Exchange Views
     """
     # queryset = ExchangeIdentity.objects.all()
-    permission_classes = [IsAuthenticated, IsExchangeIdentity]
+    permission_classes = [IsAuthenticated, IsExchangeFull]
 
     def get_queryset(self):
         queryset = ExchangeIdentity.objects.all()

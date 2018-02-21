@@ -311,3 +311,8 @@ class Badge(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Badge)
+
+
+class IdentityUrl(Base):
+    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
+    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')

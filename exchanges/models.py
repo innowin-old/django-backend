@@ -72,6 +72,9 @@ class ExchangeIdentity(Base):
 
     objects = BaseManager()
 
+    class Meta:
+        unique_together = ('exchange_identity_related_exchange', 'exchange_identity_related_identity',)
+
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=ExchangeIdentity)
