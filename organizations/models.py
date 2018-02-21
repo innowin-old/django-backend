@@ -27,7 +27,7 @@ class Organization(Base):
     )
 
     owner = models.ForeignKey(User, related_name="organizations", db_index=True,
-                              on_delete=models.CASCADE, help_text='Integer')
+                              on_delete=models.CASCADE, help_text='Integer', blank=True, null=True)
     admins = models.ManyToManyField(User,
                                     related_name="organization_admins",
                                     blank=True,
