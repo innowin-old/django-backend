@@ -149,7 +149,7 @@ class ProductViewset(ModelViewSet):
 
 class PriceViewset(ModelViewSet):
     # queryset = Price.objects.all()
-    permisison_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Price.objects.all()

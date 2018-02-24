@@ -1,4 +1,7 @@
-from rest_framework.serializers import ModelSerializer
+import requests
+import json
+
+from rest_framework.serializers import ModelSerializer, CharField
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 from .models import (
@@ -10,7 +13,8 @@ from .models import (
     WorkExperience,
     Skill,
     Badge,
-    IdentityUrl
+    IdentityUrl,
+    UserArticle
 )
 
 
@@ -222,3 +226,53 @@ class IdentityUrlSerilizer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+
+class UserArticleSerializer(BaseSerializer):
+    class Meta:
+        model = UserArticle
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'user_article_related_user': {'read_only': True},
+            'doi_meta': {'read_only': True},
+            'publisher': {'read_only': True},
+            'title': {'read_only': True},
+            'article_author': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        url = validated_data['doi_link']
+        req = requests.get(url, headers={'Accept': 'application/vnd.citationstyles.csl+json', })
+        article = req.json()
+        user_article = UserArticle.objects.create(doi_link=url, doi_meta=article, publisher=article['publisher'], title=article['title'], article_author=article['author'], user_article_related_user=request.user)
+        return user_article
+
+
+class UserArticleListSerializer(BaseSerializer):
+    doi_list = CharField(required=False)
+
+    class Meta:
+        model = UserArticle
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'user_article_related_user': {'read_only': True},
+            'doi_meta': {'read_only': True},
+            'publisher': {'read_only': True},
+            'title': {'read_only': True},
+            'article_author': {'read_only': True},
+            'doi_link': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        doi_list = json.loads(validated_data['doi_list'])
+        for item in doi_list['doi_link_list']:
+            url = item['doi_link']
+            req = requests.get(url, headers={'Accept': 'application/vnd.citationstyles.csl+json', })
+            article = req.json()
+            user_article = UserArticle.objects.create(doi_link=url, doi_meta=article, publisher=article['publisher'], title=article['title'], article_author=article['author'], user_article_related_user=request.user)
+            user_article.save()
+        return user_article
