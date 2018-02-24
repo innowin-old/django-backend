@@ -271,7 +271,6 @@ class UserArticleListSerializer(BaseSerializer):
         doi_list = json.loads(validated_data['doi_list'])
         for item in doi_list['doi_link_list']:
             url = item['doi_link']
-            print(url)
             req = requests.get(url, headers={'Accept': 'application/vnd.citationstyles.csl+json', })
             article = req.json()
             user_article = UserArticle.objects.create(doi_link=url, doi_meta=article, publisher=article['publisher'], title=article['title'], article_author=article['author'], user_article_related_user=request.user)
