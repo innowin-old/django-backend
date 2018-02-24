@@ -13,6 +13,7 @@ from .views import (
     SkillViewset,
     BadgeViewset,
     IdentityUrlViewset,
+    UserArticleViewset,
     login_page,
     logout_page,
     active_user
@@ -29,6 +30,7 @@ router.register(r'work-experiences', WorkExperienceViewset, 'work-experiences')
 router.register(r'skills', SkillViewset, 'skills')
 router.register(r'badges', BadgeViewset, 'badges')
 router.register(r'urls', IdentityUrlViewset, 'urls')
+router.register(r'user-articles', UserArticleViewset, 'articles')
 router.register(r'', UserViewset, 'users')
 
 

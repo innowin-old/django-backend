@@ -13,6 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 
 from danesh_boom.models import PhoneField
+from django.contrib.postgres.fields import JSONField
 from media.models import Media
 from organizations.models import Organization
 from base.models import Base, BaseManager
@@ -316,3 +317,13 @@ post_save.connect(update_cache, sender=Badge)
 class IdentityUrl(Base):
     url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
     identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')
+
+
+class UserArticle(Base):
+    user_article_related_user = models.ForeignKey(User, related_name="articles",
+                                                  on_delete=models.CASCADE, help_text='Integer')
+    doi_link = models.URLField(db_index=True)
+    doi_meta = JSONField()
+    publisher = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
+    article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array')

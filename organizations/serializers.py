@@ -1,5 +1,4 @@
 from base.serializers import BaseSerializer
-from rest_framework.serializers import IntegerField
 from .models import (
     Organization,
     StaffCount,
