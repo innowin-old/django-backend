@@ -1,7 +1,10 @@
 import requests
 import json
+import base64
+from django.core.files.base import ContentFile
+from django.conf import settings
 
-from rest_framework.serializers import ModelSerializer, CharField
+from rest_framework.serializers import ModelSerializer, CharField, FileField
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 from .models import (
@@ -276,3 +279,59 @@ class UserArticleListSerializer(BaseSerializer):
             user_article = UserArticle.objects.create(doi_link=url, doi_meta=article, publisher=article['publisher'], title=article['title'], article_author=article['author'], user_article_related_user=request.user)
             user_article.save()
         return user_article
+
+
+class UserArticleRisSerializer(BaseSerializer):
+    ris_file = CharField(required=False)
+
+    class Meta:
+        model = UserArticle
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'user_article_related_user': {'read_only': True},
+            'doi_meta': {'read_only': True},
+            'publisher': {'read_only': True},
+            'title': {'read_only': True},
+            'article_author': {'read_only': True},
+            'doi_link': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['user_article_related_user'] = request.user
+        ris_file = validated_data.pop('ris_file')
+        format, imgstr = ris_file.split(';base64,')
+        ext = format.split('/')[-1]
+        filelines = ContentFile(base64.b64decode(imgstr), name='temp.' + ext).readlines()
+        filelines_decoded = []
+        for fileline in filelines:
+            fileline_decoded = fileline.decode()
+            filelines_decoded.append(fileline_decoded)
+        map_array = settings.TAG_KEY_MAPPING
+        doi_media = {}
+        authors_array = []
+        publishers_array = []
+        for item in filelines_decoded:
+            item_split = item.split('-')
+            first_item = item_split[0].strip()
+            if map_array[first_item] == 'first_authors':
+                authors_array.append(item_split[1].strip())
+            if map_array[first_item] == 'publisher':
+                publishers_array.append(item_split[1].strip())
+            if map_array[first_item] == 'primary_title':
+                validated_data['title'] = item_split[1].strip()
+                doi_media['title'] = item_split[1].strip()
+            if map_array[first_item] == 'abstract':
+                doi_media['abstract'] = item_split[1].strip()
+            if map_array[first_item] == 'date':
+                doi_media['date'] = item_split[1].strip()
+            if map_array[first_item] == 'doi':
+                doi_media['doi'] = item_split[1].strip()
+            if map_array[first_item] == 'edition':
+                doi_media['edition'] = item_split[1].strip()
+        validated_data['article_author'] = authors_array
+        doi_media['authors'] = authors_array
+        doi_media['publishers'] = publishers_array
+        article = UserArticle.objects.create(**validated_data, doi_meta=doi_media, doi_link='http://doi.org/')
+        return article

@@ -99,6 +99,8 @@ class Profile(Base):
     public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
                                      validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
+    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_profile_media",
+                                      help_text='Integer', blank=True, null=True)
     birth_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
     web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
     phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')

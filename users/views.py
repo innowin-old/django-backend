@@ -35,7 +35,8 @@ from .serializers import (
     BadgeSerializer,
     IdentityUrlSerilizer,
     UserArticleSerializer,
-    UserArticleListSerializer
+    UserArticleListSerializer,
+    UserArticleRisSerializer
 )
 from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly
 
@@ -233,6 +234,16 @@ class UserArticleViewset(ModelViewSet):
     def get_serializer_class(self):
         return UserArticleListSerializer
 
+
+class UserArticleRisViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = UserArticle.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UserArticleRisSerializer
 
 def login_page(request):
     logout(request)
