@@ -40,3 +40,6 @@ class IsExchangeFull(permissions.BasePermission):
                 if exchange_count > settings.EXCHANGE_LIMIT:
                     return False
         return True
+
+'''class IsAgentOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):'''

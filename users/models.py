@@ -329,3 +329,7 @@ class UserArticle(Base):
     publisher = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
     article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array')
+
+
+class Agent(Base):
+    agent_identity = models.ForeignKey(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')

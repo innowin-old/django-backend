@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull
-from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
+from .serializers import ExchangeSerializer, ExchangeIdentitySerializer
 
 
 # Create your views here.
@@ -56,7 +56,7 @@ class ExchangeViewSet(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        return ExchangeSerilizer
+        return ExchangeSerializer
 
 
 class ExchangeIdentityViewSet(ModelViewSet):

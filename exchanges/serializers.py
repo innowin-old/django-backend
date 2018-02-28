@@ -4,7 +4,7 @@ from users.models import Identity
 
 
 # Create Serializers Here
-class ExchangeSerilizer(BaseSerializer):
+class ExchangeSerializer(BaseSerializer):
     class Meta:
         model = Exchange
         fields = '__all__'

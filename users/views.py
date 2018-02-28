@@ -274,3 +274,14 @@ def active_user(request, token):
         err = 'success-activation'
 
     return redirect('/#/auth/{}/'.format(err))
+
+
+def jwt_response_payload_handler(token, user=None, request=None):
+    profile = Profile.objects.get(profile_user=user)
+    identity = Identity.objects.get(identity_user=user)
+    return {
+        'token': token,
+        'user': UserSerializer(user, context={'request': request}).data,
+        'profile': ProfileSerializer(profile, context={'request': request}).data,
+        'identity': IdentitySerializer(identity, context={'request': request}).data
+    }
