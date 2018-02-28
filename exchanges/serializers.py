@@ -20,6 +20,19 @@ class ExchangeSerilizer(BaseSerializer):
         exchange_identity.save()
         return exchange
 
+class ExchangeMiniSerializer(BaseSerializer):
+    class Meta:
+        model = Exchange
+        exclude = ['created_time', 'updated_time', 'delete_flag', 'active_flag']
+
+
+class ExchangeIdentityListViewSerializer(BaseSerializer):
+    exchange_identity_related_exchange = ExchangeMiniSerializer()
+
+    class Meta:
+        model = ExchangeIdentity
+        exclude = ['updated_time']
+
 
 class ExchangeIdentitySerializer(BaseSerializer):
     class Meta:
@@ -30,6 +43,6 @@ class ExchangeIdentitySerializer(BaseSerializer):
         request = self.context.get("request")
         identity = Identity.objects.get(identity_user=request.user)
         exchange_identity = ExchangeIdentity.objects.create(**validated_data)
-        exchange_identity.identities_exchange = identity
+        exchange_identity.exchagne_identity_related_identity = identity
         exchange_identity.save()
         return exchange_identity

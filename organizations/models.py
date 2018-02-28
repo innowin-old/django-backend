@@ -48,11 +48,12 @@ class Organization(Base):
     established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer')
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
-        max_length=20)
+        max_length=20,
+        help_text='String :: [idi, org, cop, pvt, llp, gco, oth]')
     business_type = ArrayField(models.CharField(
         choices=BUSINESS_TYPES,
         max_length=30,
-        help_text='Array(String(30))')
+        help_text='Array(String(30)) :: [producer, investor, service provider]')
     )
     organization_logo = models.ForeignKey(
         Media,

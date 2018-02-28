@@ -35,6 +35,13 @@ class ProductSerializer(BaseSerializer):
             'updated_time': {'read_only': True}
         }
 
+class ProductListViewSerializer(BaseSerializer):
+    product_category = CategorySerializer()
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
 
 class PriceSerializer(BaseSerializer):
     class Meta:

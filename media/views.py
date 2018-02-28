@@ -17,7 +17,7 @@ class MediaViewSet(ModelViewSet):
         A ViewSet for Handle Media Views
     """
     #queryset = Media.objects.all()
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         return MediaSeriaizer

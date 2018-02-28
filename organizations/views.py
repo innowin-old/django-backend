@@ -1,7 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
+
+import json
 
 from base.permissions import IsOwnerOrReadOnly
+from base.views import BaseModelViewSet
 from .permissions import (
     StaffOrganizationOwner,
     StaffCountOrganizationOwner,
@@ -24,22 +29,25 @@ from .models import (
 
 from .serializers import (
     OrganizationSerializer,
+    OrganizationListViewSerializer,
     StaffCountSerializer,
     OrganizationPictureSerializer,
     StaffSerializer,
+    StaffListViewSerializer,
     FollowSerializer,
     AbilitySerializer,
     ConfirmationSerializer,
+    ConfirmationListViewSerializer,
     CustomerSerializer
 )
 
 
-class OrganizationViewset(ModelViewSet):
+class OrganizationViewset(BaseModelViewSet):
     owner_field = 'owner'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Organization.objects.all()
+        queryset = Organization.objects.filter(delete_flag=False)
 
         owner = self.request.query_params.get('owner', None)
         if owner is not None:
@@ -100,14 +108,58 @@ class OrganizationViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+              return OrganizationListViewSerializer
         return OrganizationSerializer
 
+    @list_route(
+      permission_classes=[AllowAny],
+      methods=['post'])
+    def import_organizations(self, request):
+        jsonString = request.data.get('records', None)
+        data = json.loads(jsonString)
+        errors = []
+        for record in data:
+            try :
+                organization = Organization.objects.create(
+                    username=record.get('username', None),
+                    email=record.get('email', None),
+                    nike_name=record.get('nike_name', None),
+                    official_name=record.get('official_name', None),
+                    national_code=record.get('national_code', None),
+                    registration_ads_url=record.get('registration_ads_url', None),
+                    country=record.get('country', None),
+                    province=record.get('province', None),
+                    city=record.get('city', None),
+                    address=record.get('address', None),
+                    phone=record.get('phone', None),
+                    web_site=record.get('web_site', None),
+                    established_year=record.get('established_year', None),
+                    business_type=record.get('business_type', None),
+                    biography=record.get('biography'),
+                    description=record.get('description'),
+                    correspondence_language=record.get('correspondence_language', None),
+                    social_network=record.get('social_network', None),
+                    owner=record.get('owner', None),
+                    organization_logo=record.get('organization_logo', None),
+                    admins=record.get('admins', None)
+                )
+            except Exception as e:
+                errors.append({
+                    'data': record,
+                    'status': str(e)
+                })
+        response = {
+            'errors': errors
+        }
+        return Response(response)
 
-class StaffCountViewset(ModelViewSet):
+
+class StaffCountViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, StaffCountOrganizationOwner]
 
     def get_queryset(self):
-        queryset = StaffCount.objects.all()
+        queryset = StaffCount.objects.filter(delete_flag=False)
 
         organization_id = self.request.query_params.get('organization_id', None)
         if organization_id is not None:
@@ -127,11 +179,11 @@ class StaffCountViewset(ModelViewSet):
         return StaffCountSerializer
 
 
-class OrganizationPictureViewset(ModelViewSet):
+class OrganizationPictureViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, PictureOrganizationOwner]
 
     def get_queryset(self):
-        queryset = OrganizationPicture.objects.all()
+        queryset = OrganizationPicture.objects.filter(delete_flag=False)
 
         organization_id = self.request.query_params.get('organization_id', None)
         if organization_id is not None:
@@ -151,12 +203,12 @@ class OrganizationPictureViewset(ModelViewSet):
         return OrganizationPictureSerializer
 
 
-class StaffViewset(ModelViewSet):
+class StaffViewset(BaseModelViewSet):
     # queryset = Staff.objects.all()
     permission_classes = [IsAuthenticated, StaffOrganizationOwner]
 
     def get_queryset(self):
-        queryset = Staff.objects.all()
+        queryset = Staff.objects.filter(delete_flag=False)
 
         """
             Organizations Filter Options
@@ -203,15 +255,17 @@ class StaffViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return StaffListViewSerializer
         return StaffSerializer
 
 
-class FollowViewset(ModelViewSet):
+class FollowViewset(BaseModelViewSet):
     # queryset = Follow.objects.all()
     permission_classes = [IsAuthenticated, FollowOwner]
 
     def get_queryset(self):
-        queryset = Follow.objects.all()
+        queryset = Follow.objects.filter(delete_flag=False)
 
         """
             Identity Filter Options
@@ -249,13 +303,13 @@ class FollowViewset(ModelViewSet):
         return FollowSerializer
 
 
-class AbilityViewset(ModelViewSet):
+class AbilityViewset(BaseModelViewSet):
     # queryset = Ability.objects.all()
     owner_field = 'ability_organization'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Ability.objects.all()
+        queryset = Ability.objects.filter(delete_flag=False)
 
         """
             Organizations Filter Options
@@ -290,12 +344,12 @@ class AbilityViewset(ModelViewSet):
         return AbilitySerializer
 
 
-class ConfirmationViewset(ModelViewSet):
+class ConfirmationViewset(BaseModelViewSet):
     # queryset = Confirmation.objects.all()
     permission_classes = [IsAuthenticated, ConfirmationOwner]
 
     def get_queryset(self):
-        queryset = Confirmation.objects.all()
+        queryset = Confirmation.objects.filter(delete_flag=False)
 
         """
             Corroborant Filter Options
@@ -342,15 +396,17 @@ class ConfirmationViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return ConfirmationListViewSerializer
         return ConfirmationSerializer
 
 
-class CustomerViewset(ModelViewSet):
+class CustomerViewset(BaseModelViewSet):
     # queryset = Customer.objects.all()
     permission_classes = [IsAuthenticated, CustomerOrganizationOwner]
 
     def get_queryset(self):
-        queryset = Customer.objects.all()
+        queryset = Customer.objects.filter(delete_flag=False)
 
         """
             Related Customer Filter Options
