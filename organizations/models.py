@@ -27,7 +27,7 @@ class Organization(Base):
     )
 
     owner = models.ForeignKey(User, related_name="organizations", db_index=True,
-                              on_delete=models.CASCADE, help_text='Integer')
+                              on_delete=models.CASCADE, help_text='Integer', blank=True, null=True)
     admins = models.ManyToManyField(User,
                                     related_name="organization_admins",
                                     blank=True,
@@ -48,12 +48,11 @@ class Organization(Base):
     established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer')
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
-        max_length=20,
-        help_text='String :: [idi, org, cop, pvt, llp, gco, oth]')
+        max_length=20)
     business_type = ArrayField(models.CharField(
         choices=BUSINESS_TYPES,
         max_length=30,
-        help_text='Array(String(30)) :: [producer, investor, service provider]')
+        help_text='Array(String(30))')
     )
     organization_logo = models.ForeignKey(
         Media,

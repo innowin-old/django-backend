@@ -19,3 +19,12 @@ class IsSuperUserOrReadOnly(permissions.BasePermission):
         elif request.user.is_superuser:
             return True
         return False
+
+
+class IsUrlOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'GET':
+            return True
+        elif obj.identity_url_related_identity.identity_user == request.user or request.user.is_superuser:
+            return True
+        return False

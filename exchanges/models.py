@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from users.models import Identity
@@ -50,6 +50,7 @@ class ExchangeIdentity(Base):
     JOIN_TYPES = (
         ('join', 'عضو'),
         ('quest', 'مهمان'),
+        ('admin', 'ادمین'),
     )
     exchange_identity_related_exchange = models.ForeignKey(
         Exchange,
@@ -70,6 +71,9 @@ class ExchangeIdentity(Base):
     active_flag = models.BooleanField(default=True, help_text='Boolean')
 
     objects = BaseManager()
+
+    class Meta:
+        unique_together = ('exchange_identity_related_exchange', 'exchange_identity_related_identity',)
 
 
 # Cache Model Data After Update

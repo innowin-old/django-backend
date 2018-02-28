@@ -1,13 +1,15 @@
+import json
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
-from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeIdentity
-from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer
 from base.views import BaseModelViewSet
-import json
+from .models import Exchange, ExchangeIdentity
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull
+from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
+
 
 # Create your views here.
 class ExchangeViewSet(BaseModelViewSet):
@@ -98,7 +100,7 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
         A ViewSet for Handle Identity Exchange Views
     """
     # queryset = ExchangeIdentity.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsExchangeFull]
 
     def get_queryset(self):
         queryset = ExchangeIdentity.objects.all()
@@ -109,7 +111,7 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
 
         exchange_name = self.request.query_params.get('exchange_name', None)
         if exchange_name is not None:
-            queryset = queryset.filter(exchanges_identity__name__contains=exchange_name)
+            queryset = queryset.filter(exchange_identity_related_exchange__name__contains=exchange_name)
 
         identity_id = self.request.query_params.get('identity_id', None)
         if identity_id is not None:
@@ -117,7 +119,7 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
 
         identity_name = self.request.query_params.get('identity_name', None)
         if identity_name is not None:
-            queryset = queryset.filter(identities_exchange__name__contains=identity_name)
+            queryset = queryset.filter(exchange_identity_related_identity__name__contains=identity_name)
 
         join_type = self.request.query_params.get('join_type', None)
         if join_type is not None:

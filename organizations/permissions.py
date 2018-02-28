@@ -1,4 +1,8 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from rest_framework import permissions
+
+from .models import Organization
 
 
 class StaffOrganizationOwner(permissions.BasePermission):
@@ -57,3 +61,13 @@ class ConfirmationOwner(permissions.BasePermission):
         if obj.confirmation_corroborant.identity_user == request.user or obj.confirmation_confirmed.identity_user == request.user or request.user.is_superuser:
             return True
         return False
+
+
+class IsOrganizationOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            try:
+                organization = Organization.objects.get(Q(owner=request.user) | Q(admins__in=request.user))
+            except ObjectDoesNotExist:
+                return False
+        return True

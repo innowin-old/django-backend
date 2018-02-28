@@ -14,11 +14,15 @@ class ExchangeSerilizer(BaseSerializer):
         if not request.user.is_superuser:
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['owner'] = identity
+        elif 'owner' not in validated_data:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['owner'] = identity
         exchange = Exchange.objects.create(**validated_data)
-        exchange_identity = ExchangeIdentity(identities_exchange_id=exchange.owner.id,
-                                             exchanges_identity_id=exchange.id)
+        exchange_identity = ExchangeIdentity(exchange_identity_related_identity_id=exchange.owner_id,
+                                             exchange_identity_related_exchange_id=exchange.id)
         exchange_identity.save()
         return exchange
+
 
 class ExchangeMiniSerializer(BaseSerializer):
     class Meta:
@@ -41,8 +45,16 @@ class ExchangeIdentitySerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        identity = Identity.objects.get(identity_user=request.user)
+        if not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['exchange_identity_related_identity'] = identity
+        elif request.user.is_superuser:
+            if 'exchange_identity_related_identity' not in validated_data:
+                identity = Identity.objects.get(identity_user=request.user)
+                validated_data['exchange_identity_related_identity'] = identity
+            else:
+                identity = validated_data['exchange_identity_related_identity']
         exchange_identity = ExchangeIdentity.objects.create(**validated_data)
-        exchange_identity.exchagne_identity_related_identity = identity
+        exchange_identity.exchange_identity_related_identity = identity
         exchange_identity.save()
         return exchange_identity

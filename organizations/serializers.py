@@ -15,6 +15,7 @@ from users.serializers import UserMiniSerializer, IdentityMiniSerializer
 class OrganizationSerializer(BaseSerializer):
     class Meta:
         model = Organization
+        depth = 1
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True}
@@ -22,10 +23,14 @@ class OrganizationSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        if not request.user.is_superuser or 'owner' not in validated_data:
+        if 'owner' not in validated_data:
             validated_data['owner'] = request.user
-        organization = Organization.objects.create(**validated_data)
+        if not request.user.is_superuser:
+            validated_data['owner'] = request.user
+        organization = Organization(**validated_data)
+        organization.save()
         return organization
+
 
 class OrganizationListViewSerializer(BaseSerializer):
     owner = UserMiniSerializer()
@@ -60,12 +65,13 @@ class StaffListViewSerializer(BaseSerializer):
         model = Staff
         fields = ['id', 'staff_user', 'position', 'staff_organization']
 
+
 class StaffSerializer(BaseSerializer):
     class Meta:
         model = Staff
         fields = '__all__'
         extra_kwargs = {
-          'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True}
         }
 
 

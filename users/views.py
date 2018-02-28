@@ -1,12 +1,9 @@
 import json
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
 
 from utils.token import validate_token
 
@@ -14,7 +11,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
 from .models import (
     Identity,
@@ -24,13 +20,14 @@ from .models import (
     Certificate,
     WorkExperience,
     Skill,
-    Badge
+    Badge,
+    IdentityUrl,
+    UserArticle
 )
 
 from .serializers import (
     SuperAdminUserSerializer,
     UserSerializer,
-    UserListViewSerializer,
     IdentitySerializer,
     ProfileSerializer,
     EducationSerializer,
@@ -38,15 +35,16 @@ from .serializers import (
     CertificateSerializer,
     WorkExperienceSerializer,
     SkillSerializer,
-    BadgeSerializer
+    BadgeSerializer,
+    IdentityUrlSerilizer,
+    UserArticleListSerializer,
+    UserArticleRisSerializer
 )
-from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly
-
-from django.shortcuts import HttpResponse
+from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -55,10 +53,9 @@ class UserViewset(ModelViewSet):
             return self.user_queryset()
 
     def get_serializer_class(self):
-        if self.request and self.request.user.is_superuser:
+        print(self.request.user.is_superuser)
+        if self.request.user.is_superuser:
             return SuperAdminUserSerializer
-        elif self.action == 'list':
-            return UserListViewSerializer
         else:
             return UserSerializer
 
@@ -123,7 +120,7 @@ class UserViewset(ModelViewSet):
     @list_route(methods=['post'])
     def import_users(self, request):
         jsonString = request.data.get('records', None)
-        data  = json.loads(jsonString)
+        data = json.loads(jsonString)
         errors = []
         for record in data:
             try:
@@ -276,6 +273,40 @@ class BadgeViewset(ModelViewSet):
         return BadgeSerializer
 
 
+class IdentityUrlViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsUrlOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = IdentityUrl.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return IdentityUrlSerilizer
+
+
+class UserArticleViewset(ModelViewSet):
+    owner_field = 'user_article_related_user'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = UserArticle.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UserArticleListSerializer
+
+
+class UserArticleRisViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = UserArticle.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UserArticleRisSerializer
+
+
 def login_page(request):
     logout(request)
     if request.POST:
@@ -305,58 +336,3 @@ def active_user(request, token):
         err = 'success-activation'
 
     return redirect('/#/auth/{}/'.format(err))
-
-
-def jwt_response_payload_handler(token, user=None, request=None):
-    profile = Profile.objects.get(profile_user=user)
-    identity = Identity.objects.get(identity_user=user)
-    return {
-        'token': token,
-        'user': UserSerializer(user, context={'request': request}).data,
-        'profile': ProfileSerializer(profile, context={'request': request}).data,
-        'identity': IdentitySerializer(identity, context={'request': request}).data
-    }
-
-
-@require_POST
-@login_required
-@csrf_exempt
-def insert_user_data(request):
-    users = json.loads(request.POST["users"])
-    with transaction.atomic():
-        for user in users:
-
-            if user["username"] is None or user["password"] is None:
-                return HttpResponse(status=500)
-
-            kwargs = {}
-
-            if hasattr(user, "first_name"):
-                kwargs["first_name"] = user["first_name"]
-
-            if hasattr(user, "last_name"):
-                kwargs["last_name"] = user["last_name"]
-
-            if hasattr(user, "email"):
-                kwargs["email"] = user["email"]
-
-            user_model = User(username=user["username"], **kwargs)
-            user_model.set_password(user["password"])
-            user_model.save()
-
-    message = " داده مورد نظر با موفقیت ذخیره گردید "
-    return HttpResponse(message, status=200)
-
-
-@require_POST
-@csrf_exempt
-def get_user_data(request):
-    err, user = validate_token(request.POST["token"])
-    profile = Profile.objects.get(profile_user=user)
-    identity = Identity.objects.get(identity_user=user)
-    return {
-        'token': request.POST["token"],
-        'user': UserSerializer(user, context={'request': request}).data,
-        'profile': ProfileSerializer(profile, context={'request': request}).data,
-        'identity': IdentitySerializer(identity, context={'request': request}).data
-    }

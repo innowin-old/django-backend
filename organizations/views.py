@@ -1,4 +1,3 @@
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -109,18 +108,18 @@ class OrganizationViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-              return OrganizationListViewSerializer
+            return OrganizationListViewSerializer
         return OrganizationSerializer
 
     @list_route(
-      permission_classes=[AllowAny],
-      methods=['post'])
+        permission_classes=[AllowAny],
+        methods=['post'])
     def import_organizations(self, request):
         jsonString = request.data.get('records', None)
         data = json.loads(jsonString)
         errors = []
         for record in data:
-            try :
+            try:
                 organization = Organization.objects.create(
                     username=record.get('username', None),
                     email=record.get('email', None),
@@ -421,7 +420,8 @@ class CustomerViewset(BaseModelViewSet):
 
         related_customer_user_username = self.request.query_params.get('related_customer_user_username', None)
         if related_customer_user_username is not None:
-            queryset = queryset.filter(related_customer__identity_user__username__contains=related_customer_user_username)
+            queryset = queryset.filter(
+                related_customer__identity_user__username__contains=related_customer_user_username)
 
         title = self.request.query_params.get('title', None)
         if title is not None:

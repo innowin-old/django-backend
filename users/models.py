@@ -13,6 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 
 from danesh_boom.models import PhoneField
+from django.contrib.postgres.fields import JSONField
 from media.models import Media
 from organizations.models import Organization
 from base.models import Base, BaseManager
@@ -94,11 +95,12 @@ def create_profile(sender, instance, created, **kwargs):
 
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
-                                on_delete=models.CASCADE, help_text='Integer')
+                                        on_delete=models.CASCADE, help_text='Integer')
     public_email = models.EmailField(null=True, blank=True, help_text='Email')
     national_code = models.CharField(max_length=20, blank=True,
                                      validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
-    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_profile_media", help_text='Integer', blank=True, null=True)
+    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_profile_media",
+                                      help_text='Integer', blank=True, null=True)
     birth_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
     web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
     phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
@@ -131,7 +133,7 @@ post_save.connect(update_cache, sender=Profile)
 
 class Education(Base):
     education_user = models.ForeignKey(User, related_name="educations",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                       on_delete=models.CASCADE, help_text='Integer')
     grade = models.CharField(max_length=100, help_text='String(100)')
     university = models.CharField(max_length=100, help_text='String(100)')
     field_of_study = models.CharField(max_length=100, help_text='String(100)')
@@ -178,7 +180,7 @@ post_save.connect(update_cache, sender=Education)
 
 class Research(Base):
     research_user = models.ForeignKey(User, related_name="researches",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                      on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     url = models.URLField(blank=True, help_text='URL')
     author = ArrayField(models.CharField(max_length=100), blank=True, help_text='Array(String(100))')
@@ -198,7 +200,7 @@ post_save.connect(update_cache, sender=Research)
 
 class Certificate(Base):
     certificate_user = models.ForeignKey(User, related_name="certificates",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                         on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     picture_media = models.ForeignKey(
         Media,
@@ -226,7 +228,7 @@ class WorkExperience(Base):
     )
 
     work_experience_user = models.ForeignKey(User, related_name="work_experiences",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                             on_delete=models.CASCADE, help_text='Integer')
     name = models.CharField(max_length=100, blank=True, help_text='String(100)')
     work_experience_organization = models.ForeignKey(
         Organization,
@@ -281,7 +283,7 @@ post_save.connect(update_cache, sender=WorkExperience)
 
 class Skill(Base):
     skill_user = models.ForeignKey(User, related_name="skills",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                   on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
     tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
     description = models.TextField(blank=True, help_text='Text')
@@ -291,13 +293,14 @@ class Skill(Base):
     def __str__(self):
         return "%s(%s)" % (self.skill_user.username, self.title)
 
+
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Skill)
 
 
 class Badge(Base):
     badge_user = models.ForeignKey(User, related_name="badges",
-                             on_delete=models.CASCADE, help_text='Integer')
+                                   on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, help_text='String(100)')
 
     objects = BaseManager()
@@ -311,3 +314,18 @@ class Badge(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Badge)
+
+
+class IdentityUrl(Base):
+    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
+    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')
+
+
+class UserArticle(Base):
+    user_article_related_user = models.ForeignKey(User, related_name="articles",
+                                                  on_delete=models.CASCADE, help_text='Integer')
+    doi_link = models.URLField(db_index=True)
+    doi_meta = JSONField()
+    publisher = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
+    article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array')
