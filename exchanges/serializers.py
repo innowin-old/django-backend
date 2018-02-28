@@ -14,6 +14,9 @@ class ExchangeSerilizer(BaseSerializer):
         if not request.user.is_superuser:
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['owner'] = identity
+        elif 'owner' not in validated_data:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['owner'] = identity
         exchange = Exchange.objects.create(**validated_data)
         exchange_identity = ExchangeIdentity(exchange_identity_related_identity_id=exchange.owner_id,
                                              exchange_identity_related_exchange_id=exchange.id)
