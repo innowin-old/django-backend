@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
-from users.models import Profile, Education, Research, Certificate,\
-    WorkExperience, Skill, Badge
+from users.models import Profile, Education, Research, Certificate, \
+    WorkExperience, Skill, Badge, Agent
 
 
 class ProfileInline(admin.StackedInline):
@@ -13,7 +13,7 @@ class ProfileInline(admin.StackedInline):
 
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
+    inlines = (ProfileInline,)
 
 
 class EducationAdmin(admin.ModelAdmin):
@@ -48,6 +48,11 @@ class BadgeAdmin(admin.ModelAdmin):
     list_display = ['badge_user', 'badge']
 
 
+class AgentAdmin(admin.ModelAdmin):
+    model = Agent
+    list_display = ['agent_identity']
+
+
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Education, EducationAdmin)
@@ -56,3 +61,4 @@ admin.site.register(Certificate, CertificateAdmin)
 admin.site.register(WorkExperience, WorkExperienceAdmin)
 admin.site.register(Skill, SkillAdmin)
 admin.site.register(Badge, BadgeAdmin)
+admin.site.register(Agent, AgentAdmin)

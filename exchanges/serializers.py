@@ -11,10 +11,7 @@ class ExchangeSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if not request.user.is_superuser:
-            identity = Identity.objects.get(identity_user=request.user)
-            validated_data['owner'] = identity
-        elif 'owner' not in validated_data:
+        if 'owner' not in validated_data:
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['owner'] = identity
         exchange = Exchange.objects.create(**validated_data)
