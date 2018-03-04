@@ -26,6 +26,7 @@ class MediaSeriaizer(ModelSerializer):
             validated_data['uploader'] = User.objects.get(id=request.user.id)
 
         format, imgstr = data.split(';base64,')
+        print(format)
         ext = format.split('/')[-1]
         validated_data['file'] = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         media = Media.objects.create(**validated_data)
