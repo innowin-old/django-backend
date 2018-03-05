@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
+from django.contrib.auth.models import User
 
 from unixtimestampfield.fields import UnixTimeStampField
 
@@ -125,3 +126,19 @@ class BaseCertificate(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=BaseCertificate)
+
+
+class BaseRoll(Base):
+    name = models.CharField(max_length=100)
+    roll_parent = models.ForeignKey(Base, related_name='base_rolls', db_index=True,
+                                    on_delete=models.CASCADE, help_text='Integer')
+    user_roll = models.ManyToManyField(User, related_name='user_rolls', help_text='Integer')
+
+    class Meta:
+        unique_together = ('name', 'roll_parent',)
+
+
+class RollPermission(Base):
+    roll_permission_related_roll = models.ForeignKey(BaseRoll, related_name='rolls', db_index=True,
+                                                     on_delete=models.CASCADE, help_text='Integer')
+    permission = models.CharField(max_length=100)
