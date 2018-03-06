@@ -1,10 +1,10 @@
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
 from users.models import Identity
 
 from base.models import Base, Hashtag, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 from media.models import Media
 from users.models import Identity
 
@@ -44,6 +44,8 @@ class Exchange(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Exchange)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Exchange)
 
 
 class ExchangeIdentity(Base):
@@ -78,3 +80,5 @@ class ExchangeIdentity(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=ExchangeIdentity)
+# Set Child Name
+pre_save.connect(set_child_name, sender=ExchangeIdentity)

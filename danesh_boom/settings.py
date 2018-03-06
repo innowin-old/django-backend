@@ -384,3 +384,12 @@ TAG_KEY_MAPPING = {
     'ER': 'end_of_reference',
     'UK': 'unknown_tag',
 }
+
+ORGANIZATION_RELATED_MODELS_ACTIONS = (
+    ('add-exchange', ' افزودن بورس '),
+    ('edit-exchange', ' ویرایش بورس '),
+    ('delete-exchange', ' حذف بورس '),
+    ('add-product', ' افزودن محصول '),
+    ('edit-product', ' ویرایش محصول '),
+    ('delete-product', ' حذف محصول '),
+)

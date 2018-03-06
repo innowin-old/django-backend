@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from unixtimestampfield.fields import UnixTimeStampField
 
-from .signals import update_cache
+from .signals import update_cache, set_child_name
 
 
 class BaseManager(models.Manager):
@@ -27,6 +27,7 @@ class Base(models.Model):
     created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
     updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
     delete_flag = models.BooleanField(db_index=True, default=False)
+    child_name = models.CharField(max_length=50, blank=True)
 
     objects = BaseManager()
 
@@ -43,6 +44,8 @@ class HashtagParent(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=HashtagParent)
+# Set Child Name
+pre_save.connect(set_child_name, sender=HashtagParent)
 
 
 class Hashtag(Base):
@@ -57,6 +60,8 @@ class Hashtag(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Hashtag)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Hashtag)
 
 
 class BaseComment(Base):
@@ -73,6 +78,8 @@ class BaseComment(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=BaseComment)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseComment)
 
 
 class Post(Base):
@@ -105,6 +112,8 @@ class Post(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Post)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Post)
 
 
 class BaseCertificate(Base):
@@ -126,19 +135,36 @@ class BaseCertificate(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=BaseCertificate)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseCertificate)
 
 
 class BaseRoll(Base):
     name = models.CharField(max_length=100)
-    roll_parent = models.ForeignKey(Base, related_name='base_rolls', db_index=True,
-                                    on_delete=models.CASCADE, help_text='Integer')
+    roll_owner = models.ForeignKey(Base, related_name='base_rolls', db_index=True,
+                                   on_delete=models.CASCADE, help_text='Integer')
     user_roll = models.ManyToManyField(User, related_name='user_rolls', help_text='Integer')
 
     class Meta:
-        unique_together = ('name', 'roll_parent',)
+        unique_together = ('name', 'roll_owner',)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseRoll)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseRoll)
 
 
 class RollPermission(Base):
-    roll_permission_related_roll = models.ForeignKey(BaseRoll, related_name='rolls', db_index=True,
+    permission = models.CharField(max_length=50, choices=settings.ORGANIZATION_RELATED_MODELS_ACTIONS)
+    roll_permission_related_roll = models.ForeignKey(BaseRoll, related_name='permission_rolls', db_index=True,
                                                      on_delete=models.CASCADE, help_text='Integer')
-    permission = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ('permission', 'roll_permission_related_roll',)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=RollPermission)
+# Set Child Name
+pre_save.connect(set_child_name, sender=RollPermission)

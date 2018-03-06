@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from .permissions import IsRollOwnerOrReadOnly, IsRollPermissionOwnerOrReadOnly
+
 
 from .models import (
     Base,
@@ -163,7 +165,7 @@ class CertificateViewSet(ModelViewSet):
 
 
 class RollViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsRollOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = BaseRoll.objects.all()
@@ -191,7 +193,7 @@ class RollViewSet(ModelViewSet):
 
 
 class RollPermissionViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsRollPermissionOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = RollPermission.objects.all()

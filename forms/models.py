@@ -1,8 +1,8 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 
 from base.models import Base, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 from media.models import Media
 
 
@@ -16,6 +16,8 @@ class Form(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Form)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Form)
 
 
 class Group(Base):
@@ -26,6 +28,8 @@ class Group(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Group)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Group)
 
 
 class FormGroup(Base):
@@ -39,6 +43,8 @@ class FormGroup(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=FormGroup)
+# Set Child Name
+pre_save.connect(set_child_name, sender=FormGroup)
 
 
 class Element(Base):
@@ -53,6 +59,8 @@ class Element(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Element)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Element)
 
 
 class FormGroupElement(models.Model):
@@ -64,6 +72,8 @@ class FormGroupElement(models.Model):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=FormGroupElement)
+# Set Child Name
+pre_save.connect(set_child_name, sender=FormGroupElement)
 
 
 class Data(Base):
@@ -76,3 +86,5 @@ class Data(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Data)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Data)
