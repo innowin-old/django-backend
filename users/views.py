@@ -42,7 +42,7 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrl
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = [IsSuperUserOrReadOnly]
 
     def get_queryset(self):
         if self.request.user.is_superuser:

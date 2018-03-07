@@ -89,12 +89,6 @@ def user_save(self, *args, **kwargs):
 User.save = user_save
 
 
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(profile_user=instance)
-
-
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
                                         on_delete=models.CASCADE, help_text='Integer')
