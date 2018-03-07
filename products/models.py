@@ -1,10 +1,10 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 
 from base.models import Base, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 from media.models import Media
 from users.models import Identity
 
@@ -24,6 +24,8 @@ class Category(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Category)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Category)
 
 
 class CategoryField(Base):
@@ -55,6 +57,8 @@ class CategoryField(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=CategoryField)
+# Set Child Name
+pre_save.connect(set_child_name, sender=CategoryField)
 
 
 class Product(Base):
@@ -78,6 +82,8 @@ class Product(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Product)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Product)
 
 
 class Price(Base):
@@ -93,6 +99,8 @@ class Price(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Price)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Price)
 
 
 class Picture(Base):
@@ -111,6 +119,8 @@ class Picture(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Picture)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Picture)
 
 
 class Comment(Base):
@@ -128,3 +138,5 @@ class Comment(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Comment)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Comment)

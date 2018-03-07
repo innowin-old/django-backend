@@ -2,8 +2,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull
-from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsAgentOrReadOnly
+from .serializers import ExchangeSerializer, ExchangeIdentitySerializer
 
 
 # Create your views here.
@@ -12,7 +12,7 @@ class ExchangeViewSet(ModelViewSet):
         A ViewSet for Handle Exchange Views
     """
     # queryset = Exchange.objects.all()
-    permission_classes = [IsExchangeOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsAgentOrReadOnly, IsExchangeOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Exchange.objects.all()
@@ -56,7 +56,7 @@ class ExchangeViewSet(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        return ExchangeSerilizer
+        return ExchangeSerializer
 
 
 class ExchangeIdentityViewSet(ModelViewSet):

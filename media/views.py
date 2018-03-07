@@ -16,7 +16,7 @@ class MediaViewSet(ModelViewSet):
     """
         A ViewSet for Handle Media Views
     """
-    #queryset = Media.objects.all()
+    # queryset = Media.objects.all()
     owner_field = 'uploader'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 

@@ -215,7 +215,7 @@ class PictureViewset(ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Picture.objects.all()
+        queryset = Picture.objects.all().order_by('order')
 
         product = self.request.query_params.get('product', None)
         if product is not None:

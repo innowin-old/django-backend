@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import re
 
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -17,7 +17,7 @@ from django.contrib.postgres.fields import JSONField
 from media.models import Media
 from organizations.models import Organization
 from base.models import Base, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 
 
 class Identity(Base):
@@ -71,6 +71,8 @@ class Identity(Base):
 default_user_save = User.save
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Identity)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Identity)
 
 
 def user_save(self, *args, **kwargs):
@@ -85,12 +87,6 @@ def user_save(self, *args, **kwargs):
 
 
 User.save = user_save
-
-
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(profile_user=instance)
 
 
 class Profile(Base):
@@ -129,6 +125,8 @@ class Profile(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Profile)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Profile)
 
 
 class Education(Base):
@@ -176,6 +174,8 @@ class Education(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Education)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Education)
 
 
 class Research(Base):
@@ -196,6 +196,8 @@ class Research(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Research)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Research)
 
 
 class Certificate(Base):
@@ -217,6 +219,8 @@ class Certificate(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Certificate)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Certificate)
 
 
 class WorkExperience(Base):
@@ -279,6 +283,8 @@ class WorkExperience(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=WorkExperience)
+# Set Child Name
+pre_save.connect(set_child_name, sender=WorkExperience)
 
 
 class Skill(Base):
@@ -296,6 +302,8 @@ class Skill(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Skill)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Skill)
 
 
 class Badge(Base):
@@ -314,11 +322,20 @@ class Badge(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Badge)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Badge)
 
 
 class IdentityUrl(Base):
     url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
-    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')
+    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,
+                                                         help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=IdentityUrl)
+# Set Child Name
+pre_save.connect(set_child_name, sender=IdentityUrl)
 
 
 class UserArticle(Base):
@@ -329,3 +346,19 @@ class UserArticle(Base):
     publisher = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
     article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=UserArticle)
+# Set Child Name
+pre_save.connect(set_child_name, sender=UserArticle)
+
+
+class Agent(Base):
+    agent_identity = models.ForeignKey(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Agent)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Agent)

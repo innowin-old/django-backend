@@ -1,5 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from .permissions import IsRollOwnerOrReadOnly, IsRollPermissionOwnerOrReadOnly
 
 
 from .models import (
@@ -8,7 +10,9 @@ from .models import (
     HashtagParent,
     BaseComment,
     Post,
-    BaseCertificate
+    BaseCertificate,
+    BaseRoll,
+    RollPermission
 )
 
 from .serializers import (
@@ -17,7 +21,9 @@ from .serializers import (
     HashtagParentSerializer,
     BaseCommentSerializer,
     PostSerializer,
-    CertificateSerializer
+    CertificateSerializer,
+    RollSerializer,
+    RollPermissionSerializer
 )
 
 
@@ -156,3 +162,55 @@ class CertificateViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return CertificateSerializer
+
+
+class RollViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsRollOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = BaseRoll.objects.all()
+
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+
+        roll_parent = self.request.query_params.get('roll_parent', None)
+        if roll_parent is not None:
+            queryset = queryset.filter(roll_parent=roll_parent)
+
+        user_roll = self.request.query_params.get('user_roll', None)
+        if user_roll is not None:
+            queryset = queryset.filter(user_roll=user_roll)
+
+        user_roll_username = self.request.query_params.get('user_roll_username', None)
+        if user_roll_username is not None:
+            queryset = queryset.filter(user_roll__username=user_roll_username)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return RollSerializer
+
+
+class RollPermissionViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsRollPermissionOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = RollPermission.objects.all()
+
+        roll_permission_related_roll = self.request.query_params.get('roll_permission_related_roll', None)
+        if roll_permission_related_roll is not None:
+            queryset = queryset.filter(roll_permission_related_roll=roll_permission_related_roll)
+
+        roll_permission_related_roll_name = self.request.query_params.get('roll_permission_related_roll_name', None)
+        if roll_permission_related_roll_name is not None:
+            queryset = queryset.filter(roll_permission_related_roll__name=roll_permission_related_roll_name)
+
+        permission = self.request.query_params.get('permission', None)
+        if permission is not None:
+            queryset = queryset.filter(permission=permission)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return RollPermissionSerializer
