@@ -49,7 +49,7 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrl
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -166,7 +166,7 @@ class IdentityViewset(ModelViewSet):
 
 class ProfileViewset(ModelViewSet):
     owner_field = 'profile_user'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Profile.objects.all()
