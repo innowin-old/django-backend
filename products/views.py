@@ -1,13 +1,5 @@
 import json
 
-from django.db import transaction
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from users.models import Identity
-
-from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -261,7 +253,7 @@ class PictureViewset(BaseModelViewSet):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Picture.objects.filter(delete_flag=False)
+        queryset = Picture.objects.all().filter(delete_flag=False).order_by('order')
 
         product = self.request.query_params.get('product', None)
         if product is not None:
@@ -300,43 +292,3 @@ class CommentViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return CommentSerializer
-
-
-@require_POST
-@login_required
-@csrf_exempt
-def insert_product_data(request):
-    products = json.loads(request.POST['products'])
-    with transaction.atomic():
-
-        for product in products:
-
-            if product["product_owner"] is None or product["product_category"] is None or product["name"] is None or \
-                    product["country"] is None or product["province"] is None:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            owner = Identity.objects.get(name__exact=product["product_owner"])
-            if owner.id is None:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            category = Category.objects.get(name__exact=product["product_category"])
-            if category.id is None:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            kwargs = {"product_owner_id": owner.id, "product_category_id": category.id,
-                      "name": product["name"], "country": product["country"], "province": product["province"]}
-
-            if hasattr(product, "city"):
-                kwargs["city"] = product["city"]
-            if hasattr(product, "description"):
-                kwargs["description"] = product["description"]
-            if hasattr(product, "attrs"):
-                kwargs["attrs"] = product["attrs"]
-            if hasattr(product, "custom_attrs"):
-                kwargs["custom_attrs"] = product["custom_attrs"]
-
-            product_model = Product(**kwargs)
-            product_model.save()
-
-    message = " داده ی ورودی با موفقیت ذخیره گردید "
-    return HttpResponse(message, status=status.HTTP_200_OK)

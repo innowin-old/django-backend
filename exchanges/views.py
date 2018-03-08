@@ -1,14 +1,13 @@
 import json
 
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull
-from .serializers import ExchangeSerilizer, ExchangeIdentitySerializer
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsAgentOrReadOnly
+from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer
 
 
 # Create your views here.
@@ -17,7 +16,7 @@ class ExchangeViewSet(BaseModelViewSet):
         A ViewSet for Handle Exchange Views
     """
     # queryset = Exchange.objects.all()
-    permission_classes = [IsExchangeOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsAgentOrReadOnly, IsExchangeOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         queryset = Exchange.objects.all()
@@ -61,18 +60,18 @@ class ExchangeViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        return ExchangeSerilizer
+        return ExchangeSerializer
 
     @list_route(
-      permission_classes = [AllowAny],
-      methods = ['post']
+        permission_classes=[AllowAny],
+        methods=['post']
     )
     def import_exchanges(self, request):
         jsonString = request.data.get('records', None)
         data = json.loads(jsonString)
         errors = []
         for record in data:
-            try :
+            try:
                 exchange = Exchange.objects.create(
                     name=record.get('name', None),
                     link=record.get('link', None),
@@ -80,7 +79,7 @@ class ExchangeViewSet(BaseModelViewSet):
                     private=record.get('private', None),
                     members_count=record.get('members_count', None),
                     active_flag=record.get('active_flag', None),
-                    owner=record.get('owner', None),
+                    owner_id=record.get('owner', None),
                     exchange_image=record.get('exchange_image', None),
                     exchange_hashtag=record.get('exchange_hashtag', None)
                 )

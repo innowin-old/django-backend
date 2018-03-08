@@ -5,7 +5,8 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, CharField, FileField
+from rest_framework.serializers import ModelSerializer, CharField, FileField, EmailField, IntegerField, ListField, \
+    URLField
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 from .models import (
@@ -23,6 +24,17 @@ from .models import (
 
 
 class SuperAdminUserSerializer(ModelSerializer):
+    public_email = EmailField(required=False)
+    national_code = CharField(required=False, max_length=20, allow_blank=True)
+    profile_media = IntegerField(required=False, allow_null=True)
+    birth_date = CharField(required=False, max_length=10, allow_blank=True)
+    fax = CharField(required=False, allow_blank=True)
+    telegram_account = CharField(required=False, max_length=256, allow_blank=True)
+    description = CharField(required=False, allow_blank=True)
+    web_site = ListField(child=URLField(required=False), required=False)
+    phone = ListField(child=CharField(max_length=23, required=False), required=False)
+    mobile = ListField(child=CharField(max_length=23, required=False), required=False)
+
     class Meta:
         model = User
         fields = '__all__'
@@ -33,17 +45,143 @@ class SuperAdminUserSerializer(ModelSerializer):
         user.save()
         return user
 
+    def create(self, validated_data):
+        user_validated_data = self.get_user_validated_args(**validated_data)
+        user = User.objects.create(**user_validated_data)
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        profile = Profile.objects.create(profile_user=user, **profile_validated_data)
+        profile.save()
+        return user
+
+    def update(self, instance, validated_data):
+        user = User.objects.get(pk=instance.id)
+        user_validated_data = self.get_user_validated_args(**validated_data)
+        for key in user_validated_data:
+            setattr(user, key, validated_data.get(key))
+        user.save()
+
+        profile = Profile.objects.get(profile_user=user)
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        for key in profile_validated_data:
+            setattr(profile, key, validated_data.get(key))
+        profile.save()
+
+        return user
+
+    def get_user_validated_args(self, **kwargs):
+        user_kwargs = {'username': kwargs['username'], 'password': kwargs['password']}
+        if 'first_name' in kwargs:
+            user_kwargs['first_name'] = kwargs['first_name']
+        if 'last_name' in kwargs:
+            user_kwargs['last_name'] = kwargs['last_name']
+        if 'email' in kwargs:
+            user_kwargs['email'] = kwargs['email']
+        if 'is_staff' in kwargs:
+            user_kwargs['is_staff'] = kwargs['is_staff']
+        if 'is_active' in kwargs:
+            user_kwargs['is_active'] = kwargs['is_active']
+        if 'date_joined' in kwargs:
+            user_kwargs['date_joined'] = kwargs['date_joined']
+        return user_kwargs
+
+    def get_profile_validated_data(self, **kwargs):
+        profile_kwargs = {}
+        if 'public_email' in kwargs:
+            profile_kwargs['public_email'] = kwargs['public_email']
+        if 'national_code' in kwargs:
+            profile_kwargs['national_code'] = kwargs['national_code']
+        if 'profile_media' in kwargs:
+            profile_kwargs['profile_media'] = kwargs['profile_media']
+        if 'birth_date' in kwargs:
+            profile_kwargs['birth_date'] = kwargs['birth_date']
+        if 'fax' in kwargs:
+            profile_kwargs['fax'] = kwargs['fax']
+        if 'telegram_account' in kwargs:
+            profile_kwargs['telegram_account'] = kwargs['telegram_account']
+        if 'description' in kwargs:
+            profile_kwargs['description'] = kwargs['description']
+        if 'web_site' in kwargs:
+            profile_kwargs['web_site'] = kwargs['web_site']
+        if 'phone' in kwargs:
+            profile_kwargs['phone'] = kwargs['phone']
+        if 'mobile' in kwargs:
+            profile_kwargs['mobile'] = kwargs['mobile']
+        return profile_kwargs
+
 
 class UserSerializer(ModelSerializer):
+    public_email = EmailField(required=False)
+    national_code = CharField(required=False, max_length=20, allow_blank=True)
+    profile_media = IntegerField(required=False, allow_null=True)
+    birth_date = CharField(required=False, max_length=10, allow_blank=True)
+    fax = CharField(required=False, allow_blank=True)
+    telegram_account = CharField(required=False, max_length=256, allow_blank=True)
+    description = CharField(required=False, allow_blank=True)
+    web_site = ListField(child=URLField(required=False), required=False)
+    phone = ListField(child=CharField(max_length=23, required=False), required=False)
+    mobile = ListField(child=CharField(max_length=23, required=False), required=False)
+
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
 
     def create(self, validated_data):
-        user = User.objects.create(**validated_data)
+        user_validated_data = self.get_user_validated_args(**validated_data)
+        user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
-        user.save()
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        profile = Profile.objects.create(profile_user=user, **profile_validated_data)
+        profile.save()
         return user
+
+    def update(self, instance, validated_data):
+        user = User.objects.get(pk=instance.id)
+        user_validated_data = self.get_user_validated_args(**validated_data)
+        for key in user_validated_data:
+            setattr(user, key, validated_data.get(key))
+        user.save()
+
+        profile = Profile.objects.get(profile_user=user)
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        for key in profile_validated_data:
+            setattr(profile, key, validated_data.get(key))
+        profile.save()
+
+        return user
+
+    def get_user_validated_args(self, **kwargs):
+        user_kwargs = {'username': kwargs['username'], 'password': kwargs['password']}
+        if 'first_name' in kwargs:
+            user_kwargs['first_name'] = kwargs['first_name']
+        if 'last_name' in kwargs:
+            user_kwargs['last_name'] = kwargs['last_name']
+        if 'email' in kwargs:
+            user_kwargs['email'] = kwargs['email']
+        return user_kwargs
+
+    def get_profile_validated_data(self, **kwargs):
+        profile_kwargs = {}
+        if 'public_email' in kwargs:
+            profile_kwargs['public_email'] = kwargs['public_email']
+        if 'national_code' in kwargs:
+            profile_kwargs['national_code'] = kwargs['national_code']
+        if 'profile_media' in kwargs:
+            profile_kwargs['profile_media'] = kwargs['profile_media']
+        if 'birth_date' in kwargs:
+            profile_kwargs['birth_date'] = kwargs['birth_date']
+        if 'fax' in kwargs:
+            profile_kwargs['fax'] = kwargs['fax']
+        if 'telegram_account' in kwargs:
+            profile_kwargs['telegram_account'] = kwargs['telegram_account']
+        if 'description' in kwargs:
+            profile_kwargs['description'] = kwargs['description']
+        if 'web_site' in kwargs:
+            profile_kwargs['web_site'] = kwargs['web_site']
+        if 'phone' in kwargs:
+            profile_kwargs['phone'] = kwargs['phone']
+        if 'mobile' in kwargs:
+            profile_kwargs['mobile'] = kwargs['mobile']
+        return profile_kwargs
 
 
 class UserListViewSerializer(ModelSerializer):

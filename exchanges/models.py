@@ -1,17 +1,18 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
-from users.models import Identity
 
+from users.models import Identity
 from base.models import Base, Hashtag, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 from media.models import Media
 from users.models import Identity
 
 
 # Create your models here.
 class Exchange(Base):
-    owner = models.ForeignKey(Identity, related_name='exchanges', blank=True, null=True, db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    owner = models.ForeignKey(Identity, related_name='exchanges', blank=True, null=True, db_index=True,
+                              on_delete=models.CASCADE, help_text='Integer')
     name = models.CharField(max_length=30, db_index=True, help_text='String(30)')
     exchange_image = models.ForeignKey(
         Media,
@@ -44,6 +45,8 @@ class Exchange(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Exchange)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Exchange)
 
 
 class ExchangeIdentity(Base):
@@ -78,3 +81,5 @@ class ExchangeIdentity(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=ExchangeIdentity)
+# Set Child Name
+pre_save.connect(set_child_name, sender=ExchangeIdentity)

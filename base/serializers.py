@@ -1,12 +1,14 @@
-from rest_framework.serializers import ModelSerializer, CharField
+from rest_framework.serializers import ModelSerializer
 from .models import (
-        Base,
-        HashtagParent,
-        Hashtag,
-        BaseComment,
-        Post,
-        BaseCertificate
-    )
+    Base,
+    HashtagParent,
+    Hashtag,
+    BaseComment,
+    Post,
+    BaseCertificate,
+    BaseRoll,
+    RollPermission
+)
 
 
 class BaseSerializer(ModelSerializer):
@@ -69,6 +71,24 @@ class PostSerializer(BaseSerializer):
 class CertificateSerializer(BaseSerializer):
     class Meta:
         model = BaseCertificate
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class RollSerializer(BaseSerializer):
+    class Meta:
+        model = BaseRoll
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class RollPermissionSerializer(BaseSerializer):
+    class Meta:
+        model = RollPermission
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True},

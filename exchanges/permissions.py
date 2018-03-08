@@ -1,8 +1,9 @@
 from rest_framework import permissions
-
-from .models import ExchangeIdentity
-
 from django.conf import settings
+
+from users.models import Agent, Identity
+from organizations.models import Organization
+from .models import ExchangeIdentity
 
 
 class IsExchangeOwnerOrReadOnly(permissions.BasePermission):
@@ -39,4 +40,28 @@ class IsExchangeFull(permissions.BasePermission):
                 exchange_count = ExchangeIdentity.objects.filter(exchange_identity_related_exchange_id=exchange_id).count()
                 if exchange_count > settings.EXCHANGE_LIMIT:
                     return False
+        return True
+
+
+class IsAgentOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            user = request.user
+            if 'owner' not in request.POST:
+                identity = Identity.objects.get(identity_user=user)
+                try:
+                    agent = Agent.objects.get(agent_identity=identity)
+                except Agent.DoesNotExist:
+                    return False
+            else:
+                if not user.is_superuser:
+                    identity = Identity.objects.get(pk=request.POST['owner'])
+                    try:
+                        agent = Agent.objects.get(agent_identity=identity)
+                    except Agent.DoesNotExist:
+                        return False
+                    if identity.identity_organization:
+                        organization = Organization.objects.get(pk=identity.identity_organization)
+                        if organization.owner != user:
+                            return False
         return True

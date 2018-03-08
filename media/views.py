@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from sendfile import sendfile
 
+from base.permissions import IsOwnerOrReadOnly
 from .serializers import MediaSeriaizer
 from .models import Media
 
@@ -16,7 +17,8 @@ class MediaViewSet(ModelViewSet):
         A ViewSet for Handle Media Views
     """
     # queryset = Media.objects.all()
-    permission_classes = [IsAuthenticated]
+    owner_field = 'uploader'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         return MediaSeriaizer

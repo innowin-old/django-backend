@@ -1,12 +1,12 @@
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 
 from danesh_boom.models import PhoneField
 from media.models import Media
 from base.models import Base, BaseManager
-from base.signals import update_cache
+from base.signals import update_cache, set_child_name
 
 
 class Organization(Base):
@@ -38,7 +38,8 @@ class Organization(Base):
     official_name = models.CharField(max_length=75, db_index=True, help_text='String(75)')
     national_code = models.CharField(max_length=20, db_index=True, help_text='String(20)')
     registration_ads_url = models.URLField(db_index=True, null=True, blank=True, help_text='URL')
-    registrar_organization = models.CharField(max_length=100, db_index=True, null=True, blank=True, help_text='String(100)')
+    registrar_organization = models.CharField(max_length=100, db_index=True, null=True, blank=True,
+                                              help_text='String(100)')
     country = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     province = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     city = models.CharField(max_length=50, db_index=True, help_text='String(50)')
@@ -62,8 +63,10 @@ class Organization(Base):
         help_text='Integer')
     biography = models.TextField(max_length=256, blank=True, help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text')
-    correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[], help_text='Array(String(50))')
-    social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[], help_text='Array(String(100))')
+    correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[],
+                                         help_text='Array(String(50))')
+    social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[],
+                                help_text='Array(String(100))')
     staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
     objects = BaseManager()
@@ -87,21 +90,30 @@ class Organization(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Organization)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Organization)
 
 
 class StaffCount(Base):
     staff_count_organization = models.ForeignKey(Organization, related_name="staff_counts", db_index=True,
-                                     on_delete=models.CASCADE, help_text='Integer')
+                                                 on_delete=models.CASCADE, help_text='Integer')
     count = models.IntegerField(help_text='Integer')
 
     def __str__(self):
         return '%s(%s)' % (self.staff_count_organization.official_name, self.count)
 
 
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=StaffCount)
+# Set Child Name
+pre_save.connect(set_child_name, sender=StaffCount)
+
+
 class OrganizationPicture(Base):
     picture_organization = models.ForeignKey(Organization, related_name="organization_pictures",
-                                     on_delete=models.CASCADE, help_text='Integer')
-    picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="organization_picture_media", help_text='Integer')
+                                             on_delete=models.CASCADE, help_text='Integer')
+    picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="organization_picture_media",
+                                      help_text='Integer')
     order = models.IntegerField(default=0, help_text='Integer')
     description = models.TextField(blank=True, help_text='Text')
 
@@ -113,11 +125,15 @@ class OrganizationPicture(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=OrganizationPicture)
+# Set Child Name
+pre_save.connect(set_child_name, sender=OrganizationPicture)
 
 
 class Staff(Base):
-    staff_organization = models.ForeignKey(Organization, related_name='staffs', db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    staff_user = models.ForeignKey(User, related_name='users', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    staff_organization = models.ForeignKey(Organization, related_name='staffs', db_index=True, on_delete=models.CASCADE,
+                                           help_text='Integer')
+    staff_user = models.ForeignKey(User, related_name='users', db_index=True, on_delete=models.CASCADE,
+                                   help_text='Integer')
 
     position = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     post_permission = models.BooleanField(default=False, help_text='Boolean')
@@ -127,21 +143,28 @@ class Staff(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Staff)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Staff)
 
 
 class Follow(Base):
-    follow_identity = models.ForeignKey('users.Identity', related_name='followers', db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    follow_follower = models.ForeignKey('users.Identity', related_name='following', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    follow_identity = models.ForeignKey('users.Identity', related_name='followers', db_index=True,
+                                        on_delete=models.CASCADE, help_text='Integer')
+    follow_follower = models.ForeignKey('users.Identity', related_name='following', db_index=True,
+                                        on_delete=models.CASCADE, help_text='Integer')
 
     objects = BaseManager()
 
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Follow)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Follow)
 
 
 class Ability(Base):
-    ability_organization = models.ForeignKey(Organization, db_index=True, related_name='abilities', on_delete=models.CASCADE, help_text='Integer')
+    ability_organization = models.ForeignKey(Organization, db_index=True, related_name='abilities',
+                                             on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     text = models.TextField(help_text='Text', db_index=True)
 
@@ -150,11 +173,15 @@ class Ability(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Ability)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Ability)
 
 
 class Confirmation(Base):
-    confirmation_corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant', db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    confirmation_corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant',
+                                                 db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', db_index=True,
+                                               on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=50, db_index=True, help_text='String(String(50))')
     description = models.TextField(help_text='Text')
     link = models.CharField(max_length=200, help_text='String(200)')
@@ -165,11 +192,15 @@ class Confirmation(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, Confirmation)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Confirmation)
 
 
 class Customer(Base):
-    customer_organization = models.ForeignKey(Organization, related_name='customer_organization', db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    related_customer = models.ForeignKey('users.Identity', related_name='customers', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    customer_organization = models.ForeignKey(Organization, related_name='customer_organization', db_index=True,
+                                              on_delete=models.CASCADE, help_text='Integer')
+    related_customer = models.ForeignKey('users.Identity', related_name='customers', db_index=True,
+                                         on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer')
 
@@ -178,3 +209,5 @@ class Customer(Base):
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Customer)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Customer)
