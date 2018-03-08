@@ -123,7 +123,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
+        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)

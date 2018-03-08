@@ -7,7 +7,7 @@ from .views import (
     ProductViewset,
     PriceViewset,
     PictureViewset,
-    CommentViewset,
+    CommentViewset
 )
 
 router = DefaultRouter()
