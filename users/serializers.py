@@ -40,17 +40,13 @@ class SuperAdminUserSerializer(ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user = User.objects.create(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
-    def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
-        profile_validated_data = self.get_profile_validated_data(**validated_data)
-        profile = Profile.objects.create(profile_user=user, **profile_validated_data)
-        profile.save()
+        user.set_password(validated_data['password'])
+        user.save()
+        '''profile_validated_data = self.get_profile_validated_data(**validated_data)
+        profile = Profile.objects.get(profile_user=user, **profile_validated_data)
+        profile.save()'''
         return user
 
     def update(self, instance, validated_data):
@@ -60,16 +56,16 @@ class SuperAdminUserSerializer(ModelSerializer):
             setattr(user, key, validated_data.get(key))
         user.save()
 
-        profile = Profile.objects.get(profile_user=user)
+        '''profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        profile.save()
+        profile.save()'''
 
         return user
 
     def get_user_validated_args(self, **kwargs):
-        user_kwargs = {'username': kwargs['username'], 'password': kwargs['password']}
+        user_kwargs = {'username': kwargs['username']}
         if 'first_name' in kwargs:
             user_kwargs['first_name'] = kwargs['first_name']
         if 'last_name' in kwargs:
@@ -129,9 +125,9 @@ class UserSerializer(ModelSerializer):
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
-        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        '''profile_validated_data = self.get_profile_validated_data(**validated_data)
         profile = Profile.objects.create(profile_user=user, **profile_validated_data)
-        profile.save()
+        profile.save()'''
         return user
 
     def update(self, instance, validated_data):
@@ -141,16 +137,16 @@ class UserSerializer(ModelSerializer):
             setattr(user, key, validated_data.get(key))
         user.save()
 
-        profile = Profile.objects.get(profile_user=user)
+        '''profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        profile.save()
+        profile.save()'''
 
         return user
 
     def get_user_validated_args(self, **kwargs):
-        user_kwargs = {'username': kwargs['username'], 'password': kwargs['password']}
+        user_kwargs = {'username': kwargs['username']}
         if 'first_name' in kwargs:
             user_kwargs['first_name'] = kwargs['first_name']
         if 'last_name' in kwargs:

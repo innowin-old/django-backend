@@ -89,6 +89,12 @@ def user_save(self, *args, **kwargs):
 User.save = user_save
 
 
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(profile_user=instance)
+
+
 class Profile(Base):
     profile_user = models.OneToOneField(User, related_name="profile",
                                         on_delete=models.CASCADE, help_text='Integer')
@@ -328,8 +334,7 @@ pre_save.connect(set_child_name, sender=Badge)
 
 class IdentityUrl(Base):
     url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
-    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,
-                                                         help_text='Integer')
+    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')
 
 
 # Cache Model Data After Update
@@ -352,6 +357,7 @@ class UserArticle(Base):
 post_save.connect(update_cache, sender=UserArticle)
 # Set Child Name
 pre_save.connect(set_child_name, sender=UserArticle)
+
 
 
 class Agent(Base):

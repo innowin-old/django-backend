@@ -49,7 +49,7 @@ from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrl
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -149,14 +149,14 @@ class UserViewset(ModelViewSet):
 
 class IdentityViewset(ModelViewSet):
     owner_field = 'identity_user'
-    permission_classes = [BlockPostMethod, IsIdentityOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Identity.objects.all()
 
-        identity_user = self.request.query_params.get('identity_user')
+        '''identity_user = self.request.query_params.get('identity_user')
         if identity_user is not None:
-            queryset = queryset.filter(identity_user_id=identity_user)
+            queryset = queryset.filter(identity_user_id=identity_user)'''
 
         return queryset
 

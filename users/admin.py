@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from users.models import Profile, Education, Research, Certificate, \
-    WorkExperience, Skill, Badge, Agent
+    WorkExperience, Skill, Badge, Agent, Identity
 
 
 class ProfileInline(admin.StackedInline):
@@ -62,3 +62,4 @@ admin.site.register(WorkExperience, WorkExperienceAdmin)
 admin.site.register(Skill, SkillAdmin)
 admin.site.register(Badge, BadgeAdmin)
 admin.site.register(Agent, AgentAdmin)
+admin.site.register(Identity)
