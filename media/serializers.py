@@ -22,9 +22,7 @@ class MediaSeriaizer(ModelSerializer):
         request = self.context.get("request")
         
         if 'identity' not in validated_data:
-            print(request.user)
             validated_data['identity'] = Identity.objects.get(identity_user=request.user)
-            print(validated_data[['identity']])
 
         if request.user.is_superuser and 'uploader' not in validated_data:
             validated_data['uploader'] = User.objects.get(id=request.user.id)
@@ -33,6 +31,7 @@ class MediaSeriaizer(ModelSerializer):
         ext = format.split('/')[-1]
         print(ext)
         validated_data['file'] = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        # validated_data['file'] = compress_video(validated_data['file'])
+        if ext == 'mp4' or ext == 'avi' or ext == 'webm':
+            validated_data['file'] = compress_video(validated_data['file'])
         media = Media.objects.create(**validated_data)
         return media
