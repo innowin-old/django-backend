@@ -6,7 +6,7 @@ from django.conf import settings
 
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, CharField, FileField, EmailField, IntegerField, ListField, \
-    URLField
+    URLField, BooleanField
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 from .models import (
@@ -34,19 +34,22 @@ class SuperAdminUserSerializer(ModelSerializer):
     web_site = ListField(child=URLField(required=False), required=False)
     phone = ListField(child=CharField(max_length=23, required=False), required=False)
     mobile = ListField(child=CharField(max_length=23, required=False), required=False)
+    password = CharField(max_length=255)
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username', 'password', 'first_name', 'last_name', 'email', 'date_joined', 'is_staff', 'is_active', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        '''profile_validated_data = self.get_profile_validated_data(**validated_data)
-        profile = Profile.objects.get(profile_user=user, **profile_validated_data)
-        profile.save()'''
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        profile = Profile.objects.get(profile_user=user)
+        for key in profile_validated_data:
+            setattr(profile, key, validated_data.get(key))
+        profile.save()
         return user
 
     def update(self, instance, validated_data):
@@ -54,13 +57,15 @@ class SuperAdminUserSerializer(ModelSerializer):
         user_validated_data = self.get_user_validated_args(**validated_data)
         for key in user_validated_data:
             setattr(user, key, validated_data.get(key))
+        if 'password' in validated_data:
+            user.set_password(validated_data['password'])
         user.save()
 
-        '''profile = Profile.objects.get(profile_user=user)
+        profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        profile.save()'''
+        profile.save()
 
         return user
 
@@ -116,18 +121,21 @@ class UserSerializer(ModelSerializer):
     web_site = ListField(child=URLField(required=False), required=False)
     phone = ListField(child=CharField(max_length=23, required=False), required=False)
     mobile = ListField(child=CharField(max_length=23, required=False), required=False)
+    password = CharField(max_length=255)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
+        fields = ['username', 'password', 'first_name', 'last_name', 'email', 'password', 'date_joined', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
-        '''profile_validated_data = self.get_profile_validated_data(**validated_data)
-        profile = Profile.objects.create(profile_user=user, **profile_validated_data)
-        profile.save()'''
+        profile_validated_data = self.get_profile_validated_data(**validated_data)
+        profile = Profile.objects.get(profile_user=user)
+        for key in profile_validated_data:
+            setattr(profile, key, validated_data.get(key))
+        profile.save()
         return user
 
     def update(self, instance, validated_data):
@@ -135,13 +143,15 @@ class UserSerializer(ModelSerializer):
         user_validated_data = self.get_user_validated_args(**validated_data)
         for key in user_validated_data:
             setattr(user, key, validated_data.get(key))
+        if 'password' in validated_data:
+            user.set_password(validated_data['password'])
         user.save()
 
-        '''profile = Profile.objects.get(profile_user=user)
+        profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        profile.save()'''
+        profile.save()
 
         return user
 

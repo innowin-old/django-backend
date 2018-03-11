@@ -359,7 +359,6 @@ post_save.connect(update_cache, sender=UserArticle)
 pre_save.connect(set_child_name, sender=UserArticle)
 
 
-
 class Agent(Base):
     agent_identity = models.ForeignKey(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')
 
