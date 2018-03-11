@@ -257,7 +257,7 @@ class PictureViewset(BaseModelViewSet):
 
         product = self.request.query_params.get('product', None)
         if product is not None:
-            queryset = queryset.filter(product_id=product)
+            queryset = queryset.filter(picture_product_id=product)
 
         description = self.request.query_params.get('description', None)
         if description is not None:
