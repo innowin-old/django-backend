@@ -154,9 +154,9 @@ class IdentityViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Identity.objects.all()
 
-        identity_user = self.request.query_params.get('identity_user')
+        '''identity_user = self.request.query_params.get('identity_user')
         if identity_user is not None:
-            queryset = queryset.filter(identity_user_id=identity_user)
+            queryset = queryset.filter(identity_user_id=identity_user)'''
 
         return queryset
 
@@ -302,7 +302,8 @@ class UserArticleViewset(ModelViewSet):
 
 
 class UserArticleRisViewset(ModelViewSet):
-    permission_classes = [AllowAny]
+    owner_field = 'user_article_related_user'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = UserArticle.objects.all()

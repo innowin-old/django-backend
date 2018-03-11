@@ -7,6 +7,8 @@ from .models import Media
 from users.models import Identity
 from django.contrib.auth.models import User
 
+from .utils import compress_video
+
 
 class MediaSeriaizer(ModelSerializer):
     file_string = CharField(write_only=True)
@@ -27,6 +29,9 @@ class MediaSeriaizer(ModelSerializer):
 
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
+        print(ext)
         validated_data['file'] = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        if ext == 'mp4' or ext == 'avi' or ext == 'webm':
+            validated_data['file'] = compress_video(validated_data['file'])
         media = Media.objects.create(**validated_data)
         return media

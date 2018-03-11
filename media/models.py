@@ -54,10 +54,13 @@ class Media(models.Model):
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Media)
 
+
 def update_meta(sender, instance, **kwargs):
     post_save.disconnect(update_meta, sender=Media)
     data = {'size': os.path.getsize(instance.file.path)}
     instance.info = json.dumps(data)
     instance.save()
     post_save.connect(update_meta, sender=Media)
+
+
 post_save.connect(update_meta, sender=Media)
