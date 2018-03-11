@@ -172,6 +172,22 @@ class PostViewSet(BaseModelViewSet):
         if post_parent is not None:
             queryset = queryset.filter(post_parent_id=post_parent)
 
+        post_product = self.request.query_params.get('post_product', None)
+        if post_product is not None:
+            queryset = queryset.filter(post_parent_id=post_product)
+
+        post_product_name = self.request.query_params.get('post_product_name', None)
+        if post_product_name is not None:
+            queryset = queryset.filter(post_product__name__contains=post_product_name)
+
+        post_product_owner_id = self.request.query_params.get('post_product_owner_id', None)
+        if post_product_owner_id is not None:
+            queryset = queryset.filter(post_product__product_owner_id=post_product_owner_id)
+
+        post_product_owner_username = self.request.query_params.get('post_product_owner_username', None)
+        if post_product_owner_username is not None:
+            queryset = queryset.filter(post_product__product_owner__username__contains=post_product_owner_username)
+
         post_pinned = self.request.query_params.get('post_pinned', None)
         if post_pinned is not None:
             queryset = queryset.filter(post_pinned=post_pinned)
