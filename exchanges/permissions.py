@@ -49,10 +49,11 @@ class IsAgentOrReadOnly(permissions.BasePermission):
             user = request.user
             if 'owner' not in request.POST:
                 identity = Identity.objects.get(identity_user=user)
-                try:
-                    agent = Agent.objects.get(agent_identity=identity)
-                except Agent.DoesNotExist:
-                    return False
+                if not user.is_superuser:
+                    try:
+                        agent = Agent.objects.get(agent_identity=identity)
+                    except Agent.DoesNotExist:
+                        return False
             else:
                 if not user.is_superuser:
                     identity = Identity.objects.get(pk=request.POST['owner'])
