@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'chats',
     'exchanges',
     'forms',
+    'displacements',
     'rest_framework',
     'rest_framework.authtoken',
     'social_django',
