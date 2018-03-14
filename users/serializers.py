@@ -131,6 +131,7 @@ class UserSerializer(ModelSerializer):
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
+        user.save()
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         profile = Profile.objects.get(profile_user=user)
         for key in profile_validated_data:
