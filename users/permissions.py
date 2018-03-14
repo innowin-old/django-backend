@@ -28,3 +28,12 @@ class IsUrlOwnerOrReadOnly(permissions.BasePermission):
         elif obj.identity_url_related_identity.identity_user == request.user or request.user.is_superuser:
             return True
         return False
+
+
+class IsAuthenticatedOrCreateOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            return True
+        elif request.user:
+            return True
+        return False

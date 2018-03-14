@@ -45,11 +45,11 @@ from .serializers import (
     UserArticleListSerializer,
     UserArticleRisSerializer
 )
-from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly
+from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrCreateOnly]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
