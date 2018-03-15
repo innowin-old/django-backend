@@ -370,3 +370,35 @@ ORGANIZATION_RELATED_MODELS_ACTIONS = (
     ('edit-product', ' ویرایش محصول '),
     ('delete-product', ' حذف محصول '),
 )
+
+# Displacement Data Settings
+USERS_BEFORE_FIELDS = {
+    'id': '',
+    'username': '',
+    'password': '',
+    'first_name': '',
+    'last_name': '',
+    'email': '',
+    'date_joined': '',
+    'is_staff': '',
+    'is_active': ''
+}
+
+PROFILES_BEFORE_FIELDS = {
+    'id': '',
+    'public_email': '',
+    'national_code': '',
+    'profile_media_id': '',
+    'birth_date': '',
+    'web_site': '',
+    'phone': '',
+    'mobile': '',
+    'fax': '',
+    'telegram_account': '',
+    'description': '',
+}
+
+IDENTITY_BEFORE_FIELDS = {
+    'identity_organization': '',
+    'name': ''
+}

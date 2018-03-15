@@ -14,5 +14,4 @@ class GetUserDataViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        print('salam')
         return GetUserDataSerializer
