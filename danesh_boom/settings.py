@@ -402,3 +402,31 @@ IDENTITY_BEFORE_FIELDS = {
     'identity_organization': '',
     'name': ''
 }
+
+CATEGORIES_BEFORE_FIELDS = {
+    'category_parent': '',
+    'name': '',
+    'title': '',
+    'creatable': ''
+}
+
+CATEGORY_FIELDS_BEFORE_FIELDS = {
+    'field_category': '',
+    'name': '',
+    'title': '',
+    'type': '',
+    'order': '',
+    'option': ''
+}
+
+PRODUCT_BEFORE_FIELDS = {
+    'product_owner': '',
+    'product_category': '',
+    'name': '',
+    'country': '',
+    'province': '',
+    'city': '',
+    'description': '',
+    'attrs': '',
+    'custom_attrs': ''
+}

@@ -5,7 +5,9 @@ from rest_framework.serializers import ModelSerializer, ListField
 
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db.models import Q
 from users.models import Profile, Identity
+from products.models import Category, CategoryField, Product
 
 
 class GetUserDataSerializer(ModelSerializer):
@@ -80,3 +82,117 @@ class GetUserDataSerializer(ModelSerializer):
         conn.close()
 
         return user
+
+
+class GetProductDataSerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+    def create(self, validated_data):
+        conn_string = "host='localhost' dbname='danesh_boom_master' user='postgres' password='1A2b3F4po'"
+        # print the connection string we will use to connect
+        print("Connecting to database\n	->%s" % conn_string)
+
+        # get a connection, if a connect cannot be made an exception will be raised here
+        conn = psycopg2.connect(conn_string, cursor_factory=DictCursor)
+
+        # conn.cursor will return a cursor object, you can use this cursor to perform queries
+        cursor = conn.cursor()
+
+        # execute our Query
+        cursor.execute("SELECT * FROM products_category")
+
+        # retrieve the records from the database
+        category_records = cursor.fetchall()
+
+        last_fields = settings.CATEGORIES_BEFORE_FIELDS
+        errors_log = []
+
+        for category_record in category_records:
+            category_kwargs = {}
+            for key in last_fields:
+                print(category_record[key])
+                category_kwargs[key] = category_record[key]
+            try:
+                category = Category.objects.get(name=category_kwargs['name'])
+            except Category.DoesNotExist:
+                category = False
+            if category:
+                errors_log.append('category with username=' + category.name + ' exist !')
+            else:
+                if category_kwargs['category_parent_id']:
+                    cursor.execute("SELECT * FROM products_category WHERE id=%s",
+                                   (category_kwargs['category_parent_id'],))
+                    category_parent_record = cursor.fetchall()[0]
+                    category_parent = Category.objects.get(name=category_parent_record['id'])
+                    category_kwargs['category_parent_id'] = category_parent.id
+                category = Category.objects.create(
+                    category_parent=category_kwargs['category_parent_id'],
+                    name=category_kwargs['name'],
+                    title=category_kwargs['title'],
+                    creatable=category_kwargs['creatable']
+                )
+                category.save()
+                cursor.execute("SELECT * FROM products_category_field WHERE field_category_id=%s",
+                               (category_kwargs['id'],))
+                category_field_records = cursor.fetchall()
+                last_categoryfields_fields = settings.CATEGORY_FIELDS_BEFORE_FIELDS
+                for category_field_record in category_field_records:
+                    category_field_kwargs = {}
+                    for key in last_categoryfields_fields:
+                        print(category_field_record[key])
+                        category_field_kwargs[key] = category_field_record[key]
+                    try:
+                        category_field = CategoryField.objects.get(Q(name=category_field_kwargs['name']) |
+                                                                   Q(title=category_field_kwargs['title']))
+                    except CategoryField.DoesNotExist:
+                        category_field = False
+                    if category_field:
+                        errors_log.append(
+                            'category_field with name=' + category_field.name + ' or title=' + category_field.title + ' exist !')
+                    else:
+                        category_field = CategoryField.objects.create(
+                            field_category_id=category.id,
+                            name=category_field_kwargs['name'],
+                            title=category_field_kwargs['title'],
+                            type=category_field_kwargs['type'],
+                            order=category_field_kwargs['order'],
+                            option=category_field_kwargs['option']
+                        )
+                        category_field.save()
+                cursor.execute("SELECT * FROM products_product WHERE product_category_id=%s", (category_kwargs['id'],))
+                product_records = cursor.fetchall()
+                last_product_fields = settings.PRODUCT_BEFORE_FIELDS
+                for product_record in product_records:
+                    product_kwargs = {}
+                    for key in last_product_fields:
+                        print(key)
+                        product_kwargs[key] = product_record[key]
+                    cursor.execute("SELECT * FROM users_identity WHERE id=%s", product_kwargs['product_owner_id'])
+                    identity_record = cursor.fetchall()[0]
+                    try:
+                        identity = Identity.objects.get(name=identity_record['name'])
+                    except Identity.DoesNotExist:
+                        identity = False
+                        errors_log.append('identity with name=' + identity_record['name'] + ' in product addition exist !')
+                    if identity:
+                        product = Product.objects.create(
+                            identity=identity,
+                            product_category=category,
+                            name=product_kwargs['name'],
+                            country=product_kwargs['country'],
+                            province=product_kwargs['province'],
+                            city=product_kwargs['city'],
+                            description=product_kwargs['description'],
+                            attrs=product_kwargs['attrs'],
+                            custom_attrs=product_kwargs['custom_attrs']
+                        )
+                        product.save()
+        cursor.close()
+        conn.close()
+        # product = Product.objects.create(**validated_data)
+
+        # product.errors_log = errors_log
+
+        # return product
