@@ -16,7 +16,8 @@ class ExchangeViewSet(BaseModelViewSet):
         A ViewSet for Handle Exchange Views
     """
     # queryset = Exchange.objects.all()
-    permission_classes = [IsAgentOrReadOnly, IsExchangeOwnerOrReadOnly, IsAuthenticated]
+    # permission_classes = [IsAgentOrReadOnly, IsExchangeOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Exchange.objects.all()
