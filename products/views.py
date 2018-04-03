@@ -91,7 +91,8 @@ class CategoryFieldViewset(BaseModelViewSet):
 
 class ProductViewset(BaseModelViewSet):
     # queryset = Product.objects.all()
-    permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
+    # permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Product.objects.filter(delete_flag=False)
