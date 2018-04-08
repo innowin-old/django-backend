@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .permissions import IsRollOwnerOrReadOnly, IsRollPermissionOwnerOrReadOnly
+from .permissions import IsRollOwnerOrReadOnly, IsRollPermissionOwnerOrReadOnly, IfExchangeIsAcceptedOrNotAccess
 
 import json
 
@@ -118,7 +118,7 @@ class HashtagViewset(BaseModelViewSet):
 
 class BaseCommentViewset(BaseModelViewSet):
     # queryset = BaseComment.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IfExchangeIsAcceptedOrNotAccess]
 
     def get_queryset(self):
         queryset = BaseComment.objects.all()
@@ -143,7 +143,7 @@ class BaseCommentViewset(BaseModelViewSet):
 
 class PostViewSet(BaseModelViewSet):
     # queryset = Post.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IfExchangeIsAcceptedOrNotAccess]
 
     def get_queryset(self):
         queryset = Post.objects.filter(delete_flag=False)

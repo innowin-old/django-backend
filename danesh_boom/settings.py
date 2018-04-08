@@ -188,6 +188,8 @@ USE_TZ = True
 
 if CONFIG.get('EMAIL').get('ENABLE_SMTP'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = CONFIG.get('EMAIL').get('HOST')
 EMAIL_HOST_USER = CONFIG.get('EMAIL').get('HOST_USER')
 EMAIL_HOST_PASSWORD = CONFIG.get('EMAIL').get('HOST_PASSWORD')
