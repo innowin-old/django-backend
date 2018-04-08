@@ -18,6 +18,8 @@ class BlockPostMethod(permissions.BasePermission):
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if request.method == 'GET':
+            return True
         owner_field_name = view.owner_field
         if getattr(obj, owner_field_name) == request.user or request.user.is_superuser:
             return True
