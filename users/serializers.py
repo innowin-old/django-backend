@@ -8,6 +8,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, CharField, FileField, EmailField, IntegerField, ListField, \
     URLField, BooleanField
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
 from .models import (
     Identity,
@@ -50,6 +51,13 @@ class SuperAdminUserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
+        email = EmailMessage(
+            ' تایید حساب کاربری ',
+            'https://daneshboom.ir/email/accept?token=123242',
+            'amir@localhost',
+            [user.email]
+        )
+        email.send()
         return user
 
     def update(self, instance, validated_data):
@@ -137,6 +145,13 @@ class UserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
+        email = EmailMessage(
+            ' تایید حساب کاربری ',
+            'https://daneshboom.ir/email/accept?token=123242',
+            'amir@localhost',
+            [user.email]
+        )
+        email.send()
         return user
 
     def update(self, instance, validated_data):

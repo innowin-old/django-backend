@@ -186,14 +186,15 @@ USE_L10N = True
 
 USE_TZ = True
 
-if CONFIG.get('EMAIL').get('ENABLE_SMTP'):
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = CONFIG.get('EMAIL').get('HOST')
+#if CONFIG.get('EMAIL').get('ENABLE_SMTP'):
+    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+'''EMAIL_HOST = CONFIG.get('EMAIL').get('HOST')
 EMAIL_HOST_USER = CONFIG.get('EMAIL').get('HOST_USER')
 EMAIL_HOST_PASSWORD = CONFIG.get('EMAIL').get('HOST_PASSWORD')
 EMAIL_PORT = CONFIG.get('EMAIL').get('PORT')
 EMAIL_USE_TLS = CONFIG.get('EMAIL').get('USE_TLS')
-EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')
+EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')'''
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

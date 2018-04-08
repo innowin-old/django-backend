@@ -38,6 +38,7 @@ class Identity(Base):
         blank=True,
         help_text='Integer')
     name = models.CharField(max_length=150, db_index=True, unique=True, help_text='String(150)')
+    accepted = models.BooleanField(default=False)
 
     objects = BaseManager()
 
