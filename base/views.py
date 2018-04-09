@@ -118,6 +118,7 @@ class HashtagViewset(BaseModelViewSet):
 
 class BaseCommentViewset(BaseModelViewSet):
     # queryset = BaseComment.objects.all()
+    parent_field = 'comment_parent'
     permission_classes = [IsAuthenticated, IfExchangeIsAcceptedOrNotAccess]
 
     def get_queryset(self):
@@ -143,6 +144,7 @@ class BaseCommentViewset(BaseModelViewSet):
 
 class PostViewSet(BaseModelViewSet):
     # queryset = Post.objects.all()
+    parent_field = 'post_parent'
     permission_classes = [IsAuthenticated, IfExchangeIsAcceptedOrNotAccess]
 
     def get_queryset(self):

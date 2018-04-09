@@ -50,7 +50,7 @@ class IsRollPermissionOwnerOrReadOnly(permissions.BasePermission):
 class IfExchangeIsAcceptedOrNotAccess(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
-            post_parent_id = request.POST['post_parent']
+            post_parent_id = request.POST['comment_parent']
             try:
                 exchange = Exchange.objects.get(pk=post_parent_id)
             except Exchange.DoesNotExist:
@@ -59,9 +59,10 @@ class IfExchangeIsAcceptedOrNotAccess(permissions.BasePermission):
             return permission.has_permission(request, view)
 
     def has_object_permission(self, request, view, obj):
+        parent_field = view.parent_field
         if request.method == 'GET':
             return True
-        post_parent_id = request.POST['post_parent']
+        post_parent_id = request.POST[parent_field]
         try:
             exchange = Exchange.objects.get(pk=post_parent_id)
         except Exchange.DoesNotExist:

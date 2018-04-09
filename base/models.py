@@ -70,7 +70,7 @@ class BaseComment(Base):
     comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True,
                                        on_delete=models.CASCADE, help_text='Integer')
     comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture",
-                                        help_text='Integer')
+                                        blank=True, null=True, help_text='Integer')
     text = models.TextField(help_text='Text')
 
     objects = BaseManager()
