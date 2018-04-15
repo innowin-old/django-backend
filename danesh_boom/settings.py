@@ -374,6 +374,10 @@ ORGANIZATION_RELATED_MODELS_ACTIONS = (
 )
 
 # Displacement Data Settings
+LAST_DATABASE_NAME = 'danesh_boom3'
+LAST_DATABASE_USERNAME = 'postgres'
+LAST_DATABASE_PASSWORD = '1A2b3F4po'
+
 USERS_BEFORE_FIELDS = {
     'id': '',
     'username': '',
@@ -387,7 +391,6 @@ USERS_BEFORE_FIELDS = {
 }
 
 PROFILES_BEFORE_FIELDS = {
-    'id': '',
     'public_email': '',
     'national_code': '',
     'profile_media_id': '',
@@ -401,6 +404,50 @@ PROFILES_BEFORE_FIELDS = {
 }
 
 IDENTITY_BEFORE_FIELDS = {
-    'identity_organization': '',
+    'identity_organization_id': '',
     'name': ''
+}
+
+CATEGORY_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'category_parent_id': '',
+    'name': '',
+    'title': '',
+    'creatable': ''
+}
+
+CATEGORY_FIELDS_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'field_category_id': '',
+    'name': '',
+    'title': '',
+    'type': '',
+    'order': '',
+    'option': ''
+}
+
+PRODUCTS_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'product_owner_id': '',
+    'product_category_id': '',
+    'name': '',
+    'country': '',
+    'province': '',
+    'city': '',
+    'description': '',
+    'attrs': '',
+    'custom_attrs': ''
+}
+
+PRICES_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'price_product_id': '',
+    'value': ''
+}
+
+COMMENTS_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'comment_product_id': '',
+    'comment_user_id': '',
+    'text': ''
 }

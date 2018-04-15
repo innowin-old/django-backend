@@ -1,10 +1,11 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
 
-from .views import GetUserDataViewset
+from .views import GetUserDataViewset, GetProductDataViewset
 
 router = DefaultRouter()
 
+router.register(r'products-data', GetProductDataViewset, 'products-data')
 router.register(r'users-data', GetUserDataViewset, 'users-data')
 
 urlpatterns = [
