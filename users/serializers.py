@@ -228,7 +228,7 @@ class IdentityMiniSerializer(BaseSerializer):
 
 
 class ProfileSerializer(BaseSerializer):
-    image_url = serializers.RelatedField(source='profile_media', read_only=True)
+    # image_url = serializers.RelatedField(source='profile_media', read_only=True)
 
     class Meta:
         model = Profile

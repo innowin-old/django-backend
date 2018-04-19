@@ -145,7 +145,7 @@ class BaseCommentViewset(BaseModelViewSet):
 class PostViewSet(BaseModelViewSet):
     # queryset = Post.objects.all()
     parent_field = 'post_parent'
-    permission_classes = [IsAuthenticated, IfExchangeIsAcceptedOrNotAccess]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Post.objects.filter(delete_flag=False)
