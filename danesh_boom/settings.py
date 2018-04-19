@@ -451,3 +451,71 @@ COMMENTS_BEFORE_FIELDS = {
     'comment_user_id': '',
     'text': ''
 }
+
+ORGANIZATION_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'owner_id': '',
+    'username': '',
+    'email': '',
+    'nike_name': '',
+    'official_name': '',
+    'national_code': '',
+    'registration_ads_url': '',
+    'registrar_organization': '',
+    'country': '',
+    'province': '',
+    'city': '',
+    'address': '',
+    'phone': '',
+    'web_site': '',
+    'established_year': '',
+    'ownership_type': '',
+    'business_type': '',
+    'organization_logo_id': '',
+    'biography': '',
+    'description': '',
+    'correspondence_language': '',
+    'social_network': '',
+    'staff_count': ''
+}
+
+STAFF_COUNT_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'staff_count_organization_id': '',
+    'count': ''
+}
+
+STAFF_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'staff_organization_id': '',
+    'staff_user_id': '',
+    'position': '',
+    'post_permission': ''
+}
+
+ABILLITY_BEFORE_FIELDS = {
+    'ability_organization_id': '',
+    'title': '',
+    'text': ''
+}
+
+CUSTOMER_BEFORE_FIELDS = {
+    'customer_organization_id': '',
+    'related_customer_id': '',
+    'title': '',
+    'customer_picture_id': ''
+}
+
+CONFIRMATION_BEFORE_FIELD = {
+    'confirmation_corroborant_id': '',
+    'confirmation_confirmed_id': '',
+    'title': '',
+    'description': '',
+    'link': '',
+    'confirm_flag': ''
+}
+
+FOLLOW_BEFORE_FIELD = {
+    'follow_identity_id': '',
+    'follow_follower_id': ''
+}
