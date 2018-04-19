@@ -1,4 +1,5 @@
 import json
+from os import stat_result
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -9,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from rest_framework import status
 
 from utils.token import validate_token
 
@@ -339,9 +341,20 @@ def active_user(request, token):
         # active user
         user.is_active = True
         user.save()
-        err = 'success-activation'
+        try:
+            identity = Identity.objects.get(identity_user=user)
+        except Identity.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        identity.email_verified = True
+        try:
+            profile = Profile.objects.get(profile_user=user)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not identity.mobile_verified and profile.national_code is not nu and user.first_name and user.last_name:
+            identity.accepted = True
+        identity.save()
 
-    return redirect('/#/auth/{}/'.format(err))
+    return Response(status=status.HTTP_200_OK)
 
 
 def jwt_response_payload_handler(token, user=None, request=None):

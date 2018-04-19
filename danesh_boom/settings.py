@@ -186,15 +186,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-#if CONFIG.get('EMAIL').get('ENABLE_SMTP'):
-    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-'''EMAIL_HOST = CONFIG.get('EMAIL').get('HOST')
+if CONFIG.get('EMAIL').get('ENABLE_SMTP'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = CONFIG.get('EMAIL').get('HOST')
 EMAIL_HOST_USER = CONFIG.get('EMAIL').get('HOST_USER')
 EMAIL_HOST_PASSWORD = CONFIG.get('EMAIL').get('HOST_PASSWORD')
 EMAIL_PORT = CONFIG.get('EMAIL').get('PORT')
 EMAIL_USE_TLS = CONFIG.get('EMAIL').get('USE_TLS')
-EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')'''
+EMAIL_FROM = CONFIG.get('EMAIL').get('EMAIL_FROM')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -373,6 +374,10 @@ ORGANIZATION_RELATED_MODELS_ACTIONS = (
 )
 
 # Displacement Data Settings
+LAST_DATABASE_NAME = 'danesh_boom3'
+LAST_DATABASE_USERNAME = 'postgres'
+LAST_DATABASE_PASSWORD = '1A2b3F4po'
+
 USERS_BEFORE_FIELDS = {
     'id': '',
     'username': '',
@@ -386,7 +391,6 @@ USERS_BEFORE_FIELDS = {
 }
 
 PROFILES_BEFORE_FIELDS = {
-    'id': '',
     'public_email': '',
     'national_code': '',
     'profile_media_id': '',
@@ -400,19 +404,21 @@ PROFILES_BEFORE_FIELDS = {
 }
 
 IDENTITY_BEFORE_FIELDS = {
-    'identity_organization': '',
+    'identity_organization_id': '',
     'name': ''
 }
 
-CATEGORIES_BEFORE_FIELDS = {
-    'category_parent': '',
+CATEGORY_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'category_parent_id': '',
     'name': '',
     'title': '',
     'creatable': ''
 }
 
 CATEGORY_FIELDS_BEFORE_FIELDS = {
-    'field_category': '',
+    'base_ptr_id': '',
+    'field_category_id': '',
     'name': '',
     'title': '',
     'type': '',
@@ -420,9 +426,10 @@ CATEGORY_FIELDS_BEFORE_FIELDS = {
     'option': ''
 }
 
-PRODUCT_BEFORE_FIELDS = {
-    'product_owner': '',
-    'product_category': '',
+PRODUCTS_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'product_owner_id': '',
+    'product_category_id': '',
     'name': '',
     'country': '',
     'province': '',
@@ -430,4 +437,85 @@ PRODUCT_BEFORE_FIELDS = {
     'description': '',
     'attrs': '',
     'custom_attrs': ''
+}
+
+PRICES_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'price_product_id': '',
+    'value': ''
+}
+
+COMMENTS_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'comment_product_id': '',
+    'comment_user_id': '',
+    'text': ''
+}
+
+ORGANIZATION_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'owner_id': '',
+    'username': '',
+    'email': '',
+    'nike_name': '',
+    'official_name': '',
+    'national_code': '',
+    'registration_ads_url': '',
+    'registrar_organization': '',
+    'country': '',
+    'province': '',
+    'city': '',
+    'address': '',
+    'phone': '',
+    'web_site': '',
+    'established_year': '',
+    'ownership_type': '',
+    'business_type': '',
+    'organization_logo_id': '',
+    'biography': '',
+    'description': '',
+    'correspondence_language': '',
+    'social_network': '',
+    'staff_count': ''
+}
+
+STAFF_COUNT_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'staff_count_organization_id': '',
+    'count': ''
+}
+
+STAFF_BEFORE_FIELDS = {
+    'base_ptr_id': '',
+    'staff_organization_id': '',
+    'staff_user_id': '',
+    'position': '',
+    'post_permission': ''
+}
+
+ABILLITY_BEFORE_FIELDS = {
+    'ability_organization_id': '',
+    'title': '',
+    'text': ''
+}
+
+CUSTOMER_BEFORE_FIELDS = {
+    'customer_organization_id': '',
+    'related_customer_id': '',
+    'title': '',
+    'customer_picture_id': ''
+}
+
+CONFIRMATION_BEFORE_FIELD = {
+    'confirmation_corroborant_id': '',
+    'confirmation_confirmed_id': '',
+    'title': '',
+    'description': '',
+    'link': '',
+    'confirm_flag': ''
+}
+
+FOLLOW_BEFORE_FIELD = {
+    'follow_identity_id': '',
+    'follow_follower_id': ''
 }

@@ -10,6 +10,7 @@ from rest_framework.serializers import ModelSerializer, CharField, FileField, Em
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
+from .utils import send_verification_mail
 from .models import (
     Identity,
     Profile,
@@ -39,7 +40,9 @@ class SuperAdminUserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'date_joined', 'is_staff', 'is_active', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'date_joined', 'is_staff',
+                  'is_active', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax',
+                  'telegram_account', 'description', 'phone', 'mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
@@ -74,7 +77,7 @@ class SuperAdminUserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
-
+        send_verification_mail(user=user)
         return user
 
     def get_user_validated_args(self, **kwargs):
@@ -133,7 +136,9 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'password', 'date_joined', 'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account', 'description', 'phone', 'mobile']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'password', 'date_joined',
+                  'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account',
+                  'description', 'phone', 'mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
@@ -168,7 +173,7 @@ class UserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
-
+        send_verification_mail(user=user)
         return user
 
     def get_user_validated_args(self, **kwargs):

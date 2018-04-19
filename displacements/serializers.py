@@ -5,9 +5,9 @@ from rest_framework.serializers import ModelSerializer, ListField
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.db.models import Q
 from users.models import Profile, Identity
-from products.models import Category, CategoryField, Product
+from organizations.models import Organization, StaffCount, Staff, Ability, Customer, Confirmation, Follow
+from products.models import Product, CategoryField, Category, Price, Comment
 
 
 class GetUserDataSerializer(ModelSerializer):
@@ -18,7 +18,7 @@ class GetUserDataSerializer(ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        conn_string = "host='localhost' dbname='danesh_boom_master' user='postgres' password='1A2b3F4po'"
+        conn_string = "host='localhost' dbname='" + settings.LAST_DATABASE_NAME + "' user='" + settings.LAST_DATABASE_USERNAME + "' password='" + settings.LAST_DATABASE_PASSWORD + "'"
         # print the connection string we will use to connect
         print("Connecting to database\n	->%s" % conn_string)
 
@@ -85,12 +85,15 @@ class GetUserDataSerializer(ModelSerializer):
 
 
 class GetProductDataSerializer(ModelSerializer):
+    errors_log = ListField(required=False)
+
     class Meta:
         model = Category
         fields = '__all__'
 
     def create(self, validated_data):
-        conn_string = "host='localhost' dbname='danesh_boom_master' user='postgres' password='1A2b3F4po'"
+        conn_string = "host='localhost' dbname='" + settings.LAST_DATABASE_NAME + "' user='" + settings.LAST_DATABASE_USERNAME + "' password='" + settings.LAST_DATABASE_PASSWORD + "'"
+
         # print the connection string we will use to connect
         print("Connecting to database\n	->%s" % conn_string)
 
@@ -104,95 +107,490 @@ class GetProductDataSerializer(ModelSerializer):
         cursor.execute("SELECT * FROM products_category")
 
         # retrieve the records from the database
-        category_records = cursor.fetchall()
+        records = cursor.fetchall()
 
-        last_fields = settings.CATEGORIES_BEFORE_FIELDS
+        last_fields = settings.CATEGORY_BEFORE_FIELDS
         errors_log = []
 
-        for category_record in category_records:
-            category_kwargs = {}
+        for record in records:
+            kwargs = {}
             for key in last_fields:
-                print(category_record[key])
-                category_kwargs[key] = category_record[key]
+                kwargs[key] = record[key]
             try:
-                category = Category.objects.get(name=category_kwargs['name'])
+                category = Category.objects.get(name=kwargs['name'])
             except Category.DoesNotExist:
                 category = False
             if category:
-                errors_log.append('category with username=' + category.name + ' exist !')
+                print('error logged !!!')
+                errors_log.append('category with name=' + category.name + ' already exist !')
             else:
-                if category_kwargs['category_parent_id']:
-                    cursor.execute("SELECT * FROM products_category WHERE id=%s",
-                                   (category_kwargs['category_parent_id'],))
-                    category_parent_record = cursor.fetchall()[0]
-                    category_parent = Category.objects.get(name=category_parent_record['id'])
-                    category_kwargs['category_parent_id'] = category_parent.id
                 category = Category.objects.create(
-                    category_parent=category_kwargs['category_parent_id'],
-                    name=category_kwargs['name'],
-                    title=category_kwargs['title'],
-                    creatable=category_kwargs['creatable']
+                    name=kwargs['name'],
+                    title=kwargs['title'],
+                    creatable=kwargs['creatable']
                 )
                 category.save()
-                cursor.execute("SELECT * FROM products_category_field WHERE field_category_id=%s",
-                               (category_kwargs['id'],))
-                category_field_records = cursor.fetchall()
-                last_categoryfields_fields = settings.CATEGORY_FIELDS_BEFORE_FIELDS
-                for category_field_record in category_field_records:
-                    category_field_kwargs = {}
-                    for key in last_categoryfields_fields:
-                        print(category_field_record[key])
-                        category_field_kwargs[key] = category_field_record[key]
+                # add category fields
+                print('add category fields')
+                cursor.execute("SELECT * FROM products_categoryfield WHERE field_category_id=%s", (kwargs['base_ptr_id'],))
+                category_fields_records = cursor.fetchall()
+                category_fields_before = settings.PRODUCTS_BEFORE_FIELDS
+                for category_fields_record in category_fields_records:
+                    category_fields_kwargs = {}
+                    for key in category_fields_before:
+                        category_fields_kwargs[key] = category_fields_record[key]
                     try:
-                        category_field = CategoryField.objects.get(Q(name=category_field_kwargs['name']) |
-                                                                   Q(title=category_field_kwargs['title']))
+                        category_field = CategoryField.objects.get(name=category_fields_kwargs['name'])
                     except CategoryField.DoesNotExist:
                         category_field = False
                     if category_field:
-                        errors_log.append(
-                            'category_field with name=' + category_field.name + ' or title=' + category_field.title + ' exist !')
+                        print('error logged !!!')
+                        errors_log.append('category field with name=' + category_field.name + ' already exist !')
                     else:
                         category_field = CategoryField.objects.create(
-                            field_category_id=category.id,
-                            name=category_field_kwargs['name'],
-                            title=category_field_kwargs['title'],
-                            type=category_field_kwargs['type'],
-                            order=category_field_kwargs['order'],
-                            option=category_field_kwargs['option']
+                            field_category=category,
+                            name=category_fields_kwargs['name'],
+                            title=category_fields_kwargs['title'],
+                            type=category_fields_kwargs['type'],
+                            order=category_fields_kwargs['order'],
+                            option=category_fields_kwargs['option']
                         )
                         category_field.save()
-                cursor.execute("SELECT * FROM products_product WHERE product_category_id=%s", (category_kwargs['id'],))
+                # add products
+                print('add products')
+                cursor.execute("SELECT * FROM products_product WHERE product_category_id=%s", (kwargs['base_ptr_id'],))
                 product_records = cursor.fetchall()
-                last_product_fields = settings.PRODUCT_BEFORE_FIELDS
+                products_before = settings.PRODUCTS_BEFORE_FIELDS
                 for product_record in product_records:
                     product_kwargs = {}
-                    for key in last_product_fields:
-                        print(key)
+                    for key in products_before:
                         product_kwargs[key] = product_record[key]
-                    cursor.execute("SELECT * FROM users_identity WHERE id=%s", product_kwargs['product_owner_id'])
-                    identity_record = cursor.fetchall()[0]
+                    cursor.execute("SELECT * FROM users_identity WHERE base_ptr_id=%s", (product_kwargs['product_owner_id'],))
+                    identity_records = cursor.fetchall()
+                    for identity_record in identity_records:
+                        identity_name = identity_record['name']
                     try:
-                        identity = Identity.objects.get(name=identity_record['name'])
+                        identity = Identity.objects.get(name=identity_name)
                     except Identity.DoesNotExist:
-                        identity = False
-                        errors_log.append('identity with name=' + identity_record['name'] + ' in product addition exist !')
-                    if identity:
-                        product = Product.objects.create(
-                            identity=identity,
-                            product_category=category,
-                            name=product_kwargs['name'],
-                            country=product_kwargs['country'],
-                            province=product_kwargs['province'],
-                            city=product_kwargs['city'],
-                            description=product_kwargs['description'],
-                            attrs=product_kwargs['attrs'],
-                            custom_attrs=product_kwargs['custom_attrs']
+                        identity = {'id': 1}
+                        print('error logged !!!')
+                        errors_log.append('category field with name=' + identity_name + ' already exist !')
+                    product = Product.objects.create(
+                        product_owner_id=identity.id,
+                        product_category_id=category.id,
+                        name=product_kwargs['name'],
+                        country=product_kwargs['country'],
+                        province=product_kwargs['province'],
+                        city=product_kwargs['city'],
+                        description=product_kwargs['description'],
+                        attrs=product_kwargs['attrs'],
+                        custom_attrs=product_kwargs['custom_attrs']
+                    )
+                    product.save()
+                    # add prices
+                    print('add prices')
+                    cursor.execute("SELECT * FROM products_price WHERE price_product_id=%s", (product_kwargs['base_ptr_id'],))
+                    price_records = cursor.fetchall()
+                    prices_before = settings.PRICES_BEFORE_FIELDS
+                    for price_record in price_records:
+                        price_kwargs = {}
+                        for key in prices_before:
+                            price_kwargs[key] = price_record[key]
+                        price = Price.objects.create(
+                            price_product_id=product.id,
+                            value=price_kwargs['value']
                         )
-                        product.save()
+                        price.save()
+                    # add pictures
+                    '''cursor.execute("SELECT * FROM products_picture WHERE picture_product_id=%", (product_kwargs['id'],))
+                    picture_records = cursor.fetchall()
+                    picture_before = settings.PRICES_BEFORE_FIELDS
+                    for picture_record in picture_records:
+                        picture_kwargs = {}
+                        for key in picture_before:
+                            picture_kwargs[key] = picture_record[key]
+                        picture = Picture.objects.create(
+                            picture_product_id=product.id,
+                            value=picture_record['value']
+                        )
+                        price.save()'''
+                    # add comments
+                    print('add comments')
+                    cursor.execute("SELECT * FROM products_comment WHERE comment_product_id=%s", (product_kwargs['base_ptr_id'],))
+                    comment_records = cursor.fetchall()
+                    comments_before = settings.PRICES_BEFORE_FIELDS
+                    for comment_record in comment_records:
+                        comment_kwargs = {}
+                        for key in comments_before:
+                            comment_kwargs[key] = comment_record[key]
+                        cursor.execute("SELECT * FROM users_user WHERE id=%s", (comment_kwargs['comment_user_id'],))
+                        user_records = cursor.fetchall()
+                        for user_record in user_records:
+                            user_username = user_record['username']
+                        user = User.objects.filter(username=user_username)
+                        user = user[0]
+                        comment = Comment.objects.create(
+                            comment_product_id=product.id,
+                            comment_user_id=user.id,
+                            text=comment_kwargs['text']
+                        )
+                        comment.save()
+        # fill parents
+        cursor.execute("SELECT * FROM products_category")
+        # retrieve the records from the database
+        category_parent_records = cursor.fetchall()
+        for category_parent_record in category_parent_records:
+            category_parent_kwargs = {}
+            for key in last_fields:
+                category_parent_kwargs[key] = category_parent_record[key]
+        if category_parent_kwargs['category_parent_id'] is not None or category_parent_kwargs['category_parent_id'] != '':
+            cursor.execute("SELECT * FROM products_category WHERE base_ptr_id=%s",
+                           (category_parent_kwargs['base_ptr_id'],))
+            parent_records = cursor.fetchall()
+            for parent_record in parent_records:
+                parent_name = parent_record['name']
+            try:
+                parent_object = Category.objects.get(name=parent_name)
+            except Category.DoesNotExist:
+                parent_object = None
+                errors_log.append('category parent with ame=' + parent_name + ' already exist !')
+            if parent_object is not None:
+                try:
+                    category_parent = Category.objects.get(name=category_parent_kwargs['name'])
+                except Category.DoesNotExist:
+                    category_parent = False
+                    errors_log.append(
+                        'category parent with name=' + parent_name + ' on target not exist !')
+                if category_parent:
+                    category_parent.category_parent_id = parent_object.id
+                    category_parent.save()
+        category.errors_log = errors_log
         cursor.close()
         conn.close()
-        # product = Product.objects.create(**validated_data)
+        return category
 
-        # product.errors_log = errors_log
 
-        # return product
+class GetOrganizationDataSerializer(ModelSerializer):
+    errors_log = ListField(required=False)
+
+    class Meta:
+        model = Organization
+        fields = '__all__'
+
+    def create(self, validated_data):
+        conn_string = "host='localhost' dbname='" + settings.LAST_DATABASE_NAME + "' user='" + settings.LAST_DATABASE_USERNAME + "' password='" + settings.LAST_DATABASE_PASSWORD + "'"
+        # print the connection string we will use to connect
+        print("Connecting to database\n	->%s" % conn_string)
+
+        # get a connection, if a connect cannot be made an exception will be raised here
+        conn = psycopg2.connect(conn_string, cursor_factory=DictCursor)
+
+        # conn.cursor will return a cursor object, you can use this cursor to perform queries
+        cursor = conn.cursor()
+
+        # execute our Query
+        cursor.execute("SELECT * FROM organizations_organization")
+
+        # retrieve the records from the database
+        records = cursor.fetchall()
+
+        last_fields = settings.ORGANIZATION_BEFORE_FIELDS
+        errors_log = []
+
+        for record in records:
+            print('in organization addition')
+            kwargs = {}
+            for key in last_fields:
+                kwargs[key] = record[key]
+            try:
+                organization = Organization.objects.get(username=kwargs['username'])
+            except Organization.DoesNotExist:
+                organization = False
+            if organization:
+                print('error logged !!!')
+                errors_log.append('organization with name=' + organization.username + ' already exist !')
+            else:
+                cursor.execute("SELECT * FROM auth_user WHERE id=%s", (kwargs['owner_id'],))
+                owner_records = cursor.fetchall()
+                for owner_record in owner_records:
+                    owner_username = owner_record['username']
+                try:
+                    owner_object = User.objects.get(username=owner_username)
+                except User.DoesNotExist:
+                    owner_object = False
+                if not owner_object:
+                    print('error logged !!!')
+                    errors_log.append('user with username=' + owner_object.username + ' not exist !')
+                else:
+                    organization = Organization.objects.create(
+                        owner_id=owner_object.id,
+                        username=kwargs['username'],
+                        email=kwargs['email'],
+                        nike_name=kwargs['nike_name'],
+                        official_name=kwargs['official_name'],
+                        national_code=kwargs['national_code'],
+                        registration_ads_url=kwargs['registration_ads_url'],
+                        registrar_organization=kwargs['registrar_organization'],
+                        country=kwargs['country'],
+                        province=kwargs['province'],
+                        city=kwargs['city'],
+                        address=kwargs['address'],
+                        phone=kwargs['phone'],
+                        web_site=kwargs['web_site'],
+                        established_year=kwargs['established_year'],
+                        ownership_type=kwargs['ownership_type'],
+                        business_type=kwargs['business_type'],
+                        biography=kwargs['biography'],
+                        description=kwargs['description'],
+                        correspondence_language=kwargs['correspondence_language'],
+                        social_network=kwargs['social_network'],
+                        staff_count=kwargs['staff_count']
+                    )
+                    cursor.execute("SELECT * FROM organizations_organization_admins WHERE organization_id=%s", (kwargs['base_ptr_id'],))
+                    admins_records = cursor.fetchall()
+                    for admins_record in admins_records:
+                        print('in organization admin addition')
+                        admins_id = admins_record['user_id']
+                        cursor.execute("SELECT * FROM auth_user WHERE id=%s", (admins_id,))
+                        admins_username_records = cursor.fetchall()
+                        for admins_username_record in admins_username_records:
+                            admins_username = admins_username_record['username']
+                            try:
+                                admin_object = User.objects.get(username=admins_username)
+                            except User.DoesNotExist:
+                                admin_object = False
+                            if not admin_object:
+                                print('error logged !!!')
+                                errors_log.append('user with username=' + owner_object.username + ' not exist !')
+                            else:
+                                organization.admins.add(admin_object)
+                    organization.save()
+            cursor.execute("SELECT * FROM organizations_staffcount WHERE staff_count_organization_id=%s", (kwargs['base_ptr_id'],))
+            staff_count_records = cursor.fetchall()
+            staff_count_before = settings.STAFF_COUNT_BEFORE_FIELDS
+            for staff_count_record in staff_count_records:
+                print('in organization staff count addition')
+                staff_count_kwargs = {}
+                for staff_count_key in staff_count_before:
+                    staff_count_kwargs[staff_count_key] = staff_count_record[staff_count_key]
+                cursor.execute("SELECT * FROM organizations_organization WHERE base_ptr_id=%s", (staff_count_kwargs['staff_count_organization_id'],))
+                staff_count_organizations_records = cursor.fetchall()
+                for staff_count_organizations_record in staff_count_organizations_records:
+                    staff_count_organizations_username = staff_count_organizations_record['username']
+                try:
+                    staff_count_organization_object = Organization.objects.get(username=staff_count_organizations_username)
+                except Organization.DoesNotExist:
+                    staff_count_organization_object = False
+                if not staff_count_organization_object:
+                    print('error logged !!!')
+                    errors_log.append('user with username=' + staff_count_organizations_username + ' not exist !')
+                else:
+                    staff_count = StaffCount.objects.create(
+                        staff_count_organization_id=staff_count_organization_object.id,
+                        count=staff_count_kwargs['count']
+                    )
+                    staff_count.save()
+            cursor.execute("SELECT * FROM organizations_staff WHERE staff_organization_id=%s", (kwargs['base_ptr_id'],))
+            staff_records = cursor.fetchall()
+            staff_before = settings.STAFF_BEFORE_FIELDS
+            for staff_record in staff_records:
+                print('in organization staff addition')
+                staff_kwargs = {}
+                for staff_key in staff_before:
+                    staff_kwargs[staff_key] = staff_record[staff_key]
+                cursor.execute("SELECT * FROM organizations_organization WHERE base_ptr_id=%s", (staff_kwargs['staff_organization_id'],))
+                staff_organizations_records = cursor.fetchall()
+                for staff_organizations_record in staff_organizations_records:
+                    staff_organizations_username = staff_organizations_record['username']
+                try:
+                    staff_organization_object = Organization.objects.get(
+                        username=staff_organizations_username)
+                except Organization.DoesNotExist:
+                    staff_organization_object = False
+                if not staff_organization_object:
+                    print('error logged !!!')
+                    errors_log.append('user with username=' + staff_count_organizations_username + ' not exist !')
+                else:
+                    print('in organization staff auth_user addition')
+                    cursor.execute("SELECT * FROM auth_user WHERE id=%s", (staff_kwargs['staff_user_id'],))
+                    staff_user_records = cursor.fetchall()
+                    for staff_user_record in staff_user_records:
+                        staff_user_username = staff_user_record['username']
+                    try:
+                        staff_user_object = User.objects.get(username=staff_user_username)
+                    except User.DoesNotExist:
+                        staff_user_object = False
+                    if not staff_user_object:
+                        print('error logged !!!')
+                        errors_log.append('user with username=' + staff_count_organizations_username + ' not exist !')
+                    else:
+                        staff = Staff.objects.create(
+                            staff_organization_id=staff_organization_object.id,
+                            staff_user_id=staff_user_object.id,
+                            position=staff_kwargs['position'],
+                            post_permission=staff_kwargs['post_permission']
+                        )
+                        staff.save()
+            cursor.execute("SELECT * FROM organizations_ability WHERE ability_organization_id=%s", (kwargs['base_ptr_id'],))
+            ability_records = cursor.fetchall()
+            ability_before = settings.ABILLITY_BEFORE_FIELDS
+            for ability_record in ability_records:
+                print('in organization ability addition')
+                ability_kwargs = {}
+                for ability_key in ability_before:
+                    ability_kwargs[ability_key] = ability_record[ability_key]
+                cursor.execute("SELECT * FROM organizations_organization WHERE base_ptr_id=%s", (ability_kwargs['ability_organization_id'],))
+                ability_organizations_records = cursor.fetchall()
+                for ability_organizations_record in ability_organizations_records:
+                    ability_organizations_username = ability_organizations_record['username']
+                try:
+                    ability_organization_object = Organization.objects.get(
+                        username=ability_organizations_username)
+                except Organization.DoesNotExist:
+                    ability_organization_object = False
+                if not ability_organization_object:
+                    print('error logged !!!')
+                    errors_log.append('user with username=' + ability_organizations_username + ' not exist !')
+                else:
+                    ability = Ability.objects.create(
+                        ability_organization_id=ability_organization_object.id,
+                        title=ability_kwargs['title'],
+                        text=ability_kwargs['text']
+                    )
+                    ability.save()
+            cursor.execute("SELECT * FROM organizations_customer WHERE customer_organization_id=%s", (kwargs['base_ptr_id'],))
+            customer_records = cursor.fetchall()
+            customer_before = settings.CUSTOMER_BEFORE_FIELDS
+            for customer_record in customer_records:
+                print('in organization customer addition')
+                customer_kwargs = {}
+                for customer_key in customer_before:
+                    customer_kwargs[customer_key] = customer_record[customer_key]
+                cursor.execute("SELECT * FROM organizations_organization WHERE base_ptr_id=%s", (customer_kwargs['customer_organization_id'],))
+                customer_organizations_records = cursor.fetchall()
+                for customer_organizations_record in customer_organizations_records:
+                    customer_organizations_username = customer_organizations_record['username']
+                try:
+                    customer_organization_object = Organization.objects.get(
+                        username=customer_organizations_username)
+                except Organization.DoesNotExist:
+                    customer_organization_object = False
+                if not customer_organization_object:
+                    print('error logged !!!')
+                    errors_log.append('user with username=' + customer_organizations_username + ' not exist !')
+                else:
+                    cursor.execute("SELECT * FROM users_identity WHERE identity_organization_id=%s", (customer_kwargs['related_customer_id'],))
+                    identity_organizations_records = cursor.fetchall()
+                    if len(identity_organizations_records) == 0:
+                        print('error logged !!!')
+                        errors_log.append('user not exist !')
+                    else:
+                        for identity_organizations_record in identity_organizations_records:
+                            #identity_organizations_id = identity_organizations_record['base_ptr_id']
+                            identity_organizations_name = identity_organizations_record['name']
+                        try:
+                            identity_organization_object = Identity.objects.get(name=identity_organizations_name)
+                        except Identity.DoesNotExist:
+                            identity_organization_object = False
+                        if not identity_organization_object:
+                            print('error logged !!!')
+                            errors_log.append('identity with username=' + identity_organizations_name + ' not exist !')
+                        else:
+                            customer = Customer.objects.create(
+                                customer_organization_id=customer_organization_object.id,
+                                related_customer_id=identity_organization_object.id,
+                                title=customer_kwargs['title']
+                            )
+                            customer.save()
+        # execute our Query
+        cursor.execute("SELECT * FROM organizations_follow")
+
+        # retrieve the records from the database
+        follow_records = cursor.fetchall()
+
+        follow_last_fields = settings.FOLLOW_BEFORE_FIELD
+        for follow_record in follow_records:
+            print('in follow addition')
+            follow_kwargs = {}
+            for follow_key in follow_last_fields:
+                follow_kwargs[follow_key] = follow_record[follow_key]
+            cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_identity_id'],))
+            identity_follow_records = cursor.fetchall()
+            if len(identity_follow_records) == 0:
+                print('error logged')
+            else:
+                for identity_follow_record in identity_follow_records:
+                    identity_follow_name = identity_follow_record['name']
+                try:
+                    identity_follow_object = Identity.objects.get(name=identity_follow_name)
+                except Identity.DoesNotExist:
+                    identity_follow_object = False
+                if not identity_follow_object:
+                    print('error logged !!!')
+                    errors_log.append('identity with username=' + identity_follow_name + ' not exist !')
+                else:
+                    cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_identity_id'],))
+                    follow_follower_records = cursor.fetchall()
+                    for follow_follower_record in follow_follower_records:
+                        follow_follower_name = follow_follower_record['name']
+                    try:
+                        follow_follower_object = Identity.objects.get(
+                            name=follow_follower_name)
+                    except Identity.DoesNotExist:
+                        follow_follower_object = False
+                    if not follow_follower_object:
+                        print('error logged !!!')
+                        errors_log.append(
+                            'identity with username=' + follow_follower_name + ' not exist !')
+                    else:
+                        follow = Follow.objects.create(
+                            follow_follower_id=follow_follower_object.id,
+                            follow_identity_id=follow_follower_object.id
+                        )
+                        follow.save()
+        # execute our Query
+        cursor.execute("SELECT * FROM organizations_confirmation")
+
+        # retrieve the records from the database
+        confirmation_records = cursor.fetchall()
+
+        confirmation_last_fields = settings.CONFIRMATION_BEFORE_FIELD
+        for confirmation_record in confirmation_records:
+            print('in confirmation addition')
+            confirmation_kwargs = {}
+            for confirmation_key in confirmation_last_fields:
+                confirmation_kwargs[confirmation_key] = confirmation_record[confirmation_key]
+            cursor.execute("SELECT * FROM user_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_corroborant_id'],))
+            identity_confirmation_corroborant_records = cursor.fetchall()
+            for identity_confirmation_corroborant_record in identity_confirmation_corroborant_records:
+                identity_confirmation_corroborant_name = identity_confirmation_corroborant_record['name']
+            try:
+                identity_confirmation_corroborant_object = Identity.objects.get(name=identity_confirmation_corroborant_name)
+            except Identity.DoesNotExist:
+                identity_confirmation_corroborant_object = False
+            if not identity_confirmation_corroborant_object:
+                print('error logged !!!')
+                errors_log.append('identity with username=' + identity_confirmation_corroborant_name + ' not exist !')
+            else:
+                cursor.execute("SELECT * FROM user_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_confirmed_id'],))
+                confirmation_confirmed_records = cursor.fetchall()
+                for confirmation_confirmed_record in confirmation_confirmed_records:
+                    confirmation_confirmed_name = confirmation_confirmed_record['name']
+                try:
+                    identity_confirmation_confirmed_object = Identity.objects.get(name=confirmation_confirmed_name)
+                except Identity.DoesNotExist:
+                    identity_confirmation_confirmed_object = False
+                if not identity_confirmation_confirmed_object:
+                    print('error logged !!!')
+                    errors_log.append('identity with username=' + identity_confirmation_corroborant_name + ' not exist !')
+                else:
+                    confirmation = Confirmation.objects.create(
+                        confirmation_corroborant_id=identity_confirmation_corroborant_object.id,
+                        confirmation_confirmed_id=identity_confirmation_confirmed_object.id,
+                        title=confirmation_kwargs['title'],
+                        description=confirmation_kwargs['description'],
+                        link=confirmation_kwargs['link'],
+                        confirm_flag=confirmation_kwargs['confirm_flag']
+                    )
+                    confirmation.save()
+        return organization
