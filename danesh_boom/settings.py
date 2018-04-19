@@ -519,3 +519,35 @@ FOLLOW_BEFORE_FIELD = {
     'follow_identity_id': '',
     'follow_follower_id': ''
 }
+
+EXCHANGE_BEFORE_FIELD = {
+    'base_ptr_id': '',
+    'owner_id': '',
+    'name': '',
+    'link': '',
+    'description': '',
+    'exchange_hashtag_id': '',
+    'private': '',
+    'members_count': '',
+    'active_flag': ''
+}
+
+EXCHANGE_IDENTITY_BEFORE_FIELD = {
+    'base_ptr_id': '',
+    'exchange_identity_related_exchange_id': '',
+    'exchange_identity_related_identity_id': '',
+    'join_type': '',
+    'active_flag': ''
+}
+
+HASHTAG_BEFORE_FIELD = {
+    'base_ptr_id': '',
+    'title': '',
+    'related_parent_id': '',
+    'hashtag_base_id': ''
+}
+
+HASHTAG_PARENT_FIELD = {
+    'base_ptr_id': '',
+    'title': ''
+}

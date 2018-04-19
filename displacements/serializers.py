@@ -5,6 +5,8 @@ from rest_framework.serializers import ModelSerializer, ListField
 
 from django.contrib.auth.models import User
 from django.conf import settings
+
+from exchanges.models import Exchange
 from users.models import Profile, Identity
 from organizations.models import Organization, StaffCount, Staff, Ability, Customer, Confirmation, Follow
 from products.models import Product, CategoryField, Category, Price, Comment
@@ -594,3 +596,61 @@ class GetOrganizationDataSerializer(ModelSerializer):
                     )
                     confirmation.save()
         return organization
+
+
+class GetExchangeDataSerializer(ModelSerializer):
+    errors_log = ListField(required=False)
+
+    class Meta:
+        model = Exchange
+        fields = '__all__'
+
+    def create(self, validated_data):
+        conn_string = "host='localhost' dbname='" + settings.LAST_DATABASE_NAME + "' user='" + settings.LAST_DATABASE_USERNAME + "' password='" + settings.LAST_DATABASE_PASSWORD + "'"
+        # print the connection string we will use to connect
+        print("Connecting to database\n	->%s" % conn_string)
+
+        # get a connection, if a connect cannot be made an exception will be raised here
+        conn = psycopg2.connect(conn_string, cursor_factory=DictCursor)
+
+        # conn.cursor will return a cursor object, you can use this cursor to perform queries
+        cursor = conn.cursor()
+
+        # execute our Query
+        cursor.execute("SELECT * FROM exchanges_exchange")
+
+        # retrieve the records from the database
+        exchange_records = cursor.fetchall()
+
+        exchange_before_fields = settings.EXCHANGE_BEFORE_FIELD
+        errors_log = []
+
+        for exchange_record in exchange_records:
+            exchange_kwargs = {}
+            for exchange_key in exchange_before_fields:
+                exchange_kwargs[exchange_key] = exchange_record[exchange_key]
+            cursor.execute("SELECT * FROM users_identity WHERE base_ptr_id=%s", (exchange_kwargs['owner_id'],))
+            exchange_identity_records = cursor.fetchall()
+            if len(exchange_identity_records) == 0:
+                print('error logged !!!')
+                print('identity id = ' + exchange_kwargs['owner_id'] + ' in source data base not found')
+            else:
+                for exchange_identity_record in exchange_identity_records:
+                    exchange_identity_name = exchange_identity_record['name']
+                try:
+                    exchange_identity_object = Identity.objects.get(name=exchange_identity_name)
+                except Identity.DoesNotExist:
+                    exchange_identity_object = False
+                if not exchange_identity_object:
+                    print('error logged !!!')
+                    print('identity name=' + exchange_identity_name + 'not found in target data base')
+                else:
+                    exchange = Exchange.objects.create(
+                        name=exchange_record['name'],
+                        owner_id=exchange_record['owner_id'],
+                        link=exchange_record['link'],
+                        description=exchange_record['description'],
+                        private=exchange_record['private']
+                    )
+                    exchange.save()
+        return exchange
