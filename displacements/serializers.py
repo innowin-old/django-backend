@@ -10,6 +10,7 @@ from exchanges.models import Exchange
 from users.models import Profile, Identity
 from organizations.models import Organization, StaffCount, Staff, Ability, Customer, Confirmation, Follow
 from products.models import Product, CategoryField, Category, Price, Comment
+from base.models import Hashtag, HashtagParent
 
 
 class GetUserDataSerializer(ModelSerializer):
@@ -595,6 +596,9 @@ class GetOrganizationDataSerializer(ModelSerializer):
                         confirm_flag=confirmation_kwargs['confirm_flag']
                     )
                     confirmation.save()
+        organization.errors_log = errors_log
+        cursor.close()
+        conn.close()
         return organization
 
 
@@ -633,7 +637,7 @@ class GetExchangeDataSerializer(ModelSerializer):
             exchange_identity_records = cursor.fetchall()
             if len(exchange_identity_records) == 0:
                 print('error logged !!!')
-                print('identity id = ' + exchange_kwargs['owner_id'] + ' in source data base not found')
+                errors_log.append('identity not found in source data base')
             else:
                 for exchange_identity_record in exchange_identity_records:
                     exchange_identity_name = exchange_identity_record['name']
@@ -643,14 +647,52 @@ class GetExchangeDataSerializer(ModelSerializer):
                     exchange_identity_object = False
                 if not exchange_identity_object:
                     print('error logged !!!')
-                    print('identity name=' + exchange_identity_name + 'not found in target data base')
+                    errors_log.append('identity name=' + exchange_identity_name + 'not found in target data base')
                 else:
+                    print('in exchange addition !!!')
                     exchange = Exchange.objects.create(
                         name=exchange_record['name'],
-                        owner_id=exchange_record['owner_id'],
+                        owner_id=exchange_identity_object.id,
                         link=exchange_record['link'],
                         description=exchange_record['description'],
-                        private=exchange_record['private']
+                        private=exchange_record['private'],
+                        members_count=exchange_kwargs['members_count'],
+                        active_flag=exchange_kwargs['active_flag']
                     )
+                    if exchange_kwargs['exchange_hashtag_id'] is not None or exchange_kwargs['exchange_hashtag_id'] != '':
+                        cursor.execute("SELECT * FROM base_hashtag WHERE base_ptr_id=%s", (exchange_kwargs['exchange_hashtag_id'],))
+                        exchange_hashtag_records = cursor.fetchall()
+                        hashtag_before = settings.HASHTAG_BEFORE_FIELD
+                        if len(exchange_hashtag_records) != 0:
+                            hashtag_kwargs = {}
+                            for exchange_hashtag_record in exchange_hashtag_records:
+                                for hashtag_key in hashtag_before:
+                                    hashtag_kwargs[hashtag_key] = exchange_hashtag_record[hashtag_key]
+                                exchange_hashtag_title = hashtag_kwargs['title']
+                                exchange_hashtag_parent_id = hashtag_kwargs['hashtag_parent_id']
+                            print('in exchange hashtag addtion !!!')
+                            exchange_hashtag_object = Hashtag.objects.create(
+                                title=exchange_hashtag_title,
+                                hashtag_base_id=exchange.id
+                            )
+                            cursor.execute("SELECT * FORM base_hashtag_parent WHERE base_ptr_id=%s", (exchange_hashtag_parent_id,))
+                            exchange_hashtag_parent_records = cursor.fetchall()
+                            hashtag_parent_before = settings.HASHTAG_PARENT_FIELD
+                            if len(exchange_hashtag_parent_records) != 0:
+                                hashtag_parent_kwargs = {}
+                                for exchange_hashtag_parent_record in exchange_hashtag_records:
+                                    for hashtag_parent_key in hashtag_parent_before:
+                                        hashtag_parent_kwargs[hashtag_parent_key] = exchange_hashtag_parent_record[hashtag_parent_key]
+                                    exchange_hashtag_parent_title = hashtag_parent_kwargs['title']
+                                    print('in exchange hahshtag parent addtion')
+                                    exchange_hashtag_parent_object = HashtagParent.objects.create(
+                                        title=exchange_hashtag_parent_title
+                                    )
+                                exchange_hashtag_object.related_parent_id = exchange_hashtag_parent_object.id
+                            exchange_hashtag_object.save()
+                            exchange.exchange_hashtag_id = exchange_hashtag_object.id
                     exchange.save()
+        exchange.errors_log = errors_log
+        cursor.close()
+        conn.close()
         return exchange
