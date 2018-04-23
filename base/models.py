@@ -90,26 +90,24 @@ class Post(Base):
     )
     post_type = models.CharField(choices=POST_TYPES, default='post', max_length=10, help_text='supply | demand | post')
     post_identity = models.ForeignKey('users.Identity', related_name="identity_posts", on_delete=models.CASCADE,
-                                  help_text='Integer', db_index=True)
+                                      help_text='Integer', db_index=True)
     post_title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     post_description = models.TextField(max_length=300, db_index=True, help_text='String(300)', blank=True, null=True)
     post_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, help_text='Integer', blank=True,
                                      null=True, default=None)
     post_parent = models.ForeignKey(Base, related_name='base_posts', db_index=True, on_delete=models.CASCADE,
                                     help_text='integer')
-    post_product = models.ForeignKey('products.Product', related_name='product_post', db_index=True,
-                                     on_delete=models.SET_NULL, null=True, blank=True, help_text='Integer')
     post_pinned = models.BooleanField(default=False, help_text='Boolean')
     post_promote = UnixTimeStampField(auto_now_add=True, use_numeric=True, help_text='Unix Time Stamp', db_index=True)
 
     objects = BaseManager()
 
     def __str__(self):
-        return self.post_user.name
+        return self.post_identity.name
 
     @property
     def user_username(self):
-        return self.post_user.name
+        return self.post_identity.name
 
 
 # Cache Model Data After Update

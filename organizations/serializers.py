@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from base.serializers import BaseSerializer
 from .models import (
     Organization,
@@ -7,12 +8,15 @@ from .models import (
     Follow,
     Ability,
     Confirmation,
-    Customer
+    Customer,
+    MetaData
 )
 from users.serializers import UserMiniSerializer, IdentityMiniSerializer
+from users.models import Identity
 
 
 class OrganizationSerializer(BaseSerializer):
+
     class Meta:
         model = Organization
         depth = 1
@@ -32,12 +36,47 @@ class OrganizationSerializer(BaseSerializer):
         return organization
 
 
+class MetaDataSerializer(BaseSerializer):
+    class Meta:
+        model = MetaData
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
+class MetaDataField(serializers.Field):
+
+    def to_representation(self, obj):
+        ret = []
+        try:
+            identity = Identity.objects.get(identity_organization_id=obj.id)
+        except Identity.DoesNotExist:
+            return None
+        meta_data = MetaData.objects.filter(meta_identity=identity)
+        if meta_data.count() != 0:
+            for meta_item in meta_data:
+                meta_object = {
+                    'id': meta_item.id,
+                    'meta_type': meta_item.meta_type,
+                    'meta_title': meta_item.meta_title,
+                    'meta_value': meta_item.meta_value
+                }
+                ret.append(meta_object)
+        return ret
+
+    def to_internal_value(self, data):
+        ret = []
+        return ret
+
+
 class OrganizationListViewSerializer(BaseSerializer):
     owner = UserMiniSerializer()
+    meta_data = MetaDataField(source='*', read_only=True)
 
     class Meta:
         model = Organization
-        fields = ['id', 'owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code']
+        fields = ['id', 'owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code', 'meta_data']
 
 
 class StaffCountSerializer(BaseSerializer):

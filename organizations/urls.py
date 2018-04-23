@@ -9,10 +9,12 @@ from .views import (
     FollowViewset,
     AbilityViewset,
     ConfirmationViewset,
-    CustomerViewset
+    CustomerViewset,
+    MetaDataViewSet
 )
 
 router = DefaultRouter()
+router.register(r'meta-data', MetaDataViewSet, 'meta-data')
 router.register(r'staff-counts', StaffCountViewset, 'staff-counts')
 router.register(r'pictures', OrganizationPictureViewset, 'organization-pictures')
 router.register(r'staff', StaffViewset, 'staffs')
