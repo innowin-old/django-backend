@@ -211,3 +211,21 @@ class Customer(Base):
 post_save.connect(update_cache, sender=Customer)
 # Set Child Name
 pre_save.connect(set_child_name, sender=Customer)
+
+
+class MetaData(Base):
+    META_TYPES = (
+        ('phone', 'تولید کننده'),
+        ('social', 'سرمایه گذار'),
+    )
+    meta_type = models.CharField(choices=META_TYPES, max_length=20)
+    meta_title = models.CharField(max_length=20, blank=True, null=True)
+    meta_value = models.CharField(max_length=255, db_index=True)
+    meta_identity = models.ForeignKey('users.Identity', related_name='meta_data', blank=True, null=True,
+                                      db_index=True, on_delete=models.CASCADE, help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=MetaData)
+# Set Child Name
+pre_save.connect(set_child_name, sender=MetaData)

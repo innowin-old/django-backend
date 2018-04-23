@@ -23,7 +23,8 @@ from .models import (
     Follow,
     Ability,
     Confirmation,
-    Customer
+    Customer,
+    MetaData
 )
 
 from .serializers import (
@@ -37,7 +38,8 @@ from .serializers import (
     AbilitySerializer,
     ConfirmationSerializer,
     ConfirmationListViewSerializer,
-    CustomerSerializer
+    CustomerSerializer,
+    MetaDataSerializer
 )
 
 
@@ -431,3 +433,14 @@ class CustomerViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return CustomerSerializer
+
+
+class MetaDataViewSet(BaseModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = MetaData.objects.filter(delete_flag=False)
+        return queryset
+
+    def get_serializer_class(self):
+        return MetaDataSerializer
