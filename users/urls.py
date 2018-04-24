@@ -15,6 +15,7 @@ from .views import (
     IdentityUrlViewset,
     UserArticleViewset,
     UserArticleRisViewset,
+    DeviceViewset,
     login_page,
     logout_page,
     active_user
@@ -22,6 +23,7 @@ from .views import (
 
 
 router = DefaultRouter()
+router.register(r'devices', DeviceViewset, 'devices')
 router.register(r'identities', IdentityViewset, 'identities')
 router.register(r'profiles', ProfileViewset, 'profiles')
 router.register(r'educations', EducationViewset, 'educations')

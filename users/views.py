@@ -1,5 +1,4 @@
 import json
-from os import stat_result
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -29,7 +28,8 @@ from .models import (
     Skill,
     Badge,
     IdentityUrl,
-    UserArticle
+    UserArticle,
+    Device
 )
 
 from .serializers import (
@@ -45,9 +45,10 @@ from .serializers import (
     BadgeSerializer,
     IdentityUrlSerilizer,
     UserArticleListSerializer,
-    UserArticleRisSerializer
+    UserArticleRisSerializer,
+    DeviceSerializer
 )
-from .permissions import IsIdentityOwnerOrReadOnly, IsSuperUserOrReadOnly, IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
+from .permissions import IsIdentityOwnerOrReadOnly, IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
 
 
 class UserViewset(ModelViewSet):
@@ -313,6 +314,17 @@ class UserArticleRisViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return UserArticleRisSerializer
+
+
+class DeviceViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Device.objects.filter(delete_flag=False)
+        return queryset
+
+    def get_serializer_class(self):
+        return DeviceSerializer
 
 
 def login_page(request):

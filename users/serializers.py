@@ -3,10 +3,9 @@ import json
 import base64
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
-from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, CharField, FileField, EmailField, IntegerField, ListField, \
-    URLField, BooleanField
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
@@ -21,7 +20,8 @@ from .models import (
     Skill,
     Badge,
     IdentityUrl,
-    UserArticle
+    UserArticle,
+    Device
 )
 
 
@@ -539,3 +539,20 @@ class UserArticleRisSerializer(BaseSerializer):
         doi_media['publishers'] = publishers_array
         article = UserArticle.objects.create(**validated_data, doi_meta=doi_media, doi_link='http://doi.org/')
         return article
+
+
+class DeviceSerializer(BaseSerializer):
+    class Meta:
+        model = Device
+        fields = '__all__'
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'device_user': {'required': False, 'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = get_object_or_404(User, pk=request.user.id)
+        device = Device.objects.create(device_user=user, **validated_data)
+        device.save()
+        return device

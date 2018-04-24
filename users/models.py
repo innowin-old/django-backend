@@ -370,3 +370,33 @@ class Agent(Base):
 post_save.connect(update_cache, sender=Agent)
 # Set Child Name
 pre_save.connect(set_child_name, sender=Agent)
+
+
+class Device(Base):
+    device_user = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE, help_text='Integer')
+    fingerprint = models.CharField(max_length=50)
+    browser_name = models.CharField(max_length=20, blank=True, null=True)
+    browser_version = models.CharField(max_length=30, blank=True, null=True)
+    browser_major_version = models.SmallIntegerField(blank=True, null=True)
+    browser_engine = models.CharField(max_length=20, blank=True, null=True)
+    browser_engine_version = models.CharField(max_length=30, blank=True, null=True)
+    browser_plugins = models.CharField(max_length=255, blank=True, null=True)
+    browser_canvas_print = models.BooleanField(default=False)
+    device_os = models.CharField(max_length=20, blank=True, null=True)
+    device_os_version = models.CharField(max_length=30, blank=True, null=True)
+    device_type = models.CharField(max_length=10, blank=True, null=True)
+    device_vendor = models.CharField(max_length=20, blank=True, null=True)
+    device_cpu = models.CharField(max_length=10, blank=True, null=True)
+    device_current_screen_resolution = models.CharField(max_length=12, blank=True, null=True)
+    device_available_screen_resolution = models.CharField(max_length=12, blank=True, null=True)
+    device_agent = models.CharField(max_length=255, blank=True, null=True)
+    device_color_depth = models.SmallIntegerField(blank=True, null=True)
+    device_xdpi = models.SmallIntegerField(blank=True, null=True)
+    device_ydpi = models.SmallIntegerField(blank=True, null=True)
+    device_local_storage = models.BooleanField(default=False)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Device)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Device)
