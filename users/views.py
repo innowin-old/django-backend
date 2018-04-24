@@ -157,9 +157,29 @@ class IdentityViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Identity.objects.all()
 
-        '''identity_user = self.request.query_params.get('identity_user')
-        if identity_user is not None:
-            queryset = queryset.filter(identity_user_id=identity_user)'''
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name=name)
+
+        accepted = self.request.query_params.get('accepted')
+        if accepted is not None:
+            queryset = queryset.filter(accepted=accepted)
+
+        user_id = self.request.query_params.get('identity_user')
+        if user_id is not None:
+            queryset = queryset.filter(identity_user_id=user_id)
+
+        user_username = self.request.query_params.get('identity_user_username')
+        if user_username is not None:
+            queryset = queryset.filter(identity_user__username=user_username)
+
+        organization_id = self.request.query_params.get('identity_organization')
+        if organization_id is not None:
+            queryset = queryset.filter(identity_organization_id=organization_id)
+
+        organization_username = self.request.query_params.get('identity_organization_username')
+        if organization_username is not None:
+            queryset = queryset.filter(identity_organization__username=organization_username)
 
         return queryset
 
