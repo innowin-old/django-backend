@@ -127,7 +127,9 @@ class Profile(Base):
     )
     is_plus_user = models.BooleanField(default=False)
     google_plus_address = models.CharField(max_length=255, blank=True, null=True)
-    google_plus_image = models.CharField(max_length=255, blank=True, null=True)
+    social_image_url = models.CharField(max_length=255, blank=True, null=True)
+    linkedin_headline = models.CharField(max_length=255, blank=True, null=True)
+    linkedin_positions = models.TextField(blank=True, null=True)
 
     objects = BaseManager()
 

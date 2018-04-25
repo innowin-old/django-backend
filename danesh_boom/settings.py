@@ -260,13 +260,14 @@ SOCIAL_AUTH_LINKEDIN_OAUTH2_REDIRECT_URI = CONFIG.get('SOCIAL_AUTH_LINKEDIN_OAUT
 # Add email to requested authorizations.
 SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress']
 # Add the fields so they will be requested from linkedin.
-SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address', 'headline', 'industry']
+SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address', 'headline', 'industry', 'picture-url', 'positions']
 # Arrange to add the fields to UserSocialAuth.extra_data
 SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA = [('id', 'id'),
                                           ('firstName', 'first_name'),
                                           ('lastName', 'last_name'),
                                           ('emailAddress', 'email_address'),
                                           ('headline', 'headline'),
+                                          ('pictureUrl', 'picture_url'),
                                           ('industry', 'industry')]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
@@ -290,7 +291,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
     'danesh_boom.pipeline.log',
-    'danesh_boom.pipeline.google.google_pipe'
+    'danesh_boom.pipeline.google.google_pipe',
+    'danesh_boom.pipeline.linkedin.linkedin_pipe'
 )
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
