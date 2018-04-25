@@ -40,7 +40,6 @@ LOCAL_SOCIAL_AUTH_PIPELINE = [
     'social_core.pipeline.social_auth.load_extra_data',
 
     # Update the user record with any changed info from the auth service.
-    'social_core.pipeline.user.user_details',
-    'danesh_boom.pipeline.log'
+    'social_core.pipeline.user.user_details'
 ]
 

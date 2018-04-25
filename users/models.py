@@ -99,6 +99,10 @@ def create_profile(sender, instance, created, **kwargs):
 
 
 class Profile(Base):
+    GENDER = (
+        ('male', 'مرد'),
+        ('female', 'زن')
+    )
     profile_user = models.OneToOneField(User, related_name="profile",
                                         on_delete=models.CASCADE, help_text='Integer')
     public_email = models.EmailField(null=True, blank=True, help_text='Email')
@@ -115,6 +119,15 @@ class Profile(Base):
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text')
+    gender = models.CharField(
+        choices=GENDER,
+        max_length=7,
+        default='Male',
+        help_text='Male | Female'
+    )
+    is_plus_user = models.BooleanField(default=False)
+    google_plus_address = models.CharField(max_length=255, blank=True, null=True)
+    google_plus_image = models.CharField(max_length=255, blank=True, null=True)
 
     objects = BaseManager()
 
