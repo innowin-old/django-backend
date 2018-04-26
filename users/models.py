@@ -130,6 +130,7 @@ class Profile(Base):
     social_image_url = models.CharField(max_length=255, blank=True, null=True)
     linkedin_headline = models.CharField(max_length=255, blank=True, null=True)
     linkedin_positions = models.TextField(blank=True, null=True)
+    yahoo_contacts = models.TextField(blank=True, null=True)
 
     objects = BaseManager()
 

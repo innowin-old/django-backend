@@ -276,8 +276,12 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'
 SOCIAL_AUTH_INSTAGRAM_KEY = CONFIG.get('SOCIAL_AUTH_INSTAGRAM_KEY')
 SOCIAL_AUTH_INSTAGRAM_SECRET = CONFIG.get('SOCIAL_AUTH_INSTAGRAM_SECRET')
 
+SOCIAL_AUTH_YAHOO_OAUTH2_SCOPE = ['sdct-r', 'sdps-r']
 SOCIAL_AUTH_YAHOO_OAUTH2_KEY = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_KEY')
 SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = CONFIG.get('SOCIAL_AUTH_YAHOO_OAUTH2_SECRET')
+SOCIAL_AUTH_YAHOO_OAUTH2_EXTRA_DATA = [
+    ('userContacts', 'contact'),
+]
 
 # SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
 SOCIAL_AUTH_PIPELINE = (
@@ -292,7 +296,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
     'danesh_boom.pipeline.log',
     'danesh_boom.pipeline.google.google_pipe',
-    'danesh_boom.pipeline.linkedin.linkedin_pipe'
+    'danesh_boom.pipeline.linkedin.linkedin_pipe',
+    'danesh_boom.pipeline.yahoo.yahoo_pipe'
 )
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
