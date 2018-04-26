@@ -49,9 +49,6 @@ class ExchangeIdentitySerializer(BaseSerializer):
             if 'exchange_identity_related_identity' not in validated_data:
                 identity = Identity.objects.get(identity_user=request.user)
                 validated_data['exchange_identity_related_identity'] = identity
-            else:
-                identity = validated_data['exchange_identity_related_identity']
         exchange_identity = ExchangeIdentity.objects.create(**validated_data)
-        exchange_identity.exchange_identity_related_identity = identity
         exchange_identity.save()
         return exchange_identity
