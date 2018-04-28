@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'exchanges',
     'forms',
     'displacements',
+    'crawler',
     'rest_framework',
     'rest_framework.authtoken',
     'social_django',
