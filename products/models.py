@@ -73,6 +73,7 @@ class Product(Base):
     description = models.CharField(max_length=1000, blank=True, db_index=True, help_text='String(1000)')
     attrs = JSONField(null=True, blank=True, help_text='JSON')
     custom_attrs = JSONField(null=True, blank=True, help_text='JSON')
+    product_user = models.ForeignKey(User, related_name="user_products", on_delete=models.CASCADE, db_index=True, help_text="Integer")
 
     objects = BaseManager()
 

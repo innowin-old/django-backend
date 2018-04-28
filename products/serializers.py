@@ -32,8 +32,16 @@ class ProductSerializer(BaseSerializer):
         model = Product
         fields = '__all__'
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'product_user': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        product = Product.objects.create(**validated_data, product_user=request.user)
+        product.save()
+        return product
+
 
 class ProductListViewSerializer(BaseSerializer):
     product_category = CategorySerializer()

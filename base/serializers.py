@@ -65,7 +65,14 @@ class PostSerializer(BaseSerializer):
         fields = '__all__'
         extra_kwargs = {
             'updated_time': {'read_only': True},
+            'post_user': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        post = Post.objects.create(**validated_data, post_user=request.user)
+        post.save()
+        return post
 
 
 class CertificateSerializer(BaseSerializer):
