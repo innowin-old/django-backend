@@ -45,7 +45,8 @@ urlpatterns = [
     #url(r'^', include('users.urls')),
     url(r'^social-auth/login/', include('rest_social_auth.urls_jwt')),
     # this route is for data displacements
-    url(r'^displacement/', include('displacements.urls', namespace='displacement'))
+    url(r'^displacement/', include('displacements.urls', namespace='displacement')),
+    url(r'^crawler/', include('crawler.urls', namespace='crawler'))
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
