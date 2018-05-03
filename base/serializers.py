@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from django.db.models import Q
 
 from users.models import Identity, Profile
 from .models import (
@@ -53,7 +54,6 @@ class HashtagSerializer(BaseSerializer):
 
     def check_hashtag_profile_strength(self):
         request = self.context.get('request')
-        print(request.user)
         try:
             identity = Identity.objects.filter(identity_user=request.user)
         except Identity.DoesNotExist:
@@ -90,7 +90,33 @@ class PostSerializer(BaseSerializer):
         request = self.context.get('request')
         post = Post.objects.create(**validated_data, post_user=request.user)
         post.save()
+        if post.post_type == 'post':
+            self.check_post_profile_strength()
+        else:
+            self.check_demand_supply_profile_strength()
         return post
+
+    def check_post_profile_strength(self):
+        request = self.context.get('request')
+        posts = Post.objects.filter(post_user=request.user, post_type='post')
+        if posts.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 5
+            profile.save()
+
+    def check_demand_supply_profile_strength(self):
+        request = self.context.get('request')
+        posts = Post.objects.filter(Q(post_user=request.user), Q(post_type='supply') | Q(post_type='demand'))
+        if posts.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 10
+            profile.save()
 
 
 class CertificateSerializer(BaseSerializer):

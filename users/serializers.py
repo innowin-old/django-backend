@@ -309,10 +309,12 @@ class EducationSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if not request.user.is_superuser or 'education_user' not in validated_data:
+        if (request.user.is_superuser and 'education_user' not in validated_data) or request.user.is_superuser:
             validated_data['education_user'] = request.user
-        research = Education.objects.create(**validated_data)
-        return research
+        education = Education.objects.create(**validated_data)
+        education.save()
+        self.check_education_profile_strength()
+        return education
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
@@ -327,6 +329,17 @@ class EducationSerializer(BaseSerializer):
         instance.description = validated_data['description']
         instance.save()
         return instance
+
+    def check_education_profile_strength(self):
+        request = self.context.get('request')
+        educations = Research.objects.filter(education_user=request.user)
+        if educations.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 5
+            profile.save()
 
 
 class ResearchSerializer(BaseSerializer):
@@ -392,14 +405,17 @@ class WorkExperienceSerializer(BaseSerializer):
         model = WorkExperience
         fields = '__all__'
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'work_experience_user': {'required': False}
         }
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if not request.user.is_superuser or 'work_experience_user' not in validated_data:
+        if (request.user.is_superuser and 'work_experience_user' not in validated_data) or not request.user.is_superuser:
             validated_data['work_experience_user'] = request.user
         experience = WorkExperience.objects.create(**validated_data)
+        experience.save()
+        self.check_experience_profile_stregth()
         return experience
 
     def update(self, instance, validated_data):
@@ -414,6 +430,17 @@ class WorkExperienceSerializer(BaseSerializer):
         instance.status = validated_data['status']
         instance.save()
         return instance
+
+    def check_experience_profile_stregth(self):
+        request = self.context.get('request')
+        works = WorkExperience.objects.filter(work_experience_user=request.user)
+        if works.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 5
+            profile.save()
 
 
 class SkillSerializer(BaseSerializer):
@@ -454,9 +481,10 @@ class BadgeSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if not request.user.is_superuser or 'badge_user' not in validated_data:
+        if (request.user.is_superuser and 'badge_user' not in validated_data) or request.user.is_superuser:
             validated_data['badge_user'] = request.user
         badge = Badge.objects.create(**validated_data)
+        badge.save()
         return badge
 
     def update(self, instance, validated_data):
@@ -468,6 +496,17 @@ class BadgeSerializer(BaseSerializer):
         instance.title = validated_data['title']
         instance.save()
         return instance
+
+    def check_badge_profile_strength(self):
+        request = self.context.get('request')
+        badges = Badge.objects.filter(badge_user=request.user)
+        if badges.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 5
+            profile.save()
 
 
 class IdentityUrlSerilizer(BaseSerializer):

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 from .models import (
     Organization,
@@ -12,7 +13,7 @@ from .models import (
     MetaData
 )
 from users.serializers import UserMiniSerializer, IdentityMiniSerializer
-from users.models import Identity
+from users.models import Identity, Profile
 
 
 class OrganizationSerializer(BaseSerializer):
@@ -121,6 +122,24 @@ class FollowSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if (request.user.is_superuser and 'follow_follower' not in validated_data) or not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['follow_follower'] = identity
+        follow = Follow.objects.create(**validated_data)
+        follow.save()
+        self.check_follow_profile_strength(validated_data['follow_follower'])
+        return follow
+
+    def check_follow_profile_strength(self, identity):
+        follows = Follow.objects.filter(follow_follower=identity)
+        if follows.count() == 3:
+            user = User.objects.get(pk=identity.identity_user_id)
+            profile = Profile.objects.get(profile_user=user)
+            profile.profile_strength += 5
+            profile.save()
 
 
 class AbilitySerializer(BaseSerializer):

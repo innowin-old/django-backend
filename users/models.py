@@ -342,9 +342,6 @@ class Badge(Base):
     def __str__(self):
         return "%s(%s)" % (self.badge_user.username, self.badge_user)
 
-    class Meta:
-        unique_together = (('badge_user', 'title'),)
-
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Badge)

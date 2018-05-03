@@ -148,10 +148,11 @@ pre_save.connect(set_child_name, sender=Staff)
 
 
 class Follow(Base):
-    follow_identity = models.ForeignKey('users.Identity', related_name='followers', db_index=True,
+    follow_followed = models.ForeignKey('users.Identity', related_name='followed', db_index=True,
                                         on_delete=models.CASCADE, help_text='Integer')
-    follow_follower = models.ForeignKey('users.Identity', related_name='following', db_index=True,
+    follow_follower = models.ForeignKey('users.Identity', related_name='followers', db_index=True,
                                         on_delete=models.CASCADE, help_text='Integer')
+    follow_accepted = models.BooleanField(default=False)
 
     objects = BaseManager()
 
