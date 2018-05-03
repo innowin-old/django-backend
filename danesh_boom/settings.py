@@ -222,10 +222,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get(
 SOCIAL_AUTH_PIPELINE = LOCAL_SOCIAL_AUTH_PIPELINE
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False'''
 
-
 SOCIAL_AUTH_GITHUB_KEY = '67a98bf8d7882de6ce0f'
 SOCIAL_AUTH_GITHUB_SECRET = '753ee8b506b04f338f1b38234f4f05b30fbd2e4a'
-
 
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
@@ -402,7 +400,7 @@ USERS_BEFORE_FIELDS = {
 PROFILES_BEFORE_FIELDS = {
     'public_email': '',
     'national_code': '',
-    'profile_media_id': '',
+    # 'profile_media_id': '',
     'birth_date': '',
     'web_site': '',
     'phone': '',

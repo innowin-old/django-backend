@@ -59,11 +59,13 @@ class ExchangeIdentity(Base):
         Exchange,
         related_name="identities_exchange",
         help_text='Integer',
+        on_delete=models.CASCADE
     )
     exchange_identity_related_identity = models.ForeignKey(
         Identity,
         related_name="exchanges_identities",
         help_text='Integer',
+        on_delete=models.CASCADE
     )
     join_type = models.CharField(
         choices=JOIN_TYPES,
@@ -74,9 +76,6 @@ class ExchangeIdentity(Base):
     active_flag = models.BooleanField(default=True, help_text='Boolean')
 
     objects = BaseManager()
-
-    class Meta:
-        unique_together = ('exchange_identity_related_exchange', 'exchange_identity_related_identity',)
 
 
 # Cache Model Data After Update

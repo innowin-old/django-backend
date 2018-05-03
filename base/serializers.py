@@ -1,4 +1,6 @@
 from rest_framework.serializers import ModelSerializer
+
+from users.models import Identity, Profile
 from .models import (
     Base,
     HashtagParent,
@@ -35,7 +37,6 @@ class HashtagSerializer(BaseSerializer):
         fields = '__all__'
         extra_kwargs = {
             'related_parent': {'read_only': True},
-            'hashtag_base': {'read_only': True},
             'updated_time': {'read_only': True}
         }
 
@@ -47,7 +48,24 @@ class HashtagSerializer(BaseSerializer):
             parent_instance = HashtagParent.objects.get(title=validated_data['title'])
         instance.related_parent = parent_instance
         instance.save()
+        self.check_hashtag_profile_strength()
         return instance
+
+    def check_hashtag_profile_strength(self):
+        request = self.context.get('request')
+        print(request.user)
+        try:
+            identity = Identity.objects.filter(identity_user=request.user)
+        except Identity.DoesNotExist:
+            return False
+        hashtags = Hashtag.objects.filter(hashtag_base=identity)
+        if hashtags.count() == 3:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                return False
+            profile.profile_strength += 10
+            profile.save()
 
 
 class BaseCommentSerializer(BaseSerializer):

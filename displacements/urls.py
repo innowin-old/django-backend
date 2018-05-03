@@ -9,7 +9,6 @@ router.register(r'exchanges-data', GetExchangeDataViwSet, 'exchanges-data')
 router.register(r'organizations-data', GetOrganizationDataViewSet, 'organizations-data')
 router.register(r'products-data', GetProductDataViewset, 'products-data')
 router.register(r'users-data', GetUserDataViewset, 'users-data')
-router.register(r'products-data', GetProductDataViewset, 'products-data')
 
 urlpatterns = [
     url('^', include(router.urls))
