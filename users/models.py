@@ -131,6 +131,7 @@ class Profile(Base):
     linkedin_headline = models.CharField(max_length=255, blank=True, null=True)
     linkedin_positions = models.TextField(blank=True, null=True)
     yahoo_contacts = models.TextField(blank=True, null=True)
+    profile_strength = models.SmallIntegerField(default=10)
 
     objects = BaseManager()
 

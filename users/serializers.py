@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
+# from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
-from .utils import send_verification_mail
+# from .utils import send_verification_mail
 from .models import (
     Identity,
     Profile,
@@ -53,14 +53,14 @@ class SuperAdminUserSerializer(ModelSerializer):
         profile = Profile.objects.get(profile_user=user)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        profile.save()
+        '''profile.save()
         email = EmailMessage(
             ' تایید حساب کاربری ',
             'https://daneshboom.ir/email/accept?token=123242',
             'amir@localhost',
             [user.email]
         )
-        email.send()
+        email.send()'''
         return user
 
     def update(self, instance, validated_data):
@@ -77,7 +77,7 @@ class SuperAdminUserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
-        send_verification_mail(user=user)
+        # send_verification_mail(user=user)
         return user
 
     def get_user_validated_args(self, **kwargs):
@@ -150,34 +150,63 @@ class UserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
-        email = EmailMessage(
+        if validated_data.get('first_name') is not None and validated_data.get('last_name') is not None:
+            profile.profile_strength += 5
+            profile.save()
+
+        if 'profile_media' in profile_validated_data:
+            profile.profile_strength += 10
+            profile.save()
+        '''email = EmailMessage(
             ' تایید حساب کاربری ',
             'https://daneshboom.ir/email/accept?token=123242',
             'amir@localhost',
             [user.email]
         )
-        email.send()
+        email.send()'''
         return user
 
     def update(self, instance, validated_data):
         user = User.objects.get(pk=instance.id)
+        profile = Profile.objects.get(profile_user=user)
         user_validated_data = self.get_user_validated_args(**validated_data)
+        # check for first name strength rate
+        if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
+            user.first_name = user_validated_data['first_name']
+            if user.first_name is None or user.first_name == '':
+                profile.profile_strength += 5
+        # check for last name strength rate
+        if 'last_name' in user_validated_data and user_validated_data['last_name'] != '':
+            user.last_name = user_validated_data['last_name']
+            if user.last_name is None or user.last_name == '':
+                profile.profile_strength += 5
         for key in user_validated_data:
-            setattr(user, key, validated_data.get(key))
+            if key != 'first_name' and key != 'last_name':
+                setattr(user, key, user_validated_data.get(key))
         if 'password' in validated_data:
             user.set_password(validated_data['password'])
+
         user.save()
 
-        profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
+
+        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and profile_validated_data['profile_media'] is not None:
+            profile.profile_media = profile_validated_data['profile_media']
+            if profile.profile_media == '' or profile.profile_media is None:
+                profile.profile_strength += 10
+
         for key in profile_validated_data:
-            setattr(profile, key, validated_data.get(key))
+            if key != 'profile_media':
+                setattr(profile, key, validated_data.get(key))
+
         profile.save()
-        send_verification_mail(user=user)
+        # send_verification_mail(user=user)
         return user
 
     def get_user_validated_args(self, **kwargs):
-        user_kwargs = {'username': kwargs['username']}
+        user_kwargs = {}
+        if 'username' in kwargs:
+            user_kwargs['username'] = kwargs['username']
         if 'first_name' in kwargs:
             user_kwargs['first_name'] = kwargs['first_name']
         if 'last_name' in kwargs:
@@ -249,6 +278,25 @@ class ProfileSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if not request.user.is_superuser or 'profile_user' not in validated_data:
+            instance.profile_user = request.user
+        else:
+            instance.profile_user = validated_data.get('profile_user', instance.profile_user)
+
+        if 'profile_media' in validated_data and validated_data['profile_media'] != '' and validated_data['profile_media'] is not None:
+            instance.profile_media = validated_data['profile_media']
+            if instance.profile_media == '' or instance.profile_media is None:
+                instance.profile_strength += 10
+
+        for key in validated_data:
+            if key != 'profile_user' and key != 'profile_media':
+                setattr(instance, key, validated_data.get(key))
+
+        instance.save()
+        return instance
 
 
 class EducationSerializer(BaseSerializer):
