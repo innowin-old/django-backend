@@ -1,6 +1,6 @@
 from base.serializers import BaseSerializer
 from .models import Exchange, ExchangeIdentity
-from users.models import Identity, Profile
+from users.models import Identity, Profile, StrengthStates
 
 
 # Create Serializers Here
@@ -61,7 +61,15 @@ class ExchangeIdentitySerializer(BaseSerializer):
     def check_exchange_identity_profile_strength(self, identity):
         request = self.context.get('request')
         exchange_identity = ExchangeIdentity.objects.filter(exchange_identity_related_identity=identity)
-        if exchange_identity.count() == 1:
-            profile = Profile.objects.get(profile_user=request.user)
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.exchange_obtained is False and exchange_identity.count() == 1:
+            try:
+                profile = Profile.objects.get(profile_user=request.user)
+            except Profile.DoesNotExist:
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.exchange_obtained = True

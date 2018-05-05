@@ -13,7 +13,7 @@ from .models import (
     MetaData
 )
 from users.serializers import UserMiniSerializer, IdentityMiniSerializer
-from users.models import Identity, Profile
+from users.models import Identity, Profile, StrengthStates
 
 
 class OrganizationSerializer(BaseSerializer):
@@ -134,12 +134,18 @@ class FollowSerializer(BaseSerializer):
         return follow
 
     def check_follow_profile_strength(self, identity):
+        user = User.objects.get(pk=identity.identity_user_id)
         follows = Follow.objects.filter(follow_follower=identity)
-        if follows.count() == 3:
-            user = User.objects.get(pk=identity.identity_user_id)
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=user)
+        if user_strength.follow_obtained is False and follows.count() == 3:
             profile = Profile.objects.get(profile_user=user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.follow_obtained = True
+            user_strength.save()
 
 
 class AbilitySerializer(BaseSerializer):

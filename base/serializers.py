@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from django.db.models import Q
 
-from users.models import Identity, Profile
+from users.models import Identity, Profile, StrengthStates
 from .models import (
     Base,
     HashtagParent,
@@ -55,17 +55,23 @@ class HashtagSerializer(BaseSerializer):
     def check_hashtag_profile_strength(self):
         request = self.context.get('request')
         try:
-            identity = Identity.objects.filter(identity_user=request.user)
+            identity = Identity.objects.get(identity_user=request.user)
         except Identity.DoesNotExist:
-            return False
+            identity = Identity.objects.create(identity_user=request.user)
         hashtags = Hashtag.objects.filter(hashtag_base=identity)
-        if hashtags.count() == 3:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.hashtags_obtained is False and hashtags.count() == 3:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
                 return False
             profile.profile_strength += 10
             profile.save()
+            user_strength.hashtags_obtained = True
+            user_strength.save()
 
 
 class BaseCommentSerializer(BaseSerializer):
@@ -99,24 +105,36 @@ class PostSerializer(BaseSerializer):
     def check_post_profile_strength(self):
         request = self.context.get('request')
         posts = Post.objects.filter(post_user=request.user, post_type='post')
-        if posts.count() == 1:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.post_obtained is False and posts.count() == 1:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
-                return False
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.post_obtained = True
+            user_strength.save()
 
     def check_demand_supply_profile_strength(self):
         request = self.context.get('request')
         posts = Post.objects.filter(Q(post_user=request.user), Q(post_type='supply') | Q(post_type='demand'))
-        if posts.count() == 1:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.supply_demand_obtained is False and posts.count() == 1:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
-                return False
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 10
             profile.save()
+            user_strength.supply_demand_obtained = True
+            user_strength.save()
 
 
 class CertificateSerializer(BaseSerializer):

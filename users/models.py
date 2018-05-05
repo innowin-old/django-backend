@@ -414,3 +414,28 @@ class Device(Base):
 post_save.connect(update_cache, sender=Device)
 # Set Child Name
 pre_save.connect(set_child_name, sender=Device)
+
+
+@receiver(post_save, sender=User)
+def create_strength(sender, instance, created, **kwargs):
+    if created:
+        StrengthStates.objects.create(strength_user=instance)
+
+
+class StrengthStates(Base):
+    strength_user = models.OneToOneField(User, related_name='strength', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    registration_obtained = models.BooleanField(default=False)
+    profile_media_obtained = models.BooleanField(default=False)
+    first_last_name_obtained = models.BooleanField(default=False)
+    hashtags_obtained = models.BooleanField(default=False)
+    exchange_obtained = models.BooleanField(default=False)
+    follow_obtained = models.BooleanField(default=False)
+    post_obtained = models.BooleanField(default=False)
+    supply_demand_obtained = models.BooleanField(default=False)
+    certificate_obtained = models.BooleanField(default=False)
+    badge_obtained = models.BooleanField(default=False)
+    mobile_verification_obtained = models.BooleanField(default=False)
+    email_verification_obtained = models.BooleanField(default=False)
+    education_obtained = models.BooleanField(default=False)
+    brought_obtained = models.BooleanField(default=False)
+    work_obtained = models.BooleanField(default=False)

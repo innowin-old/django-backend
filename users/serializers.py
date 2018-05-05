@@ -21,7 +21,8 @@ from .models import (
     Badge,
     IdentityUrl,
     UserArticle,
-    Device
+    Device,
+    StrengthStates
 )
 
 
@@ -53,30 +54,63 @@ class SuperAdminUserSerializer(ModelSerializer):
         profile = Profile.objects.get(profile_user=user)
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
-        '''profile.save()
-        email = EmailMessage(
-            ' تایید حساب کاربری ',
-            'https://daneshboom.ir/email/accept?token=123242',
-            'amir@localhost',
-            [user.email]
-        )
-        email.send()'''
+        user_strength = StrengthStates.objects.get(strength_user=user)
+        if validated_data.get('first_name') is not None and validated_data.get('last_name') is not None:
+            profile.profile_strength += 5
+            profile.save()
+            user_strength.first_last_name_obtained = True
+
+        if 'profile_media' in profile_validated_data:
+            profile.profile_strength += 10
+            profile.save()
+            user_strength.profile_media_obtained = True
+        user_strength.registration_obtained = True
+        user_strength.save()
         return user
 
     def update(self, instance, validated_data):
         user = User.objects.get(pk=instance.id)
+        profile = Profile.objects.get(profile_user=user)
         user_validated_data = self.get_user_validated_args(**validated_data)
+        try:
+            user_strength = StrengthStates.objects.get(user_strength=user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(user_strength=user)
+        # check for first name strength rate
+        if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
+            user.first_name = user_validated_data['first_name']
+            if (user.first_name is None or user.first_name == '') and (
+                    user.last_name is not None or user.last_name != ''):
+                profile.profile_strength += 5
+                user_strength.first_last_name_obtained = True
+        # check for last name strength rate
+        if 'last_name' in user_validated_data and user_validated_data['last_name'] != '':
+            user.last_name = user_validated_data['last_name']
+            if (user.last_name is None or user.last_name == '') and (
+                    user.first_name is not None or user.first_name != ''):
+                profile.profile_strength += 5
+                user_strength.first_last_name_obtained = True
         for key in user_validated_data:
-            setattr(user, key, validated_data.get(key))
+            if key != 'first_name' and key != 'last_name':
+                setattr(user, key, user_validated_data.get(key))
         if 'password' in validated_data:
             user.set_password(validated_data['password'])
         user.save()
 
-        profile = Profile.objects.get(profile_user=user)
         profile_validated_data = self.get_profile_validated_data(**validated_data)
+
+        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and profile_validated_data['profile_media'] is not None:
+            profile.profile_media = profile_validated_data['profile_media']
+            if profile.profile_media == '' or profile.profile_media is None:
+                profile.profile_strength += 10
+                user_strength.profile_media_obtained = True
+
         for key in profile_validated_data:
-            setattr(profile, key, validated_data.get(key))
+            if key != 'profile_media':
+                setattr(profile, key, validated_data.get(key))
+
         profile.save()
+        user_strength.save()
         # send_verification_mail(user=user)
         return user
 
@@ -150,36 +184,40 @@ class UserSerializer(ModelSerializer):
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
+        user_strength = StrengthStates.objects.get(strength_user=user)
         if validated_data.get('first_name') is not None and validated_data.get('last_name') is not None:
             profile.profile_strength += 5
             profile.save()
+            user_strength.first_last_name_obtained = True
 
         if 'profile_media' in profile_validated_data:
             profile.profile_strength += 10
             profile.save()
-        '''email = EmailMessage(
-            ' تایید حساب کاربری ',
-            'https://daneshboom.ir/email/accept?token=123242',
-            'amir@localhost',
-            [user.email]
-        )
-        email.send()'''
+            user_strength.profile_media_obtained = True
+        user_strength.registration_obtained = True
+        user_strength.save()
         return user
 
     def update(self, instance, validated_data):
         user = User.objects.get(pk=instance.id)
         profile = Profile.objects.get(profile_user=user)
         user_validated_data = self.get_user_validated_args(**validated_data)
+        try:
+            user_strength = StrengthStates.objects.get(user_strength=user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(user_strength=user)
         # check for first name strength rate
         if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
             user.first_name = user_validated_data['first_name']
-            if user.first_name is None or user.first_name == '':
+            if (user.first_name is None or user.first_name == '') and (user.last_name is not None or user.last_name != ''):
                 profile.profile_strength += 5
+                user_strength.first_last_name_obtained = True
         # check for last name strength rate
         if 'last_name' in user_validated_data and user_validated_data['last_name'] != '':
             user.last_name = user_validated_data['last_name']
-            if user.last_name is None or user.last_name == '':
+            if (user.last_name is None or user.last_name == '') and (user.first_name is not None or user.first_name != ''):
                 profile.profile_strength += 5
+                user_strength.first_last_name_obtained = True
         for key in user_validated_data:
             if key != 'first_name' and key != 'last_name':
                 setattr(user, key, user_validated_data.get(key))
@@ -194,12 +232,14 @@ class UserSerializer(ModelSerializer):
             profile.profile_media = profile_validated_data['profile_media']
             if profile.profile_media == '' or profile.profile_media is None:
                 profile.profile_strength += 10
+                user_strength.profile_media_obtained = True
 
         for key in profile_validated_data:
             if key != 'profile_media':
                 setattr(profile, key, validated_data.get(key))
 
         profile.save()
+        user_strength.save()
         # send_verification_mail(user=user)
         return user
 
@@ -289,7 +329,12 @@ class ProfileSerializer(BaseSerializer):
         if 'profile_media' in validated_data and validated_data['profile_media'] != '' and validated_data['profile_media'] is not None:
             instance.profile_media = validated_data['profile_media']
             if instance.profile_media == '' or instance.profile_media is None:
+                try:
+                    user_strength = StrengthStates.objects.get(user_strength=instance.profile_user)
+                except StrengthStates.DoesNotExist:
+                    user_strength = StrengthStates.objects.create(user_strength=instance.profile_user)
                 instance.profile_strength += 10
+                user_strength.profile_media_obtained = True
 
         for key in validated_data:
             if key != 'profile_user' and key != 'profile_media':
@@ -333,13 +378,19 @@ class EducationSerializer(BaseSerializer):
     def check_education_profile_strength(self):
         request = self.context.get('request')
         educations = Research.objects.filter(education_user=request.user)
-        if educations.count() == 1:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if educations.count() == 1 and user_strength.education_obtained is False:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
-                return False
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.education_obtained = True
+            user_strength.save()
 
 
 class ResearchSerializer(BaseSerializer):
@@ -434,13 +485,19 @@ class WorkExperienceSerializer(BaseSerializer):
     def check_experience_profile_stregth(self):
         request = self.context.get('request')
         works = WorkExperience.objects.filter(work_experience_user=request.user)
-        if works.count() == 1:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.work_obtained is False and works.count() == 1:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
-                return False
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.work_obtained = True
+            user_strength.save()
 
 
 class SkillSerializer(BaseSerializer):
@@ -500,13 +557,19 @@ class BadgeSerializer(BaseSerializer):
     def check_badge_profile_strength(self):
         request = self.context.get('request')
         badges = Badge.objects.filter(badge_user=request.user)
-        if badges.count() == 1:
+        try:
+            user_strength = StrengthStates.objects.get(strength_user=request.user)
+        except StrengthStates.DoesNotExist:
+            user_strength = StrengthStates.objects.create(strength_user=request.user)
+        if user_strength.badge_obtained is False and badges.count() == 1:
             try:
                 profile = Profile.objects.get(profile_user=request.user)
             except Profile.DoesNotExist:
-                return False
+                profile = Profile.objects.create(profile_user=request.user)
             profile.profile_strength += 5
             profile.save()
+            user_strength.badge_obtained = True
+            user_strength.save()
 
 
 class IdentityUrlSerilizer(BaseSerializer):
