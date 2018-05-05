@@ -90,6 +90,7 @@ class Post(Base):
     )
     post_type = models.CharField(choices=POST_TYPES, default='post', max_length=10, help_text='supply | demand | post')
     post_user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
+    post_identity = models.ForeignKey('users.Identity', related_name="identity_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
     post_title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     post_description = models.TextField(max_length=300, db_index=True, help_text='String(300)', blank=True, null=True)
     post_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, help_text='Integer', blank=True,
