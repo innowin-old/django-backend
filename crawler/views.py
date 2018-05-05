@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import HttpResponse
 
 from crawler.models import Topic
+from .category_lists import VITRINNET_CATEGORIES
 
 
 # Create your views here.
@@ -58,16 +59,16 @@ def export_research_gate_to_excel(request):
 
 
 def crawl_vitrin_net():
+    categories = VITRINNET_CATEGORIES
     with transaction.atomic():
         organizations_entities = []
         print('start crawling ...')
-        response = requests.get('https://vitrinnet.com/c/Food-industry-lines')
-        soup = BeautifulSoup(response.content.decode('utf-8'), 'html.parser')
-        categories = soup.find_all(name='a', attrs={'class': 'brand confirm'})
         # print(categories)
         for category in categories:
             organizations_url = 'https://vitrinnet.com/{0}'.format(category)
             orgaization_response = requests.get(organizations_url)
             organization_soup = BeautifulSoup(orgaization_response.content.decode('utf-8'), 'html.parser')
-        data_resp = requests.post('https://vitrinnet.com/Handler/LoadContactInfo.ashx', data={'BrandId': 6393})
-        print(data_resp.content)
+        '''data_resp = requests.post('https://vitrinnet.com/Handler/LoadContactInfo.ashx', data={'BrandId': 6393})
+        contact_soup = BeautifulSoup(data_resp.content.decode('utf-8'), 'html.parser')
+        contancts = contact_soup.find_all(name='a')
+        print(contancts[0].get_text())'''
