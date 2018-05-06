@@ -10,8 +10,6 @@ from unixtimestampfield.fields import UnixTimeStampField
 
 from .signals import update_cache, set_child_name
 
-from products.models import Product
-
 
 class BaseManager(models.Manager):
     def get_queryset(self):
