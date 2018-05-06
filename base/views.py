@@ -162,6 +162,10 @@ class PostViewSet(BaseModelViewSet):
         if post_identity_name is not None:
             queryset = queryset.filter(post_identity__name__contains=post_identity_name)
 
+        post_related_product = self.request.query_params.get('post_related_product')
+        if post_related_product is not None:
+            queryset = queryset.filter(post_related_product_id=post_related_product)
+
         post_title = self.request.query_params.get('post_title', None)
         if post_title is not None:
             queryset = queryset.filter(post_title__contains=post_title)
