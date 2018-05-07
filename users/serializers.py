@@ -7,9 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
 from django.contrib.auth.models import User
-# from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
-# from .utils import send_verification_mail
 from .models import (
     Identity,
     Profile,

@@ -61,7 +61,6 @@ class UserViewset(ModelViewSet):
             return self.user_queryset()
 
     def get_serializer_class(self):
-        #print(self.request.user.is_superuser)
         if self.request and self.request.user and self.request.user.is_superuser:
             return SuperAdminUserSerializer
         else:

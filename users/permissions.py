@@ -1,6 +1,7 @@
 from rest_framework import permissions
 from .models import Identity
 
+
 class IsIdentityOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == 'GET':
@@ -34,6 +35,6 @@ class IsAuthenticatedOrCreateOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == "POST":
             return True
-        elif request.user:
+        elif request.user.is_authenticated:
             return True
         return False
