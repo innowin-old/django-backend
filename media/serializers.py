@@ -35,3 +35,9 @@ class MediaSeriaizer(ModelSerializer):
             validated_data['file'] = compress_video(validated_data['file'])
         media = Media.objects.create(**validated_data)
         return media
+
+
+class MediaMiniSerializer(ModelSerializer):
+    class Meta:
+        model = Media
+        fields = ['id', 'file', 'info']

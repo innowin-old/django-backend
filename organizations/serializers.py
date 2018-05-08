@@ -17,7 +17,6 @@ from users.models import Identity, Profile, StrengthStates
 
 
 class OrganizationSerializer(BaseSerializer):
-
     class Meta:
         model = Organization
         depth = 1
@@ -77,7 +76,8 @@ class OrganizationListViewSerializer(BaseSerializer):
 
     class Meta:
         model = Organization
-        fields = ['id', 'owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code', 'meta_data']
+        fields = ['id', 'owner', 'admins', 'username', 'email', 'nike_name', 'official_name', 'national_code',
+                  'meta_data']
 
 
 class StaffCountSerializer(BaseSerializer):

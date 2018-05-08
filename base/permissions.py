@@ -80,3 +80,10 @@ class IsAcceptedOrNotAccess(permissions.BasePermission):
         if not identity.accepted:
             return False
         return True
+
+
+class SafeMethodsOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return False

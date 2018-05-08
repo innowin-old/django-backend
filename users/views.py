@@ -17,7 +17,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from base.permissions import BlockPostMethod, IsOwnerOrReadOnly
+from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly
 from .models import (
     Identity,
     Profile,
@@ -37,6 +37,7 @@ from .serializers import (
     UserSerializer,
     IdentitySerializer,
     ProfileSerializer,
+    ProfileListSerializer,
     EducationSerializer,
     ResearchSerializer,
     CertificateSerializer,
@@ -151,11 +152,10 @@ class UserViewset(ModelViewSet):
 
 
 class IdentityViewset(ModelViewSet):
-    owner_field = 'identity_user'
-    permission_classes = [BlockPostMethod, IsIdentityOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsAuthenticated, SafeMethodsOnly]
 
     def get_queryset(self):
-        queryset = Identity.objects.all()
+        queryset = Identity.objects.filter(delete_flag=False)
 
         name = self.request.query_params.get('name')
         if name is not None:
@@ -201,6 +201,8 @@ class ProfileViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.request == 'GET':
+            return ProfileListSerializer
         return ProfileSerializer
 
 
@@ -382,7 +384,7 @@ def active_user(request, token):
             profile = Profile.objects.get(profile_user=user)
         except Profile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        if not identity.mobile_verified and profile.national_code is not nu and user.first_name and user.last_name:
+        if not identity.mobile_verified and profile.national_code is not None and user.first_name and user.last_name:
             identity.accepted = True
         identity.save()
 

@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
 from django.contrib.auth.models import User
-# from django.core.mail import EmailMessage
 from base.serializers import BaseSerializer
-# from .utils import send_verification_mail
+from media.serializers import MediaMiniSerializer
+from organizations.utils import OrganizationListSerializer
 from .models import (
     Identity,
     Profile,
@@ -293,12 +293,12 @@ class UserMiniSerializer(ModelSerializer):
 
 
 class IdentitySerializer(BaseSerializer):
+    identity_user = UserMiniSerializer()
+    identity_organization = OrganizationListSerializer()
+
     class Meta:
         model = Identity
-        fields = '__all__'
-        extra_kwargs = {
-            'updated_time': {'read_only': True}
-        }
+        exclude = ['updated_time', 'child_name', 'delete_flag']
 
 
 class IdentityMiniSerializer(BaseSerializer):
@@ -310,11 +310,9 @@ class IdentityMiniSerializer(BaseSerializer):
 
 
 class ProfileSerializer(BaseSerializer):
-    # image_url = serializers.RelatedField(source='profile_media', read_only=True)
-
     class Meta:
         model = Profile
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -326,15 +324,15 @@ class ProfileSerializer(BaseSerializer):
         else:
             instance.profile_user = validated_data.get('profile_user', instance.profile_user)
 
-        if 'profile_media' in validated_data and validated_data['profile_media'] != '' and validated_data['profile_media'] is not None:
-            instance.profile_media = validated_data['profile_media']
+        if 'profile_media' in validated_data and (validated_data['profile_media'] != '' or validated_data['profile_media'] is not None):
             if instance.profile_media == '' or instance.profile_media is None:
                 try:
-                    user_strength = StrengthStates.objects.get(user_strength=instance.profile_user)
+                    user_strength = StrengthStates.objects.get(strength_user=instance.profile_user)
                 except StrengthStates.DoesNotExist:
-                    user_strength = StrengthStates.objects.create(user_strength=instance.profile_user)
+                    user_strength = StrengthStates.objects.create(strength_user=instance.profile_user)
                 instance.profile_strength += 10
                 user_strength.profile_media_obtained = True
+            instance.profile_media = validated_data['profile_media']
 
         for key in validated_data:
             if key != 'profile_user' and key != 'profile_media':
@@ -342,6 +340,18 @@ class ProfileSerializer(BaseSerializer):
 
         instance.save()
         return instance
+
+
+class ProfileListSerializer(BaseSerializer):
+    profile_user = UserMiniSerializer()
+    profile_media = MediaMiniSerializer()
+
+    class Meta:
+        model = Profile
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
 class EducationSerializer(BaseSerializer):
