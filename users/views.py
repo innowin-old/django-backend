@@ -198,6 +198,38 @@ class ProfileViewset(ModelViewSet):
         if profile_user is not None:
             queryset = queryset.filter(profile_user_id=profile_user)
 
+        public_email = self.request.query_params.get('public_email')
+        if public_email is not None:
+            queryset = queryset.filter(public_email=public_email)
+
+        national_code = self.request.query_params.get('national_code')
+        if national_code is not None:
+            queryset = queryset.filter(national_code=national_code)
+
+        birth_date = self.request.query_params.get('birth_date')
+        if birth_date is not None:
+            queryset = queryset.filter(birth_date=birth_date)
+
+        birth_date = self.request.query_params.get('birth_date')
+        if birth_date is not None:
+            queryset = queryset.filter(birth_date=birth_date)
+
+        fax = self.request.query_params.get('fax')
+        if fax is not None:
+            queryset = queryset.filter(fax=fax)
+
+        telegram_account = self.request.query_params.get('telegram_account')
+        if telegram_account is not None:
+            queryset = queryset.filter(telegram_account=telegram_account)
+
+        gender = self.request.query_params.get('gender')
+        if gender is not None:
+            queryset = queryset.filter(gender=gender)
+
+        is_plus_user = self.request.query_params.get('is_plus_user')
+        if is_plus_user is not None:
+            queryset = queryset.filter(is_plus_user=is_plus_user)
+            
         return queryset
 
     def get_serializer_class(self):
