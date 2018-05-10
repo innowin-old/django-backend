@@ -229,7 +229,7 @@ class ProfileViewset(ModelViewSet):
         is_plus_user = self.request.query_params.get('is_plus_user')
         if is_plus_user is not None:
             queryset = queryset.filter(is_plus_user=is_plus_user)
-            
+
         return queryset
 
     def get_serializer_class(self):
@@ -243,7 +243,30 @@ class EducationViewset(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Education.objects.all()
+        queryset = Education.objects.filter(delete_flag=False)
+        education_user = self.request.query_params.get('education_user')
+        if education_user is not None:
+            queryset = queryset.filter(education_user_id=education_user)
+
+        grade = self.request.query_params.get('grade')
+        if grade is not None:
+            queryset = queryset.filter(grade=grade)
+
+        university = self.request.query_params.get('university')
+        if university is not None:
+            queryset = queryset.filter(university=university)
+
+        field_of_study = self.request.query_params.get('field_of_study')
+        if field_of_study is not None:
+            queryset = queryset.filter(field_of_study=field_of_study)
+
+        from_date = self.request.query_params.get('from_date')
+        if from_date is not None:
+            queryset = queryset.filter(from_date=from_date)
+
+        to_date = self.request.query_params.get('to_date')
+        if to_date is not None:
+            queryset = queryset.filter(to_date=to_date)
         return queryset
 
     def get_serializer_class(self):
@@ -255,11 +278,15 @@ class ResearchViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Research.objects.all()
+        queryset = Research.objects.filter(delete_flag=False)
 
         research_user = self.request.query_params.get('research_user')
         if research_user is not None:
             queryset = queryset.filter(research_user_id=research_user)
+
+        title = self.request.query_params.get('title')
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
@@ -272,11 +299,15 @@ class CertificateViewset(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Certificate.objects.all()
+        queryset = Certificate.objects.filter(delete_flag=False)
 
         certificate_user = self.request.query_params.get('certificate_user')
         if certificate_user is not None:
             queryset = queryset.filter(certificate_user_id=certificate_user)
+
+        title = self.request.query_params.get('title')
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
@@ -289,11 +320,35 @@ class WorkExperienceViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = WorkExperience.objects.all()
+        queryset = WorkExperience.objects.filter(delete_flag=False)
 
         work_experience_user = self.request.query_params.get('work_experience_user')
         if work_experience_user is not None:
             queryset = queryset.filter(work_experience_user_id=work_experience_user)
+
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name__contains=name)
+
+        work_experience_organization = self.request.query_params.get('work_experience_organization')
+        if work_experience_organization is not None:
+            queryset = queryset.filter(work_experience_organization=work_experience_organization)
+
+        position = self.request.query_params.get('position')
+        if position is not None:
+            queryset = queryset.filter(position=position)
+
+        from_date = self.request.query_params.get('from_date')
+        if from_date is not None:
+            queryset = queryset.filter(from_date=from_date)
+
+        to_date = self.request.query_params.get('to_date')
+        if to_date is not None:
+            queryset = queryset.filter(to_date=to_date)
+
+        experience_status = self.request.query_params.get('status')
+        if experience_status is not None:
+            queryset = queryset.filter(status=experience_status)
 
         return queryset
 
@@ -306,11 +361,15 @@ class SkillViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Skill.objects.all()
+        queryset = Skill.objects.filter(delete_flag=False)
 
         skill_user = self.request.query_params.get('skill_user')
         if skill_user is not None:
             queryset = queryset.filter(skill_user_id=skill_user)
+
+        title = self.request.query_params.get('title')
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
@@ -323,11 +382,15 @@ class BadgeViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Badge.objects.all()
+        queryset = Badge.objects.filter(delete_flag=False)
 
         badge_user = self.request.query_params.get('badge_user')
         if badge_user is not None:
             queryset = queryset.filter(badge_user_id=badge_user)
+
+        title = self.request.query_params.get('title')
+        if title is not None:
+            queryset = queryset.filter(title=title)
 
         return queryset
 
@@ -339,7 +402,16 @@ class IdentityUrlViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsUrlOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = IdentityUrl.objects.all()
+        queryset = IdentityUrl.objects.filter(delet_flag=False)
+
+        url = self.request.query_params.get('url')
+        if url is not None:
+            queryset = queryset.filter(url=url)
+
+        identity_url_related_identity = self.request.query_params.get('identity_url_related_identity')
+        if identity_url_related_identity is not None:
+            queryset = queryset.filter(identity_url_related_identity=identity_url_related_identity)
+
         return queryset
 
     def get_serializer_class(self):
@@ -351,7 +423,16 @@ class UserArticleViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = UserArticle.objects.all()
+        queryset = UserArticle.objects.filter(delete_flag=False)
+
+        publisher = self.request.query_params.get('publisher')
+        if publisher is not None:
+            queryset = queryset.filter(publisher=publisher)
+
+        title = self.request.query_params.get('title')
+        if title is not None:
+            queryset = queryset.filter(title=title)
+
         return queryset
 
     def get_serializer_class(self):
@@ -375,6 +456,19 @@ class DeviceViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Device.objects.filter(delete_flag=False)
+
+        device_user = self.request.query_params.get('device_user')
+        if device_user is not None:
+            queryset = queryset.filter(device_user=device_user)
+
+        fingerprint = self.request.query_params.get('fingerprint')
+        if fingerprint is not None:
+            queryset = queryset.filter(fingerprint=fingerprint)
+
+        browser_name = self.request.query_params.get('browser_name')
+        if browser_name is not None:
+            queryset = queryset.filter(browser_name=browser_name)
+
         return queryset
 
     def get_serializer_class(self):
