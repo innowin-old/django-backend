@@ -64,7 +64,7 @@ pre_save.connect(set_child_name, sender=CategoryField)
 class Product(Base):
     product_owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE,
                                       db_index=True, help_text='Integer')
-    product_category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE, db_index=True,
+    product_category = models.ForeignKey(Category, related_name="category_products", on_delete=models.CASCADE, db_index=True,
                                          help_text='Integer')
     name = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     country = models.CharField(max_length=50, db_index=True, help_text='String(50)')

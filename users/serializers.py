@@ -8,6 +8,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
+
+from media.serializers import MediaMiniSerializer
+from organizations.utils import OrganizationListSerializer
 from .models import (
     Identity,
     Profile,
@@ -291,12 +294,12 @@ class UserMiniSerializer(ModelSerializer):
 
 
 class IdentitySerializer(BaseSerializer):
+    identity_user = UserMiniSerializer()
+    identity_organization = OrganizationListSerializer()
+
     class Meta:
         model = Identity
-        fields = '__all__'
-        extra_kwargs = {
-            'updated_time': {'read_only': True}
-        }
+        exclude = ['updated_time', 'child_name', 'delete_flag']
 
 
 class IdentityMiniSerializer(BaseSerializer):
@@ -308,11 +311,9 @@ class IdentityMiniSerializer(BaseSerializer):
 
 
 class ProfileSerializer(BaseSerializer):
-    # image_url = serializers.RelatedField(source='profile_media', read_only=True)
-
     class Meta:
         model = Profile
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -324,15 +325,15 @@ class ProfileSerializer(BaseSerializer):
         else:
             instance.profile_user = validated_data.get('profile_user', instance.profile_user)
 
-        if 'profile_media' in validated_data and validated_data['profile_media'] != '' and validated_data['profile_media'] is not None:
-            instance.profile_media = validated_data['profile_media']
+        if 'profile_media' in validated_data and (validated_data['profile_media'] != '' or validated_data['profile_media'] is not None):
             if instance.profile_media == '' or instance.profile_media is None:
                 try:
-                    user_strength = StrengthStates.objects.get(user_strength=instance.profile_user)
+                    user_strength = StrengthStates.objects.get(strength_user=instance.profile_user)
                 except StrengthStates.DoesNotExist:
-                    user_strength = StrengthStates.objects.create(user_strength=instance.profile_user)
+                    user_strength = StrengthStates.objects.create(strength_user=instance.profile_user)
                 instance.profile_strength += 10
                 user_strength.profile_media_obtained = True
+            instance.profile_media = validated_data['profile_media']
 
         for key in validated_data:
             if key != 'profile_user' and key != 'profile_media':
@@ -342,21 +343,34 @@ class ProfileSerializer(BaseSerializer):
         return instance
 
 
-class EducationSerializer(BaseSerializer):
+class ProfileListSerializer(BaseSerializer):
+    profile_user = UserMiniSerializer()
+    profile_media = MediaMiniSerializer()
+
     class Meta:
-        model = Education
-        fields = '__all__'
+        model = Profile
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
 
+
+class EducationSerializer(BaseSerializer):
+    class Meta:
+        model = Education
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'education_user': {'required': False}
+        }
+
     def create(self, validated_data):
         request = self.context.get("request")
-        if (request.user.is_superuser and 'education_user' not in validated_data) or request.user.is_superuser:
+        if not request.user.is_superuser or 'education_user' not in validated_data:
             validated_data['education_user'] = request.user
         education = Education.objects.create(**validated_data)
         education.save()
-        self.check_education_profile_strength()
+        self.check_education_profile_strength(validated_data['education_user'])
         return education
 
     def update(self, instance, validated_data):
@@ -365,26 +379,24 @@ class EducationSerializer(BaseSerializer):
             instance.education_user = request.user
         else:
             instance.education_user = validated_data['education_user']
-        instance.grade = validated_data['grade']
-        instance.university = validated_data['university']
-        instance.field_of_study = validated_data['field_of_study']
-        instance.average = validated_data['average']
-        instance.description = validated_data['description']
+
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
-    def check_education_profile_strength(self):
-        request = self.context.get('request')
-        educations = Research.objects.filter(education_user=request.user)
+    def check_education_profile_strength(self, user):
+        educations = Education.objects.filter(education_user=user)
         try:
-            user_strength = StrengthStates.objects.get(strength_user=request.user)
+            user_strength = StrengthStates.objects.get(strength_user=user)
         except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(strength_user=request.user)
+            user_strength = StrengthStates.objects.create(strength_user=user)
         if educations.count() == 1 and user_strength.education_obtained is False:
             try:
-                profile = Profile.objects.get(profile_user=request.user)
+                profile = Profile.objects.get(profile_user=user)
             except Profile.DoesNotExist:
-                profile = Profile.objects.create(profile_user=request.user)
+                profile = Profile.objects.create(profile_user=user)
             profile.profile_strength += 5
             profile.save()
             user_strength.education_obtained = True
@@ -394,9 +406,10 @@ class EducationSerializer(BaseSerializer):
 class ResearchSerializer(BaseSerializer):
     class Meta:
         model = Research
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'research_user': {'required': False}
         }
 
     def create(self, validated_data):
@@ -412,12 +425,10 @@ class ResearchSerializer(BaseSerializer):
             instance.research_user = request.user
         else:
             instance.research_user = validated_data['research_user']
-        instance.title = validated_data['title']
-        instance.url = validated_data['url']
-        instance.author = validated_data['author']
-        instance.publication = validated_data['publication']
-        instance.year = validated_data['year']
-        instance.page_count = validated_data['page_count']
+
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
@@ -425,9 +436,10 @@ class ResearchSerializer(BaseSerializer):
 class CertificateSerializer(BaseSerializer):
     class Meta:
         model = Certificate
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'certificate_user': {'required': False}
         }
 
     def create(self, validated_data):
@@ -442,9 +454,11 @@ class CertificateSerializer(BaseSerializer):
         if not request.user.is_superuser or 'certificate_user' not in validated_data:
             instance.certificate_user = request.user
         else:
-            instance.certificate_user = validated_data['certificate_user']
-        instance.title = validated_data['title']
-        instance.picture_media = validated_data['picture_media']
+            instance.certificate_user = validated_data.get('certificate_user')
+
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
@@ -452,7 +466,7 @@ class CertificateSerializer(BaseSerializer):
 class WorkExperienceSerializer(BaseSerializer):
     class Meta:
         model = WorkExperience
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
             'work_experience_user': {'required': False}
@@ -460,11 +474,11 @@ class WorkExperienceSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if (request.user.is_superuser and 'work_experience_user' not in validated_data) or not request.user.is_superuser:
+        if not request.user.is_superuser or 'work_experience_user' not in validated_data:
             validated_data['work_experience_user'] = request.user
         experience = WorkExperience.objects.create(**validated_data)
         experience.save()
-        self.check_experience_profile_stregth()
+        self.check_experience_profile_strength(validated_data.get('work_experience_user'))
         return experience
 
     def update(self, instance, validated_data):
@@ -473,25 +487,25 @@ class WorkExperienceSerializer(BaseSerializer):
             instance.work_experience_user = request.user
         else:
             instance.work_experience_user = validated_data['work_experience_user']
-        instance.name = validated_data['name']
-        instance.work_experience_organization = validated_data['work_experience_organization']
-        instance.position = validated_data['position']
-        instance.status = validated_data['status']
+
+        for key in validated_data:
+            if key != 'work_experience_user':
+                setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
-    def check_experience_profile_stregth(self):
-        request = self.context.get('request')
-        works = WorkExperience.objects.filter(work_experience_user=request.user)
+    def check_experience_profile_strength(self, user):
+        works = WorkExperience.objects.filter(work_experience_user=user)
         try:
-            user_strength = StrengthStates.objects.get(strength_user=request.user)
+            user_strength = StrengthStates.objects.get(strength_user=user)
         except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(strength_user=request.user)
+            user_strength = StrengthStates.objects.create(strength_user=user)
         if user_strength.work_obtained is False and works.count() == 1:
             try:
-                profile = Profile.objects.get(profile_user=request.user)
+                profile = Profile.objects.get(profile_user=user)
             except Profile.DoesNotExist:
-                profile = Profile.objects.create(profile_user=request.user)
+                profile = Profile.objects.create(profile_user=user)
             profile.profile_strength += 5
             profile.save()
             user_strength.work_obtained = True
@@ -501,9 +515,10 @@ class WorkExperienceSerializer(BaseSerializer):
 class SkillSerializer(BaseSerializer):
     class Meta:
         model = Skill
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'skill_user': {'required': False}
         }
 
     def create(self, validated_data):
@@ -519,9 +534,10 @@ class SkillSerializer(BaseSerializer):
             instance.skill_user = request.user
         else:
             instance.skill_user = validated_data['skill_user']
-        instance.title = validated_data['title']
-        instance.tag = validated_data['tag']
-        instance.description = validated_data['description']
+
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
@@ -529,17 +545,19 @@ class SkillSerializer(BaseSerializer):
 class BadgeSerializer(BaseSerializer):
     class Meta:
         model = Badge
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'badge_user': {'required': False}
         }
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if (request.user.is_superuser and 'badge_user' not in validated_data) or request.user.is_superuser:
+        if not request.user.is_superuser or 'badge_user' not in validated_data:
             validated_data['badge_user'] = request.user
         badge = Badge.objects.create(**validated_data)
         badge.save()
+        self.check_badge_profile_strength(badge.badge_user)
         return badge
 
     def update(self, instance, validated_data):
@@ -548,22 +566,24 @@ class BadgeSerializer(BaseSerializer):
             instance.badge_user = request.user
         else:
             instance.badge_user = validated_data['badge_user']
-        instance.title = validated_data['title']
+
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+
         instance.save()
         return instance
 
-    def check_badge_profile_strength(self):
-        request = self.context.get('request')
-        badges = Badge.objects.filter(badge_user=request.user)
+    def check_badge_profile_strength(self, user):
+        badges = Badge.objects.filter(badge_user=user)
         try:
-            user_strength = StrengthStates.objects.get(strength_user=request.user)
+            user_strength = StrengthStates.objects.get(strength_user=user)
         except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(strength_user=request.user)
+            user_strength = StrengthStates.objects.create(strength_user=user)
         if user_strength.badge_obtained is False and badges.count() == 1:
             try:
-                profile = Profile.objects.get(profile_user=request.user)
+                profile = Profile.objects.get(profile_user=user)
             except Profile.DoesNotExist:
-                profile = Profile.objects.create(profile_user=request.user)
+                profile = Profile.objects.create(profile_user=user)
             profile.profile_strength += 5
             profile.save()
             user_strength.badge_obtained = True
@@ -573,7 +593,7 @@ class BadgeSerializer(BaseSerializer):
 class IdentityUrlSerilizer(BaseSerializer):
     class Meta:
         model = IdentityUrl
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -692,7 +712,7 @@ class UserArticleRisSerializer(BaseSerializer):
 class DeviceSerializer(BaseSerializer):
     class Meta:
         model = Device
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
             'device_user': {'required': False, 'read_only': True}
