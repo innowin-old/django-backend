@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
-from base.permissions import IsAdminUserOrReadOnly
+from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
+from .permissions import IsPriceProductOwnerOrReadOnly
 
-from .permissions import IsProductOwnerOrReadOnly
 from .models import (
     Category,
     CategoryField,
@@ -29,7 +29,6 @@ from .serializers import (
 
 
 class CategoryViewset(BaseModelViewSet):
-    # queryset = Category.objects.all()
     permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
@@ -41,7 +40,7 @@ class CategoryViewset(BaseModelViewSet):
 
         name = self.request.query_params.get('name', None)
         if name is not None:
-            queryset = queryset.filter(name__contains=name)
+            queryset = queryset.filter(name=name)
 
         title = self.request.query_params.get('title', None)
         if title is not None:
@@ -54,15 +53,11 @@ class CategoryViewset(BaseModelViewSet):
 
 
 class CategoryFieldViewset(BaseModelViewSet):
-    # queryset = CategoryField.objects.all()
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         queryset = CategoryField.objects.filter(delete_flag=False)
 
-        """
-            Category Filter Options
-        """
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
             queryset = queryset.filter(field_category_id=category_id)
@@ -90,16 +85,19 @@ class CategoryFieldViewset(BaseModelViewSet):
 
 
 class ProductViewset(BaseModelViewSet):
-    # queryset = Product.objects.all()
-    # permission_classes = [IsAuthenticated, IsProductOwnerOrReadOnly]
-    permission_classes = [AllowAny]
+    owner_field = 'product_user'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Product.objects.filter(delete_flag=False)
 
         """
-            Owner Filter Options
+            Owner Filter Filters
         """
+        product_user = self.request.query_params.get('product_user', None)
+        if product_user is not None:
+            queryset = queryset.filter(product_user=product_user)
+
         owner_id = self.request.query_params.get('owner_id', None)
         if owner_id is not None:
             queryset = queryset.filter(product_owner_id=owner_id)
@@ -113,7 +111,7 @@ class ProductViewset(BaseModelViewSet):
             queryset = queryset.filter(product_owner__identity_user__username__contains=owner_username)
 
         """
-            Category Filter Options
+            Product Category Filter
         """
         category_id = self.request.query_params.get('category_id', None)
         if category_id is not None:
@@ -163,7 +161,7 @@ class ProductViewset(BaseModelViewSet):
         data = json.loads(jsonString)
         errors = []
         for record in data:
-            try :
+            try:
                 product = Product.objects.create(
                     name=record.get('name', None),
                     country=record.get('country', None),
@@ -187,8 +185,7 @@ class ProductViewset(BaseModelViewSet):
 
 
 class PriceViewset(BaseModelViewSet):
-    # queryset = Price.objects.all()
-    permisison_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsPriceProductOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Price.objects.filter(delete_flag=False)
