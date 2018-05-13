@@ -1,3 +1,4 @@
+import json
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
@@ -5,9 +6,12 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .permissions import IsRollOwnerOrReadOnly, IsRollPermissionOwnerOrReadOnly, IfExchangeIsAcceptedOrNotAccess
-
-import json
+from .permissions import (
+    IsRollOwnerOrReadOnly,
+    IsRollPermissionOwnerOrReadOnly,
+    IfExchangeIsAcceptedOrNotAccess,
+    IsAdminUserOrReadOnly
+)
 
 from .models import (
     Base,
@@ -120,7 +124,7 @@ class HashtagViewset(BaseModelViewSet):
 
 
 class HashtagRelationViewset(BaseModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = HashtagRelation.objects.filter(delete_flag=False)
