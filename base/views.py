@@ -149,7 +149,7 @@ class PostViewSet(BaseModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Post.objects.filter(delete_flag=False)
+        queryset = Post.objects.filter(delete_flag=False).order_by('-id')
 
         post_type = self.request.query_params.get('post_type', None)
         if post_type is not None:
