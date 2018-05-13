@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -165,6 +166,11 @@ class PostViewSet(BaseModelViewSet):
         post_related_product = self.request.query_params.get('post_related_product')
         if post_related_product is not None:
             queryset = queryset.filter(post_related_product_id=post_related_product)
+
+        post_related_product_is_null = self.request.query_params.get('post_related_product_is_null')
+        if post_related_product_is_null is not None and post_related_product_is_null == '0':
+            print('salam')
+            queryset = queryset.filter(~Q(post_related_product_id=None))
 
         post_title = self.request.query_params.get('post_title', None)
         if post_title is not None:
