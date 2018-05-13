@@ -17,7 +17,8 @@ from .models import (
     Post,
     BaseCertificate,
     BaseRoll,
-    RollPermission
+    RollPermission,
+    HashtagRelation
 )
 
 from .serializers import (
@@ -28,7 +29,8 @@ from .serializers import (
     PostSerializer,
     CertificateSerializer,
     RollSerializer,
-    RollPermissionSerializer
+    RollPermissionSerializer,
+    HashtagRelationSerializer
 )
 
 
@@ -115,6 +117,38 @@ class HashtagViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return HashtagSerializer
+
+
+class HashtagRelationViewset(BaseModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = HashtagRelation.objects.filter(delete_flag=False)
+
+        hashtag_first = self.request.query_params.get('hashtag_first')
+        if hashtag_first is not None:
+            queryset = queryset.filter(hashtag_first=hashtag_first)
+
+        hashtag_first_title = self.request.query_params.get('hashtag_first_title')
+        if hashtag_first_title is not None:
+            queryset = queryset.filter(hashtag_first__title=hashtag_first_title)
+
+        hashtag_second = self.request.query_params.get('hashtag_second')
+        if hashtag_second is not None:
+            queryset = queryset.filter(hashtag_second=hashtag_second)
+
+        hashtag_second_title = self.request.query_params.get('hashtag_second_title')
+        if hashtag_second_title is not None:
+            queryset = queryset.filter(hashtag_second__title=hashtag_second_title)
+
+        active = self.request.query_params.get('active')
+        if active is not None:
+            queryset = queryset.filter(active=active)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return HashtagRelationSerializer
 
 
 class BaseCommentViewset(BaseModelViewSet):

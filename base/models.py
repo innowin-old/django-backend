@@ -64,6 +64,23 @@ post_save.connect(update_cache, sender=Hashtag)
 pre_save.connect(set_child_name, sender=Hashtag)
 
 
+class HashtagRelation(Base):
+    hashtag_first = models.ForeignKey(HashtagParent, related_name='hashtag_first_relation', db_index=True,
+                                      on_delete=models.CASCADE, help_text='Integer')
+    hashtag_second = models.ForeignKey(HashtagParent, related_name='hashtag_second_relation', db_index=True,
+                                       on_delete=models.CASCADE, help_text='Integer')
+    active = models.BooleanField(default=True)
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=HashtagRelation)
+# Set Child Name
+pre_save.connect(set_child_name, sender=HashtagRelation)
+
+
+
 class BaseComment(Base):
     comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True, on_delete=models.CASCADE,
                                        help_text='Integer')

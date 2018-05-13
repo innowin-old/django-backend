@@ -10,7 +10,8 @@ from .models import (
     Post,
     BaseCertificate,
     BaseRoll,
-    RollPermission
+    RollPermission,
+    HashtagRelation
 )
 
 
@@ -72,6 +73,15 @@ class HashtagSerializer(BaseSerializer):
             profile.save()
             user_strength.hashtags_obtained = True
             user_strength.save()
+
+
+class HashtagRelationSerializer(BaseSerializer):
+    class Meta:
+        model = HashtagRelation
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
 
 
 class BaseCommentSerializer(BaseSerializer):

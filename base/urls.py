@@ -8,13 +8,15 @@ from .views import (
         BaseCommentViewset,
         PostViewSet,
         RollViewSet,
-        RollPermissionViewSet
+        RollPermissionViewSet,
+        HashtagRelationViewset,
         #CertificateViewSet
     )
 
 
 router = DefaultRouter()
 #router.register(r'certificates', CertificateViewSet, 'certificates')
+router.register(r'hashtag-relations', HashtagRelationViewset, 'Hashtag Relations')
 router.register(r'rolls', RollViewSet, 'Rolls')
 router.register(r'permissions', RollPermissionViewSet, 'Permissions')
 router.register(r'hashtag-parents', HashtagParentViewset, 'Hashtag Parents')
