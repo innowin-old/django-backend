@@ -6,6 +6,10 @@ class Topic(models.Model):
     name = models.CharField(max_length=100)
 
 
+class ResearchGateTopic(models.Model):
+    name = models.CharField(max_length=100)
+
+
 class VitrinOrganization(models.Model):
     internal_link = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)

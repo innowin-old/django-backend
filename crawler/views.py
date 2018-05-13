@@ -5,7 +5,7 @@ import string
 from django.db import transaction
 from django.http import HttpResponse
 
-from crawler.models import Topic, VitrinOrganization
+from crawler.models import Topic, VitrinOrganization, ResearchGateTopic
 from .category_lists import VITRINNET_CATEGORIES
 
 
@@ -18,12 +18,27 @@ def crawl_research_gate():
             print('In page with character {0}'.format(character))
             response = requests.get('https://www.researchgate.net/topics/{0}'.format(character))
             soup = BeautifulSoup(response.content, 'html.parser')
-            topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
-            for topic in topics:
-                topic_entity = Topic(name=topic.get_text())
-                topic_entities.append(topic_entity)
+            pager_container = soup.find(name='div', attrs={'class': 'c-list-navi pager'})
+            if pager_container is not None:
+                pages = pager_container.find_all(name='a')
+                max_page = int(pages[len(pages)-2].get_text())
+                print(max_page)
+                for page_num in range(1, max_page+1):
+                    print('In page ' + str(page_num) + ' with character ' + character)
+                    response = requests.get('https://www.researchgate.net/topics/' + character + '/' + str(page_num))
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
+                    for topic in topics:
+                        topic_entity = ResearchGateTopic(name=topic.get_text())
+                        topic_entities.append(topic_entity)
+            '''else:
+                exit(code=0)
+                topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
+                for topic in topics:
+                    topic_entity = ResearchGateTopic(name=topic.get_text())
+                    topic_entities.append(topic_entity)'''
         print('Adding topics to database :))))))))))')
-        Topic.objects.bulk_create(topic_entities)
+        ResearchGateTopic.objects.bulk_create(topic_entities)
         print('OK !')
 
 
@@ -48,7 +63,7 @@ def export_research_gate_to_excel(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Topic.objects.all().values_list('name')
+    rows = ResearchGateTopic.objects.all().values_list('name')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
