@@ -489,7 +489,8 @@ class WorkExperienceSerializer(BaseSerializer):
             confirmation_confirmed=user_identity,
             title=organization_identity.name,
             description=description,
-            link='https://daneshboom.ir/'
+            link='https://daneshboom.ir/',
+            confirmation_parent=experience
         )
         confirmation.save()
         # check for experience profile points

@@ -187,6 +187,8 @@ class Confirmation(Base):
     description = models.TextField(help_text='Text')
     link = models.CharField(max_length=200, help_text='String(200)')
     confirm_flag = models.BooleanField(default=False, help_text='Boolean')
+    confirmation_parent = models.ForeignKey(Base, related_name='base_confirmation', db_index=True,
+                                            on_delete=models.CASCADE, help_text='Integer')
 
     objects = BaseManager()
 

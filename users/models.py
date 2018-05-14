@@ -264,8 +264,6 @@ class WorkExperience(Base):
         Organization,
         related_name="work_experience_organization",
         on_delete=models.CASCADE,
-        blank=True,
-        null=True,
         help_text='Integer')
     position = models.CharField(max_length=100, blank=True, help_text='String(100)')
     from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')

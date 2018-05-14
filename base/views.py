@@ -79,7 +79,11 @@ class BaseViewset(ModelViewSet):
     permission_classes = ""
 
     def get_queryset(self):
-        return Base.objects.all()
+        queryset = Base.objects.all()
+        child_name = self.request.query_params.get('child_name', None)
+        if child_name is not None:
+            queryset = queryset.filter(child_name=child_name)
+        return queryset
 
     def get_serializer_class(self):
         return BaseSerializer

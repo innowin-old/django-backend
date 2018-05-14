@@ -13,7 +13,7 @@ from .models import (
     MetaData
 )
 from users.serializers import UserMiniSerializer, IdentityMiniSerializer
-from users.models import Identity, Profile, StrengthStates
+from users.models import Identity, Profile, StrengthStates, WorkExperience
 
 
 class OrganizationSerializer(BaseSerializer):
@@ -165,9 +165,23 @@ class ConfirmationSerializer(BaseSerializer):
             'updated_time': {'read_only': True}
         }
 
+    def update(self, instance, validated_data):
+        if 'confirm_flag' in validated_data:
+            experience = WorkExperience.objects.get(pk=instance.confirmation_parent_id)
+            if validated_data.get('confirm_flag') is True:
+                experience.status = "CONFIRMED"
+            else:
+                experience.status = "WITHOUT_CONFIRM"
+            experience.save()
+        for key in validated_data:
+            setattr(instance, key, validated_data.get(key))
+        instance.save()
+        return instance
+
 
 class ConfirmationListViewSerializer(BaseSerializer):
     confirmation_corroborant = IdentityMiniSerializer()
+    confirmation_confirmed = IdentityMiniSerializer()
 
     class Meta:
         model = Confirmation

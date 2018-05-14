@@ -80,7 +80,6 @@ post_save.connect(update_cache, sender=HashtagRelation)
 pre_save.connect(set_child_name, sender=HashtagRelation)
 
 
-
 class BaseComment(Base):
     comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True, on_delete=models.CASCADE,
                                        help_text='Integer')

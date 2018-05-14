@@ -7,5 +7,4 @@ def update_cache(sender, instance, **kwargs):
 
 
 def set_child_name(sender, instance, **kwargs):
-    print(instance._meta.model_name)
     instance.child_name = instance._meta.model_name
