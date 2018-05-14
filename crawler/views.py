@@ -6,7 +6,7 @@ from django.db import transaction
 from django.http import HttpResponse
 
 from crawler.models import Topic, VitrinOrganization, ResearchGateTopic
-from .category_lists import VITRINNET_CATEGORIES
+from .category_lists import VITRINNET_CATEGORIES, RESEARCH_GATE_CHARACTER_BLACK_LIST
 
 
 # Create your views here.

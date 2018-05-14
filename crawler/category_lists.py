@@ -7,3 +7,11 @@ VITRINNET_CATEGORIES = [
     'chemichal', 'color-industry', 'printing-industry', 'medical', 'electricity', 'Metal-Processing-Industries', 'Livestock-and-poultry-industries',
     'other-industrial-machinery-and-equipments', 'car', 'Industrial-cleaning', 'oil-and-gas-industry'
 ]
+
+RESEARCH_GATE_CHARACTER_BLACK_LIST = {
+    'A': 22,
+    'B': 13,
+    'C': 31,
+    'D': 13,
+    'E': 6
+}
