@@ -11,6 +11,7 @@ from base.serializers import BaseSerializer
 
 from media.serializers import MediaMiniSerializer
 from organizations.utils import OrganizationListSerializer
+from organizations.models import Confirmation
 from .models import (
     Identity,
     Profile,
@@ -469,6 +470,7 @@ class WorkExperienceSerializer(BaseSerializer):
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
+            'status': {'read_only': True},
             'work_experience_user': {'required': False}
         }
 
@@ -478,6 +480,19 @@ class WorkExperienceSerializer(BaseSerializer):
             validated_data['work_experience_user'] = request.user
         experience = WorkExperience.objects.create(**validated_data)
         experience.save()
+        # create confirmation object
+        organization_identity = Identity.objects.get(identity_organization=experience.work_experience_organization)
+        user_identity = Identity.objects.get(identity_user=experience.work_experience_user)
+        description = experience.work_experience_user.username + ' - ' + experience.work_experience_organization.official_name
+        confirmation = Confirmation.objects.create(
+            confirmation_corroborant=organization_identity,
+            confirmation_confirmed=user_identity,
+            title=organization_identity.name,
+            description=description,
+            link='https://daneshboom.ir/'
+        )
+        confirmation.save()
+        # check for experience profile points
         self.check_experience_profile_strength(validated_data.get('work_experience_user'))
         return experience
 
