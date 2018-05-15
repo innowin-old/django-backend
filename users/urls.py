@@ -16,6 +16,7 @@ from .views import (
     UserArticleViewset,
     UserArticleRisViewset,
     DeviceViewset,
+    ForgetPasswordViewset,
     login_page,
     logout_page,
     active_user
@@ -23,6 +24,7 @@ from .views import (
 
 
 router = DefaultRouter()
+router.register(r'forget-password', ForgetPasswordViewset, 'forget-password')
 router.register(r'devices', DeviceViewset, 'devices')
 router.register(r'identities', IdentityViewset, 'identities')
 router.register(r'profiles', ProfileViewset, 'profiles')

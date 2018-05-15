@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField, Serializer
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 
@@ -740,3 +740,8 @@ class DeviceSerializer(BaseSerializer):
         device = Device.objects.create(device_user=user, **validated_data)
         device.save()
         return device
+
+
+class ForgetPasswordSerializer(Serializer):
+    mobile = CharField(required=False, max_length=20)
+    email = EmailField(required=False)

@@ -5,16 +5,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from rest_framework import status
 
 from utils.token import validate_token
+from utils.number_generator import random_with_N_digits
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ViewSet
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly
@@ -47,7 +49,8 @@ from .serializers import (
     IdentityUrlSerilizer,
     UserArticleListSerializer,
     UserArticleRisSerializer,
-    DeviceSerializer
+    DeviceSerializer,
+    ForgetPasswordSerializer
 )
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
 
@@ -148,6 +151,38 @@ class UserViewset(ModelViewSet):
             'errors': errors
         }
         return Response(response)
+
+
+class ForgetPasswordViewset(ViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        forget_password_serializer = ForgetPasswordSerializer(data=request.POST)
+        if forget_password_serializer.is_valid():
+            send_sms = False
+            if 'email' in forget_password_serializer.validated_data:
+                try:
+                    user = User.objects.get(email=forget_password_serializer.validated_data['email'])
+                except User.DoesNotExist:
+                    return Response(status=status.HTTP_404_NOT_FOUND, data='Not Found')
+            elif 'mobile' in forget_password_serializer.validated_data:
+                send_sms = True
+                try:
+                    profile = Profile.objects.get(mobile__in=forget_password_serializer.validated_data['mobile'])
+                except Profile.DoesNotExist:
+                    return Response(status=status.HTTP_404_NOT_FOUND, data='Not Found')
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
+            random_number = random_with_N_digits(5)
+            if send_sms is True:
+                print('sms')
+                # send random number via sms
+            else:
+                print('email')
+                # send random number via email
+            return Response(status=status.HTTP_200_OK, data='Code Send')
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
 
 
 class IdentityViewset(ModelViewSet):
