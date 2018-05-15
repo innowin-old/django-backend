@@ -15,6 +15,7 @@ def crawl_research_gate():
         topic_entities = []
         characters = list(string.ascii_uppercase)
         for character in characters:
+            check_flag = True
             print('In page with character {0}'.format(character))
             response = requests.get('https://www.researchgate.net/topics/{0}'.format(character))
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -24,13 +25,20 @@ def crawl_research_gate():
                 max_page = int(pages[len(pages)-2].get_text())
                 print(max_page)
                 for page_num in range(1, max_page+1):
-                    print('In page ' + str(page_num) + ' with character ' + character)
-                    response = requests.get('https://www.researchgate.net/topics/' + character + '/' + str(page_num))
-                    soup = BeautifulSoup(response.content, 'html.parser')
-                    topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
-                    for topic in topics:
-                        topic_entity = ResearchGateTopic(name=topic.get_text())
-                        topic_entities.append(topic_entity)
+                    if character in RESEARCH_GATE_CHARACTER_BLACK_LIST.keys():
+                        if page_num <= RESEARCH_GATE_CHARACTER_BLACK_LIST[character]:
+                            check_flag = False
+                            print('page ' + str(page_num) + ' with character ' + character + ' not checked')
+                        else:
+                            check_flag = True
+                    if check_flag:
+                        print('In page ' + str(page_num) + ' with character ' + character)
+                        response = requests.get('https://www.researchgate.net/topics/' + character + '/' + str(page_num))
+                        soup = BeautifulSoup(response.content, 'html.parser')
+                        topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
+                        for topic in topics:
+                            topic_entity = ResearchGateTopic(name=topic.get_text())
+                            topic_entities.append(topic_entity)
             '''else:
                 exit(code=0)
                 topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
