@@ -5,7 +5,16 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from rest_framework.serializers import ModelSerializer, CharField, EmailField, IntegerField, ListField, URLField, Serializer
+from rest_framework.serializers import (
+    ModelSerializer,
+    CharField,
+    EmailField,
+    IntegerField,
+    ListField,
+    URLField,
+    Serializer,
+    ValidationError
+)
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
 
@@ -24,7 +33,8 @@ from .models import (
     IdentityUrl,
     UserArticle,
     Device,
-    StrengthStates
+    StrengthStates,
+    UserMetaData
 )
 
 
@@ -740,6 +750,31 @@ class DeviceSerializer(BaseSerializer):
         device = Device.objects.create(device_user=user, **validated_data)
         device.save()
         return device
+
+
+class UserMetaDataSerializer(BaseSerializer):
+    class Meta:
+        model = UserMetaData
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'user_meta_related_user': {'required': False}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if not request.user.is_superuser or 'user_meta_related_user' not in validated_data:
+            validated_data['user_meta_related_user'] = request.user
+        if validated_data['user_meta_type'] == 'phone' or validated_data['user_meta_type'] == 'mobile':
+            print('phone or mobile')
+            user_related_meta_data = UserMetaData.objects.filter(user_meta_related_user=validated_data['user_meta_related_user'],
+                                                                 user_meta_type=validated_data['user_meta_type'])
+            if user_related_meta_data.count() >= 2:
+                error = {'message': "user have more than 2 " + validated_data['user_meta_type'] + ' !'}
+                raise ValidationError(error)
+        user_meta_data = UserMetaData.objects.create(**validated_data)
+        user_meta_data.save()
+        return user_meta_data
 
 
 class ForgetPasswordSerializer(Serializer):

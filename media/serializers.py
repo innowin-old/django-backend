@@ -7,15 +7,16 @@ from .models import Media
 from users.models import Identity
 from django.contrib.auth.models import User
 
-from .utils import compress_video
+from .utils import compress_video, compress_image
 
 
 class MediaSeriaizer(ModelSerializer):
     file_string = CharField(write_only=True)
+    file_usage = CharField(write_only=True, required=False)
 
     class Meta:
         model = Media
-        fields = ('id', 'identity', 'file', 'uploader', 'create_time', 'info', 'delete_flag', 'file_string')
+        fields = ('id', 'identity', 'file', 'uploader', 'create_time', 'info', 'delete_flag', 'file_string', 'file_usage')
 
     def create(self, validated_data):
         data = validated_data.pop('file_string')
@@ -33,6 +34,11 @@ class MediaSeriaizer(ModelSerializer):
         validated_data['file'] = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         if ext == 'mp4' or ext == 'avi' or ext == 'webm':
             validated_data['file'] = compress_video(validated_data['file'])
+        elif ext == 'jpeg' or ext == 'png':
+            validated_data['file'] = compress_image(image=validated_data['file'], usage=validated_data.get('file_usage'))
+        if 'file_usage' in validated_data:
+            validated_data.pop('file_usage')
+        print(validated_data)
         media = Media.objects.create(**validated_data)
         return media
 

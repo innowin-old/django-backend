@@ -185,3 +185,29 @@ class RollPermission(Base):
 post_save.connect(update_cache, sender=RollPermission)
 # Set Child Name
 pre_save.connect(set_child_name, sender=RollPermission)
+
+
+class BaseCountry(Base):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=10, blank=True, null=True)
+
+
+class BaseProvince(Base):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=10, blank=True, null=True)
+    province_related_country = models.ForeignKey(BaseCountry, related_name='province_country', db_index=True,
+                                                 on_delete=models.CASCADE, help_text='Integer')
+
+
+class BaseTown(Base):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=10, blank=True, null=True)
+    town_related_province = models.ForeignKey(BaseProvince, related_name='town_province', db_index=True,
+                                              on_delete=models.CASCADE, help_text='Integer')
+
+
+class BaseSocial(Base):
+    social_logo = models.CharField(max_length=255)
+    social_name = models.CharField(max_length=30)
+    social_base_url = models.CharField(max_length=50)
+    social_sort = models.IntegerField()

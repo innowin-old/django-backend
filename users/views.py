@@ -31,7 +31,8 @@ from .models import (
     Badge,
     IdentityUrl,
     UserArticle,
-    Device
+    Device,
+    UserMetaData
 )
 
 from .serializers import (
@@ -50,6 +51,7 @@ from .serializers import (
     UserArticleListSerializer,
     UserArticleRisSerializer,
     DeviceSerializer,
+    UserMetaDataSerializer,
     ForgetPasswordSerializer
 )
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
@@ -507,6 +509,30 @@ class DeviceViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return DeviceSerializer
+
+
+class UserMetaDataViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = UserMetaData.objects.filter(delete_flag=False)
+
+        user_meta_related_user = self.request.query_params.get('user_meta_related_user')
+        if user_meta_related_user is not None:
+            queryset = queryset.filter(user_meta_related_user=user_meta_related_user)
+
+        user_meta_type = self.request.query_params.get('user_meta_related_user')
+        if user_meta_type is not None:
+            queryset = queryset.filter(user_meta_type=user_meta_type)
+
+        user_meta_value = self.request.query_params.get('user_meta_value')
+        if user_meta_value is not None:
+            queryset = queryset.filter(user_meta_value=user_meta_value)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return UserMetaDataSerializer
 
 
 def login_page(request):
