@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -32,11 +33,12 @@ class Organization(Base):
                                     related_name="organization_admins",
                                     blank=True,
                                     help_text='Integer')
-    username = models.CharField(max_length=100, unique=True, help_text='String(100)')
+    username = models.CharField(max_length=32, unique=True, help_text='String(32)', validators=[MinLengthValidator(3)])
     email = models.EmailField(blank=True, null=True, help_text='Text')
-    nike_name = models.CharField(max_length=100, db_index=True, null=True, blank=True, help_text='String(100)')
-    official_name = models.CharField(max_length=75, db_index=True, help_text='String(75)')
-    national_code = models.CharField(max_length=20, db_index=True, help_text='String(20)')
+    public_email = models.EmailField(blank=True, null=True, help_text='Text')
+    nike_name = models.CharField(max_length=20, db_index=True, null=True, blank=True, help_text='String(100)')
+    official_name = models.CharField(max_length=50, db_index=True, help_text='String(75)')
+    national_code = models.CharField(max_length=11, db_index=True, help_text='String(20)')
     registration_ads_url = models.URLField(db_index=True, null=True, blank=True, help_text='URL')
     registrar_organization = models.CharField(max_length=100, db_index=True, null=True, blank=True,
                                               help_text='String(100)')
@@ -46,7 +48,7 @@ class Organization(Base):
     address = models.TextField(blank=True, db_index=True, help_text='Text')
     phone = ArrayField(PhoneField(), blank=True, db_index=True, default=[], help_text='Phone')
     web_site = models.URLField(null=True, db_index=True, blank=True, help_text='URL')
-    established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer')
+    established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
         max_length=20)
@@ -57,12 +59,20 @@ class Organization(Base):
     )
     organization_logo = models.ForeignKey(
         Media,
+        related_name='organization_logo_media',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Integer')
-    biography = models.TextField(max_length=256, blank=True, help_text='String(256)')
-    description = models.TextField(blank=True, help_text='Text')
+    organization_banner = models.ForeignKey(
+        Media,
+        related_name='organization_banner_media',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text='Integer')
+    biography = models.TextField(max_length=70, blank=True, help_text='String(70)')
+    description = models.TextField(blank=True, help_text='Text', max_length=1000)
     correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[],
                                          help_text='Array(String(50))')
     social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[],
@@ -220,6 +230,7 @@ class MetaData(Base):
     META_TYPES = (
         ('phone', 'تولید کننده'),
         ('social', 'سرمایه گذار'),
+        ('address', 'آدرس'),
     )
     meta_type = models.CharField(choices=META_TYPES, max_length=20)
     meta_title = models.CharField(max_length=20, blank=True, null=True)

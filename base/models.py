@@ -192,11 +192,23 @@ class BaseCountry(Base):
     code = models.CharField(max_length=10, blank=True, null=True)
 
 
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseCountry)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseCountry)
+
+
 class BaseProvince(Base):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=10, blank=True, null=True)
     province_related_country = models.ForeignKey(BaseCountry, related_name='province_country', db_index=True,
                                                  on_delete=models.CASCADE, help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseProvince)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseProvince)
 
 
 class BaseTown(Base):
@@ -206,8 +218,33 @@ class BaseTown(Base):
                                               on_delete=models.CASCADE, help_text='Integer')
 
 
-class BaseSocial(Base):
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseTown)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseTown)
+
+
+class BaseSocialType(Base):
     social_logo = models.CharField(max_length=255)
     social_name = models.CharField(max_length=30)
     social_base_url = models.CharField(max_length=50)
     social_sort = models.IntegerField()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseSocialType)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseSocialType)
+
+
+class BaseSocial(Base):
+    base_social_related_social_type = models.ForeignKey(BaseSocialType, related_name='base_social_parent',
+                                                   db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    base_social_parent = models.ForeignKey(Base, related_name='social_parent', db_index=True, on_delete=models.CASCADE,
+                                      help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseSocial)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseSocial)

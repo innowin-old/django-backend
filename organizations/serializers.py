@@ -20,16 +20,14 @@ class OrganizationSerializer(BaseSerializer):
     class Meta:
         model = Organization
         depth = 1
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
 
     def create(self, validated_data):
         request = self.context.get('request')
-        if 'owner' not in validated_data:
-            validated_data['owner'] = request.user
-        if not request.user.is_superuser:
+        if 'owner' not in validated_data or not request.user.is_superuser:
             validated_data['owner'] = request.user
         organization = Organization(**validated_data)
         organization.save()
@@ -43,6 +41,29 @@ class MetaDataSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        if validated_data['meta_type'] == 'address':
+            idnetity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
+                                                         meta_type=validated_data['meta_type'])
+            if idnetity_meta_data.count() >= 3:
+                error = {'message': "organization have more than 3 " + validated_data['meta_type'] + ' !'}
+                raise serializers.ValidationError(error)
+            elif len(validated_data['meta_value']) > 100:
+                error = {'message': "organization have more than 100 character !"}
+                raise serializers.ValidationError(error)
+        elif validated_data['meta_type'] == 'address':
+            idnetity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
+                                                         meta_type=validated_data['meta_type'])
+            if idnetity_meta_data.count() >= 4:
+                error = {'message': "organization have more than 4 " + validated_data['meta_type'] + ' !'}
+                raise serializers.ValidationError(error)
+            elif len(validated_data['meta_value']) > 20:
+                error = {'message': "organization have more than 20 character !"}
+                raise serializers.ValidationError(error)
+        meta_data = MetaData.objects.create(**validated_data)
+        meta_data.save()
+        return meta_data
 
 
 class MetaDataField(serializers.Field):

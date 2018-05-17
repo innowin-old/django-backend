@@ -18,14 +18,17 @@ def compress_image(image, usage):
     # Opening the uploaded image
     im = Image.open(image)
     output = BytesIO()
-    if usage == 'profile_media':
+    if usage == 'profile_media' or usage == 'organization_logo':
         # Resize/modify the image
         # im = im.resize((100, 100))
         # after modifications, save it to the output
         im.save(output, format='JPEG', quality=50)
-    elif usage == 'profile_banner':
+    elif usage == 'profile_banner' or usage == 'organization_banner':
         # after modifications, save it to the output
         im.save(output, format='JPEG', quality=80)
+    else:
+        # after modifications, save it to the output
+        im.save(output, format='JPEG', quality=100)
     output.seek(0)
     return InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % image.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
 
