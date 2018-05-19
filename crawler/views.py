@@ -23,7 +23,6 @@ def crawl_research_gate():
             if pager_container is not None:
                 pages = pager_container.find_all(name='a')
                 max_page = int(pages[len(pages)-2].get_text())
-                print(max_page)
                 for page_num in range(1, max_page+1):
                     if character in RESEARCH_GATE_CHARACTER_BLACK_LIST.keys():
                         if page_num <= RESEARCH_GATE_CHARACTER_BLACK_LIST[character]:
@@ -39,12 +38,11 @@ def crawl_research_gate():
                         for topic in topics:
                             topic_entity = ResearchGateTopic(name=topic.get_text())
                             topic_entities.append(topic_entity)
-            '''else:
-                exit(code=0)
+            else:
                 topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
                 for topic in topics:
                     topic_entity = ResearchGateTopic(name=topic.get_text())
-                    topic_entities.append(topic_entity)'''
+                    topic_entities.append(topic_entity)
         print('Adding topics to database :))))))))))')
         ResearchGateTopic.objects.bulk_create(topic_entities)
         print('OK !')
@@ -84,7 +82,6 @@ def export_research_gate_to_excel(request):
 def crawl_vitrin_net():
     categories = VITRINNET_CATEGORIES
     organizations_crawled = []
-    # categories = ['Food-industry-lines']
     with transaction.atomic():
         organizations_entities = []
         print('start crawling ...')
@@ -174,7 +171,6 @@ def crawl_vitrin_net():
                         organizations_crawled.append(organization_name['href'])
                 print(category_url + 'data added to array !')
         print('Adding organizations to database :))))))))))')
-        # VitrinOrganization.objects.bulk_create(organizations_entities)
         print('OK !')
 
 

@@ -1,9 +1,11 @@
 import requests
 import json
 import base64
+
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 from rest_framework.serializers import (
     ModelSerializer,
@@ -15,9 +17,7 @@ from rest_framework.serializers import (
     Serializer,
     ValidationError
 )
-from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
-
 from media.serializers import MediaMiniSerializer
 from organizations.utils import OrganizationListSerializer
 from organizations.models import Confirmation
@@ -102,28 +102,31 @@ class SuperAdminUserSerializer(ModelSerializer):
                     user.first_name is not None or user.first_name != ''):
                 profile.profile_strength += 5
                 user_strength.first_last_name_obtained = True
+        # set validated data to user object
         for key in user_validated_data:
             if key != 'first_name' and key != 'last_name':
                 setattr(user, key, user_validated_data.get(key))
+        # set password if is in validated data
         if 'password' in validated_data:
             user.set_password(validated_data['password'])
         user.save()
 
         profile_validated_data = self.get_profile_validated_data(**validated_data)
 
-        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and profile_validated_data['profile_media'] is not None:
+        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and \
+                profile_validated_data['profile_media'] is not None:
             profile.profile_media = profile_validated_data['profile_media']
             if profile.profile_media == '' or profile.profile_media is None:
                 profile.profile_strength += 10
                 user_strength.profile_media_obtained = True
 
+        # set validated data to profile object
         for key in profile_validated_data:
             if key != 'profile_media':
                 setattr(profile, key, validated_data.get(key))
 
         profile.save()
         user_strength.save()
-        # send_verification_mail(user=user)
         return user
 
     def get_user_validated_args(self, **kwargs):
@@ -193,15 +196,18 @@ class UserSerializer(ModelSerializer):
         user.save()
         profile_validated_data = self.get_profile_validated_data(**validated_data)
         profile = Profile.objects.get(profile_user=user)
+        # set validated data to profile object
         for key in profile_validated_data:
             setattr(profile, key, validated_data.get(key))
         profile.save()
         user_strength = StrengthStates.objects.get(strength_user=user)
+        # check for first & last name strength rate
         if validated_data.get('first_name') is not None and validated_data.get('last_name') is not None:
             profile.profile_strength += 5
             profile.save()
             user_strength.first_last_name_obtained = True
 
+        # check for profile media strength rate
         if 'profile_media' in profile_validated_data:
             profile.profile_strength += 10
             profile.save()
@@ -221,15 +227,18 @@ class UserSerializer(ModelSerializer):
         # check for first name strength rate
         if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
             user.first_name = user_validated_data['first_name']
-            if (user.first_name is None or user.first_name == '') and (user.last_name is not None or user.last_name != ''):
+            if (user.first_name is None or user.first_name == '') and (
+                    user.last_name is not None or user.last_name != ''):
                 profile.profile_strength += 5
                 user_strength.first_last_name_obtained = True
         # check for last name strength rate
         if 'last_name' in user_validated_data and user_validated_data['last_name'] != '':
             user.last_name = user_validated_data['last_name']
-            if (user.last_name is None or user.last_name == '') and (user.first_name is not None or user.first_name != ''):
+            if (user.last_name is None or user.last_name == '') and (
+                    user.first_name is not None or user.first_name != ''):
                 profile.profile_strength += 5
                 user_strength.first_last_name_obtained = True
+        # set validated data to user object
         for key in user_validated_data:
             if key != 'first_name' and key != 'last_name':
                 setattr(user, key, user_validated_data.get(key))
@@ -240,20 +249,45 @@ class UserSerializer(ModelSerializer):
 
         profile_validated_data = self.get_profile_validated_data(**validated_data)
 
-        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and profile_validated_data['profile_media'] is not None:
+        # check for profile media strength rate
+        if 'profile_media' in profile_validated_data and profile_validated_data['profile_media'] != '' and \
+                profile_validated_data['profile_media'] is not None:
             profile.profile_media = profile_validated_data['profile_media']
             if profile.profile_media == '' or profile.profile_media is None:
                 profile.profile_strength += 10
                 user_strength.profile_media_obtained = True
 
+        # set validated data to profile object
         for key in profile_validated_data:
             if key != 'profile_media':
                 setattr(profile, key, validated_data.get(key))
 
         profile.save()
         user_strength.save()
-        # send_verification_mail(user=user)
+
         return user
+
+    def validate_first_name(self, value):
+        if len(value) > 20:
+            error = {'message': "maximum length for first name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+
+    def validate_last_name(self, value):
+        if len(value) > 20:
+            error = {'message': "maximum length for last name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+    def validate_username(self, value):
+        if len(value) < 5:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        if len(value) > 32:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        return value
 
     def get_user_validated_args(self, **kwargs):
         user_kwargs = {}
@@ -331,12 +365,15 @@ class ProfileSerializer(BaseSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
+        # fill profile_user field for super users
         if not request.user.is_superuser or 'profile_user' not in validated_data:
             instance.profile_user = request.user
         else:
             instance.profile_user = validated_data.get('profile_user', instance.profile_user)
 
-        if 'profile_media' in validated_data and (validated_data['profile_media'] != '' or validated_data['profile_media'] is not None):
+        # check for profile media strength rate
+        if 'profile_media' in validated_data and (
+                validated_data['profile_media'] != '' or validated_data['profile_media'] is not None):
             if instance.profile_media == '' or instance.profile_media is None:
                 try:
                     user_strength = StrengthStates.objects.get(strength_user=instance.profile_user)
@@ -346,6 +383,7 @@ class ProfileSerializer(BaseSerializer):
                 user_strength.profile_media_obtained = True
             instance.profile_media = validated_data['profile_media']
 
+        # set validated data to profile instance
         for key in validated_data:
             if key != 'profile_user' and key != 'profile_media':
                 setattr(instance, key, validated_data.get(key))
@@ -377,15 +415,18 @@ class EducationSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
+        # fill education user for super users
         if not request.user.is_superuser or 'education_user' not in validated_data:
             validated_data['education_user'] = request.user
         education = Education.objects.create(**validated_data)
         education.save()
+        # check for education user strength rate
         self.check_education_profile_strength(validated_data['education_user'])
         return education
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
+        # fill education user for super users
         if not request.user.is_superuser or 'education_user' not in validated_data:
             instance.education_user = request.user
         else:
@@ -425,6 +466,7 @@ class ResearchSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
+        # fill research_user for super users
         if not request.user.is_superuser or 'research_user' not in validated_data:
             validated_data['research_user'] = request.user
         research = Research.objects.create(**validated_data)
@@ -432,11 +474,13 @@ class ResearchSerializer(BaseSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
+        # fill research_user for super users
         if not request.user.is_superuser or 'research_user' not in validated_data:
             instance.research_user = request.user
         else:
             instance.research_user = validated_data['research_user']
 
+        # set validated data to instance object
         for key in validated_data:
             setattr(instance, key, validated_data.get(key))
 
@@ -455,6 +499,7 @@ class CertificateSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
+        # fill certificate_user for super users
         if not request.user.is_superuser or 'certificate_user' not in validated_data:
             validated_data['certificate_user'] = request.user
         certificate = Certificate.objects.create(**validated_data)
@@ -462,11 +507,13 @@ class CertificateSerializer(BaseSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
+        # fill certificate_user for super users
         if not request.user.is_superuser or 'certificate_user' not in validated_data:
             instance.certificate_user = request.user
         else:
             instance.certificate_user = validated_data.get('certificate_user')
 
+        # set validated data to certificate instance
         for key in validated_data:
             setattr(instance, key, validated_data.get(key))
 
@@ -486,10 +533,12 @@ class WorkExperienceSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
+        # fill work_experience_user for super users
         if not request.user.is_superuser or 'work_experience_user' not in validated_data:
             validated_data['work_experience_user'] = request.user
         experience = WorkExperience.objects.create(**validated_data)
         experience.save()
+
         # create confirmation object
         organization_identity = Identity.objects.get(identity_organization=experience.work_experience_organization)
         user_identity = Identity.objects.get(identity_user=experience.work_experience_user)
@@ -509,11 +558,13 @@ class WorkExperienceSerializer(BaseSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
+        # fill work_experience_user for super users
         if not request.user.is_superuser or 'work_experience_user' not in validated_data:
             instance.work_experience_user = request.user
         else:
             instance.work_experience_user = validated_data['work_experience_user']
 
+        # set validated data to work experience instance
         for key in validated_data:
             if key != 'work_experience_user':
                 setattr(instance, key, validated_data.get(key))
@@ -549,6 +600,7 @@ class SkillSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
+        # fill skill_user for super users
         if not request.user.is_superuser or 'skill_user' not in validated_data:
             validated_data['skill_user'] = request.user
         skill = Skill.objects.create(**validated_data)
@@ -556,11 +608,13 @@ class SkillSerializer(BaseSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
+        # fill skill_user for super users
         if not request.user.is_superuser or 'skill_user' not in validated_data:
             instance.skill_user = request.user
         else:
             instance.skill_user = validated_data['skill_user']
 
+        # set validated data to skill instance
         for key in validated_data:
             setattr(instance, key, validated_data.get(key))
 
@@ -767,8 +821,9 @@ class UserMetaDataSerializer(BaseSerializer):
             validated_data['user_meta_related_user'] = request.user
         if validated_data['user_meta_type'] == 'phone' or validated_data['user_meta_type'] == 'mobile':
             print('phone or mobile')
-            user_related_meta_data = UserMetaData.objects.filter(user_meta_related_user=validated_data['user_meta_related_user'],
-                                                                 user_meta_type=validated_data['user_meta_type'])
+            user_related_meta_data = UserMetaData.objects.filter(
+                user_meta_related_user=validated_data['user_meta_related_user'],
+                user_meta_type=validated_data['user_meta_type'])
             if user_related_meta_data.count() >= 2:
                 error = {'message': "user have more than 2 " + validated_data['user_meta_type'] + ' !'}
                 raise ValidationError(error)

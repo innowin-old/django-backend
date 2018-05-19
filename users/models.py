@@ -454,6 +454,7 @@ post_save.connect(update_cache, sender=StrengthStates)
 # Set Child Name
 pre_save.connect(set_child_name, sender=StrengthStates)
 
+
 class UserMetaData(Base):
     META_TYPES = (
         ('phone', 'شماره تلفن'),
