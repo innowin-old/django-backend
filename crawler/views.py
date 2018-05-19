@@ -39,15 +39,32 @@ def crawl_research_gate():
                         for topic in topics:
                             topic_entity = ResearchGateTopic(name=topic.get_text())
                             topic_entities.append(topic_entity)
-            '''else:
-                exit(code=0)
+            else:
                 topics = soup.find_all(name='a', attrs={'class': 'js-score-goal'})
                 for topic in topics:
                     topic_entity = ResearchGateTopic(name=topic.get_text())
-                    topic_entities.append(topic_entity)'''
+                    topic_entities.append(topic_entity)
         print('Adding topics to database :))))))))))')
         ResearchGateTopic.objects.bulk_create(topic_entities)
         print('OK !')
+
+
+def normalize_research_gate_data():
+    topics = ResearchGateTopic.objects.filter()
+    for topic in topics:
+        topic_repeated_names = ResearchGateTopic.objects.filter(name=topic.name)
+        if topic_repeated_names.count() > 1:
+            print(str(topic_repeated_names[1].name) + ' deleted !')
+            topic_repeated_names[1].delete()
+    print('Repeated names deleted successfully !')
+
+
+def research_gate_all_flag_true():
+    topics = ResearchGateTopic.objects.all()
+    for topic in topics:
+        topic.delete_flag=False
+        topic.save()
+    print('OK !')
 
 
 def export_research_gate_to_excel(request):

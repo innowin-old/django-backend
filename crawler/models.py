@@ -8,6 +8,7 @@ class Topic(models.Model):
 
 class ResearchGateTopic(models.Model):
     name = models.CharField(max_length=100)
+    delete_flag = models.BooleanField(default=False)
 
 
 class VitrinOrganization(models.Model):
