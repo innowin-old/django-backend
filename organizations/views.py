@@ -5,9 +5,9 @@ from rest_framework.response import Response
 
 import json
 
-from base.permissions import IsOwnerOrReadOnly
+from base.permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
 from base.views import BaseModelViewSet
-from users.models import Identity
+
 from .permissions import (
     StaffOrganizationOwner,
     StaffCountOrganizationOwner,
@@ -47,7 +47,7 @@ from .serializers import (
 
 class OrganizationViewset(BaseModelViewSet):
     owner_field = 'owner'
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Organization.objects.filter(delete_flag=False)
@@ -116,7 +116,7 @@ class OrganizationViewset(BaseModelViewSet):
         return OrganizationSerializer
 
     @list_route(
-        permission_classes=[AllowAny],
+        permission_classes=[IsAdminUserOrReadOnly],
         methods=['post'])
     def import_organizations(self, request):
         jsonString = request.data.get('records', None)
@@ -161,14 +161,13 @@ class OrganizationViewset(BaseModelViewSet):
                     'status': str(e)
                 })
             if organization is not None:
-                identity = Identity.objects.get(identity_organization=organization)
                 phone_data = record.get('phones', None)
                 if phone_data is not None:
                     phones = phone_data.split('*')
                     for phone in phones:
                         try:
                             organization_phone = MetaData.objects.create(
-                                meta_identity=identity,
+                                meta_organization=organization,
                                 meta_value=phone,
                                 meta_type='phone'
                             )
@@ -183,7 +182,7 @@ class OrganizationViewset(BaseModelViewSet):
                     for address in addresses:
                         try:
                             organization_address = MetaData.objects.create(
-                                meta_identity=identity,
+                                meta_identity=organization,
                                 meta_value=address,
                                 meta_type='address'
                             )
@@ -247,7 +246,6 @@ class OrganizationPictureViewset(BaseModelViewSet):
 
 
 class StaffViewset(BaseModelViewSet):
-    # queryset = Staff.objects.all()
     permission_classes = [IsAuthenticated, StaffOrganizationOwner]
 
     def get_queryset(self):
@@ -304,41 +302,47 @@ class StaffViewset(BaseModelViewSet):
 
 
 class FollowViewset(BaseModelViewSet):
-    # queryset = Follow.objects.all()
     permission_classes = [IsAuthenticated, FollowOwner]
 
     def get_queryset(self):
         queryset = Follow.objects.filter(delete_flag=False)
 
         """
-            Identity Filter Options
+            Followed Filter Options
         """
-        identity_id = self.request.query_params.get('identity_id', None)
-        if identity_id is not None:
-            queryset = queryset.filter(follow_identity_id=identity_id)
+        follow_followed_id = self.request.query_params.get('follow_followed', None)
+        if follow_followed_id is not None:
+            queryset = queryset.filter(follow_followed_id=follow_followed_id)
 
-        identity_name = self.request.query_params.get('identity_name', None)
-        if identity_name is not None:
-            queryset = queryset.filter(follow_identity__name__contains=identity_name)
+        follow_followed_name = self.request.query_params.get('follow_followed_name', None)
+        if follow_followed_name is not None:
+            queryset = queryset.filter(follow_followed__name=follow_followed_name)
 
-        identity_user_username = self.request.query_params.get('identity_user_username', None)
-        if identity_user_username is not None:
-            queryset = queryset.filter(follow_identity__identity_user__username__contains=identity_user_username)
+        follow_followed_user_username = self.request.query_params.get('follow_followed_user_username', None)
+        if follow_followed_user_username is not None:
+            queryset = queryset.filter(follow_identity__identity_user__username=follow_followed_user_username)
 
         """
             Follower Filter Options
         """
-        follower_id = self.request.query_params.get('follower_id', None)
+        follower_id = self.request.query_params.get('follow_follower', None)
         if follower_id is not None:
             queryset = queryset.filter(follow_follower_id=follower_id)
 
-        follower_name = self.request.query_params.get('follower_name', None)
+        follower_name = self.request.query_params.get('follow_follower_name', None)
         if follower_name is not None:
             queryset = queryset.filter(follow_follower__name__contains=follower_name)
 
-        follower_username = self.request.query_params.get('follower_username', None)
+        follower_username = self.request.query_params.get('follow_follower_username', None)
         if follower_username is not None:
-            queryset = queryset.filter(follow_follower__identity_user__username__contains=follower_username)
+            queryset = queryset.filter(follow_follower__identity_user__username=follower_username)
+
+        """
+            Accept Filter
+        """
+        follow_accepted = self.request.query_params.get('follow_accepted', None)
+        if follow_accepted is not None:
+            queryset = queryset.filter(follow_accepted=follow_accepted)
 
         return queryset
 
@@ -388,7 +392,6 @@ class AbilityViewset(BaseModelViewSet):
 
 
 class ConfirmationViewset(BaseModelViewSet):
-    # queryset = Confirmation.objects.all()
     permission_classes = [IsAuthenticated, ConfirmationOwner]
 
     def get_queryset(self):
@@ -445,7 +448,6 @@ class ConfirmationViewset(BaseModelViewSet):
 
 
 class CustomerViewset(BaseModelViewSet):
-    # queryset = Customer.objects.all()
     permission_classes = [IsAuthenticated, CustomerOrganizationOwner]
 
     def get_queryset(self):
