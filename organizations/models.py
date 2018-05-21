@@ -235,8 +235,8 @@ class MetaData(Base):
     meta_type = models.CharField(choices=META_TYPES, max_length=20)
     meta_title = models.CharField(max_length=20, blank=True, null=True)
     meta_value = models.CharField(max_length=255, db_index=True)
-    meta_identity = models.ForeignKey('users.Identity', related_name='meta_data', blank=True, null=True,
-                                      db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    meta_organization = models.ForeignKey(Organization, related_name='meta_data', blank=True, null=True,
+                                          db_index=True, on_delete=models.CASCADE, help_text='Integer')
 
 
 # Cache Model Data After Update

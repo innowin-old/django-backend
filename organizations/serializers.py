@@ -70,11 +70,7 @@ class MetaDataField(serializers.Field):
 
     def to_representation(self, obj):
         ret = []
-        try:
-            identity = Identity.objects.get(identity_organization_id=obj.id)
-        except Identity.DoesNotExist:
-            return None
-        meta_data = MetaData.objects.filter(meta_identity=identity)
+        meta_data = MetaData.objects.filter(meta_organization_id=obj.id)
         if meta_data.count() != 0:
             for meta_item in meta_data:
                 meta_object = {
