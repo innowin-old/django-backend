@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -6,6 +7,7 @@ import json
 
 from base.permissions import IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
+from users.models import Identity
 from .permissions import (
     StaffOrganizationOwner,
     StaffCountOrganizationOwner,
@@ -121,6 +123,16 @@ class OrganizationViewset(BaseModelViewSet):
         data = json.loads(jsonString)
         errors = []
         for record in data:
+            organization = None
+            owner = record.get('owner', None)
+            if owner is not None:
+                try:
+                    owner = User.objects.get(username=record.get('owner', None))
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
             try:
                 organization = Organization.objects.create(
                     username=record.get('username', None),
@@ -141,15 +153,45 @@ class OrganizationViewset(BaseModelViewSet):
                     description=record.get('description'),
                     correspondence_language=record.get('correspondence_language', None),
                     social_network=record.get('social_network', None),
-                    owner=record.get('owner', None),
-                    organization_logo=record.get('organization_logo', None),
-                    admins=record.get('admins', None)
+                    owner=owner
                 )
             except Exception as e:
                 errors.append({
                     'data': record,
                     'status': str(e)
                 })
+            if organization is not None:
+                identity = Identity.objects.get(identity_organization=organization)
+                phone_data = record.get('phones', None)
+                if phone_data is not None:
+                    phones = phone_data.split('*')
+                    for phone in phones:
+                        try:
+                            organization_phone = MetaData.objects.create(
+                                meta_identity=identity,
+                                meta_value=phone,
+                                meta_type='phone'
+                            )
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
+                    address_data = record.get('addresses', None)
+                if address_data is not None:
+                    addresses = address_data.split('*')
+                    for address in addresses:
+                        try:
+                            organization_address = MetaData.objects.create(
+                                meta_identity=identity,
+                                meta_value=address,
+                                meta_type='address'
+                            )
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
         response = {
             'errors': errors
         }

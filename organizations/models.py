@@ -45,17 +45,17 @@ class Organization(Base):
     country = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     province = models.CharField(max_length=50, db_index=True, help_text='String(50)')
     city = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    address = models.TextField(blank=True, db_index=True, help_text='Text')
-    phone = ArrayField(PhoneField(), blank=True, db_index=True, default=[], help_text='Phone')
+    address = models.TextField(blank=True, null=True, db_index=True, help_text='Text')
+    phone = ArrayField(PhoneField(), blank=True, null=True, db_index=True, default=[], help_text='Phone')
     web_site = models.URLField(null=True, db_index=True, blank=True, help_text='URL')
     established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
         max_length=20)
-    business_type = ArrayField(models.CharField(
+    business_type = models.CharField(
         choices=BUSINESS_TYPES,
         max_length=30,
-        help_text='Array(String(30))')
+        help_text='Array(String(30))'
     )
     organization_logo = models.ForeignKey(
         Media,
@@ -71,11 +71,11 @@ class Organization(Base):
         null=True,
         blank=True,
         help_text='Integer')
-    biography = models.TextField(max_length=70, blank=True, help_text='String(70)')
-    description = models.TextField(blank=True, help_text='Text', max_length=1000)
-    correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, default=[],
+    biography = models.TextField(max_length=70, blank=True, null=True, help_text='String(70)')
+    description = models.TextField(blank=True, null=True, help_text='Text', max_length=1000)
+    correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=[],
                                          help_text='Array(String(50))')
-    social_network = ArrayField(models.CharField(max_length=100), blank=True, default=[],
+    social_network = ArrayField(models.CharField(max_length=100), blank=True, null=True, default=[],
                                 help_text='Array(String(100))')
     staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
 
@@ -229,7 +229,7 @@ pre_save.connect(set_child_name, sender=Customer)
 class MetaData(Base):
     META_TYPES = (
         ('phone', 'تولید کننده'),
-        ('social', 'سرمایه گذار'),
+        ('social', 'شبکه اجتماعی'),
         ('address', 'آدرس'),
     )
     meta_type = models.CharField(choices=META_TYPES, max_length=20)

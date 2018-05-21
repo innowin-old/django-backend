@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -136,6 +136,7 @@ class UserViewset(ModelViewSet):
         data = json.loads(jsonString)
         errors = []
         for record in data:
+            user = None
             try:
                 user = User.objects.create_user(
                     first_name=record.get('first_name', None),
@@ -149,6 +150,37 @@ class UserViewset(ModelViewSet):
                     'data': record,
                     'status': str(e)
                 })
+            if user is not None:
+                phone_data = record.get('phones', None)
+                if phone_data is not None:
+                    phones = phone_data.split('*')
+                    for phone in phones:
+                        try:
+                            meta_phone = UserMetaData.objects.create(
+                                user_meta_related_user=user,
+                                user_meta_type='phone',
+                                user_meta_value=phone
+                            )
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
+                mobile_data = record.get('mobiles', None)
+                if mobile_data is not None:
+                    mobiles = mobile_data.split('*')
+                    for mobile in mobiles:
+                        try:
+                            meta_mobile = UserMetaData.objects.create(
+                                user_meta_related_user=user,
+                                user_meta_type='mobile',
+                                user_meta_value=mobile
+                            )
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
         response = {
             'errors': errors
         }
