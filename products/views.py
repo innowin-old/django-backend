@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
-from .permissions import IsPriceProductOwnerOrReadOnly
+from .permissions import IsPriceProductOwnerOrReadOnly, IsPictureProductOwnerOrReadOnly, IsCommentOwnerOrReadOnly
 
 from .models import (
     Category,
@@ -247,8 +247,7 @@ class PriceViewset(BaseModelViewSet):
 
 
 class PictureViewset(BaseModelViewSet):
-    # queryset = Picture.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsPictureProductOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Picture.objects.all().filter(delete_flag=False).order_by('order')
@@ -268,8 +267,7 @@ class PictureViewset(BaseModelViewSet):
 
 
 class CommentViewset(BaseModelViewSet):
-    # queryset = Comment.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Comment.objects.filter(delete_flag=False)
