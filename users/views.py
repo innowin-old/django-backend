@@ -142,8 +142,8 @@ class UserViewset(ModelViewSet):
                     first_name=record.get('first_name', None),
                     last_name=record.get('last_name', None),
                     username=record.get('username', None),
-                    password=record.get('password', None),
-                    email=record.get('email', None)
+                    email=record.get('email', None),
+                    password=record.get('password', None)
                 )
             except Exception as e:
                 errors.append({

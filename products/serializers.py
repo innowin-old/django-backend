@@ -1,6 +1,3 @@
-from rest_framework import status
-from django.http.response import JsonResponse
-
 from base.serializers import BaseSerializer
 from users.serializers import UserMiniSerializer, IdentityMiniSerializer
 from .models import (
@@ -10,7 +7,7 @@ from .models import (
         Price,
         Picture,
         Comment
-    )
+)
 
 
 class CategorySerializer(BaseSerializer):

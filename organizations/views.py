@@ -14,7 +14,8 @@ from .permissions import (
     PictureOrganizationOwner,
     FollowOwner,
     CustomerOrganizationOwner,
-    ConfirmationOwner
+    ConfirmationOwner,
+    IsMetaDataOrganizationOwner
 )
 
 from .models import (
@@ -480,7 +481,7 @@ class CustomerViewset(BaseModelViewSet):
 
 
 class MetaDataViewSet(BaseModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsMetaDataOrganizationOwner]
 
     def get_queryset(self):
         queryset = MetaData.objects.filter(delete_flag=False)

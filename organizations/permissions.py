@@ -73,7 +73,7 @@ class IsOrganizationOwnerOrReadOnly(permissions.BasePermission):
         return True
 
 
-class IsOrganizationMetaDataOwner(permissions.BasePermission):
+class IsMetaDataOrganizationOwner(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
             organization_id = request.POST.get('meta_organization')
@@ -84,6 +84,7 @@ class IsOrganizationMetaDataOwner(permissions.BasePermission):
                     return False
                 if organization.owner == request.user or request.user.is_superuser:
                     return True
+            return False
         return True
 
     def has_object_permission(self, request, view, obj):
