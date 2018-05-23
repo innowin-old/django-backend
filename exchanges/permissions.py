@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import permissions
 from django.conf import settings
 
@@ -7,6 +8,34 @@ from .models import ExchangeIdentity
 
 
 class IsExchangeOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            if 'owner' in request.POST:
+                identity_id = request.POST.get('owner')
+                try:
+                    identity = Identity.objects.get(pk=identity_id)
+                except Identity.DoesNotExist:
+                    return False
+                if identity.identity_user is None:
+                    try:
+                        organization = Organization.objects.get(pk=identity.identity_organization)
+                    except Organization.DoesNotExist:
+                        return False
+                    if organization.owner == request.user or request.user.is_superuser:
+                        return True
+                    return False
+                else:
+                    try:
+                        user = User.objects.get(pk=identity.identity_user)
+                    except User.DoesNotExist:
+                        return False
+                    if user == request.user or request.user.is_superuser:
+                        return True
+                return False
+            else:
+                return True
+        return True
+
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             return True
