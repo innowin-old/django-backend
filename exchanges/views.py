@@ -3,6 +3,7 @@ import json
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
@@ -15,12 +16,10 @@ class ExchangeViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Exchange Views
     """
-    # queryset = Exchange.objects.all()
-    # permission_classes = [IsAgentOrReadOnly, IsExchangeOwnerOrReadOnly, IsAuthenticated]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsExchangeOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Exchange.objects.all()
+        queryset = Exchange.objects.filter(delete_flag=False)
 
         owner_id = self.request.query_params.get('owner_id')
         if owner_id is not None:
@@ -64,7 +63,7 @@ class ExchangeViewSet(BaseModelViewSet):
         return ExchangeSerializer
 
     @list_route(
-        permission_classes=[AllowAny],
+        permission_classes=[IsAdminUser],
         methods=['post']
     )
     def import_exchanges(self, request):

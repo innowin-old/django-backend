@@ -7,7 +7,11 @@ from users.models import Identity, Profile, StrengthStates
 class ExchangeSerializer(BaseSerializer):
     class Meta:
         model = Exchange
-        fields = '__all__'
+        exclude = ['child_name']
+        extra_kwargs = {
+            'owner': {'required': False},
+            'updated_time': {'read_only': True}
+        }
 
     def create(self, validated_data):
         request = self.context.get("request")

@@ -11,8 +11,8 @@ from users.models import Identity
 
 # Create your models here.
 class Exchange(Base):
-    owner = models.ForeignKey(Identity, related_name='exchanges', blank=True, null=True, db_index=True,
-                              on_delete=models.CASCADE, help_text='Integer')
+    owner = models.ForeignKey(Identity, related_name='exchanges', db_index=True, on_delete=models.CASCADE,
+                              help_text='Integer')
     name = models.CharField(max_length=30, db_index=True, help_text='String(30)')
     exchange_image = models.ForeignKey(
         Media,
