@@ -20,6 +20,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly
+from base.models import BaseSocialType, BaseSocial
 from .models import (
     Identity,
     Profile,
@@ -136,51 +137,192 @@ class UserViewset(ModelViewSet):
         data = json.loads(jsonString)
         errors = []
         for record in data:
-            user = None
-            try:
-                user = User.objects.create_user(
-                    first_name=record.get('first_name', None),
-                    last_name=record.get('last_name', None),
-                    username=record.get('username', None),
-                    email=record.get('email', None),
-                    password=record.get('password', None)
-                )
-            except Exception as e:
-                errors.append({
-                    'data': record,
-                    'status': str(e)
-                })
-            if user is not None:
-                phone_data = record.get('phones', None)
-                if phone_data is not None:
-                    phones = phone_data.split('*')
+
+            # get users with username  if not exist adding it to data baase
+            user = User.objects.filter(username=record.get('username', None))
+            if user.count() == 0:
+                user = User(username=record.get('username', None))
+            else:
+                user = User.objects.get(username=record.get('username', None))
+
+            # check for user input data and add update fields
+            if record.get('password', None) is not None or record.get('password', None) != '':
+                user.set_password(record.get('password', None))
+            if record.get('email', None) is not None or record.get('email') != '':
+                user.email = record.get('email', None)
+            if record.get('first_name') is not None or record.get('first_name', None) != '':
+                user.first_name = record.get('first_name', None)
+            if record.get('last_name') is not None or record.get('last_name', None) != '':
+                user.last_name = record.get('last_name', None)
+            user.save()
+
+            # get user identity
+            user_identity = Identity.objects.get(identity_user=user)
+
+            # adding user phone numbers
+            phone_data = record.get('phones', None)
+            if phone_data is not None or phone_data != '':
+                # get phone numbers with '*' split
+                phones = phone_data.split('*')
+                if phones.count() < 3:
                     for phone in phones:
-                        try:
-                            meta_phone = UserMetaData.objects.create(
-                                user_meta_related_user=user,
-                                user_meta_type='phone',
-                                user_meta_value=phone
-                            )
-                        except Exception as e:
+                        meta_phone_count = UserMetaData.objects.filter(user_meta_related_user=user, user_meta_type='phone').count()
+                        if meta_phone_count < 2:
+                            try:
+                                meta_phone = UserMetaData.objects.create(
+                                    user_meta_related_user=user,
+                                    user_meta_type='phone',
+                                    user_meta_value=phone
+                                )
+                            except Exception as e:
+                                errors.append({
+                                    'data': record,
+                                    'status': str(e)
+                                })
+                        else:
                             errors.append({
                                 'data': record,
-                                'status': str(e)
+                                'status': 'user can not have more that two phone number'
                             })
-                mobile_data = record.get('mobiles', None)
-                if mobile_data is not None:
-                    mobiles = mobile_data.split('*')
+                else:
+                    errors.append({
+                        'data': record,
+                        'status': 'user can not have more that two phone number'
+                    })
+            # adding user mobile numbers
+            mobile_data = record.get('mobiles', None)
+            if mobile_data is not None or mobile_data != '':
+                # get mobile numbers wiht '*' split
+                mobiles = mobile_data.split('*')
+                if mobiles.count() < 3:
                     for mobile in mobiles:
-                        try:
-                            meta_mobile = UserMetaData.objects.create(
-                                user_meta_related_user=user,
-                                user_meta_type='mobile',
-                                user_meta_value=mobile
-                            )
-                        except Exception as e:
+                        meta_mobile_count =UserMetaData.objects.filter(user_meta_related_user=user, user_meta_type='mobile').count()
+                        if meta_mobile_count < 2:
+                            try:
+                                meta_mobile = UserMetaData.objects.create(
+                                    user_meta_related_user=user,
+                                    user_meta_type='mobile',
+                                    user_meta_value=mobile
+                                )
+                            except Exception as e:
+                                errors.append({
+                                    'data': record,
+                                    'status': str(e)
+                                })
+                        else:
                             errors.append({
                                 'data': record,
-                                'status': str(e)
+                                'status': 'user can not have more that two mobile number'
                             })
+                else:
+                    errors.append({
+                        'data': record,
+                        'status': 'user can not have more that two mobile number'
+                    })
+            # add user profile data
+            profile = Profile.objects.filter(profile_user=user)
+            if profile.count() == 0:
+                profile = Profile(profile_user=user)
+            else:
+                profile = Profile.objects.get(profile_user=user)
+            # check if data exist update profile instance
+            if record.get('profile_national_code', None) is not None or record.get('profile_national_code', None) != '':
+                profile.national_code = record.get('profile_national_code', None)
+            if record.get('profile_birth_date', None) is not None or record.get('profile_birth_date', None) != '':
+                profile.birth_date = record.get('profile_birth_date', None)
+            if record.get('profile_description', None) is not None or record.get('profile_description', None) != '':
+                profile.description = record.get('description', None)
+            if record.get('profile_address', None) is not None or record.get('profile_address', None) != '':
+                profile.address = record.get('profile_address', None)
+            if record.get('profile_public_email', None) is not None or record.get('profile_public_email', None) != '':
+                profile.public_email = record.get('profile_public_email', None)
+            # add social data
+            if record.get('social_name', None) is not None or record.get('social_name', None) != '':
+                try:
+                    social_type = BaseSocialType.objects.get(social_name=record.get('social_name', None))
+                except Exception as e:
+                    social_type = None
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+                if social_type is not None:
+                    social_value = BaseSocial.objects.filter(base_social_related_social_type=social_type,
+                                                             base_social_parent=user_identity)
+                    if social_value.count() == 0:
+                        social_value = BaseSocial(base_social_parent=user_identity)
+                    else:
+                        social_value = BaseSocial.objects.get(base_social_related_social_type=social_type,
+                                                              base_social_parent=user_identity)
+                    if record.get('base_social_value', None) is not None or record.get('base_social_value', None) != '':
+                        social_value.base_social_parent = user_identity
+                    social_value.save()
+            # add education data
+            if (record.get('education_grade', None) is not None or record.get('education_grade', None) != '') and (record.get('education_university', None) is not None or record.get('education_university', None) != '') and (record.get('education_field_of_study', None) or record.get('education_field_of_study', None) != 0) and (record.get('education_from_date', None) is not None or record.get('education_from_date', None) != '') and (record.get('education_to_date', None) is not None or record.get('education_to_date', None) != ''):
+                education = Education.objects.filter(education_user=user,
+                                                     grade=record.get('education_grade', None),
+                                                     university=record.get('education_university', None),
+                                                     field_of_study=record.get('education_field_of_study', None),
+                                                     from_date=record.get('education_from_date', None),
+                                                     to_date=record.get('education_to_date', None))
+                if education.count() == 0:
+                    education = Education(education_user=user,
+                                          grade=record.get('education_grade', None),
+                                          university=record.get('education_university', None),
+                                          field_of_study=record.get('education_field_of_study', None),
+                                          from_date=record.get('education_from_date', None),
+                                          to_date=record.get('education_to_date', None))
+                else:
+                    education = Education.objects.get(education_user=user,
+                                                      grade=record.get('education_grade', None),
+                                                      university=record.get('education_university', None),
+                                                      field_of_study=record.get('education_field_of_study', None),
+                                                      from_date=record.get('education_from_date', None),
+                                                      to_date=record.get('education_to_date', None))
+                if record.get('education_average', None) is not None or record.get('education_average', None) != '':
+                    education.average = record.get('education_average', None)
+                if record.get('education_description', None) is not None or record.get('education_description', None) != '':
+                    education.description = record.get('education_description', None)
+            # add research data
+            if record.get('research_title', None) is not None or record.get('research_title', None) != '':
+                research = Research.objects.filter(research_user=user, title=record.get('research_title'))
+                if research.count() == 0:
+                    research = Research(research_user=user)
+                else:
+                    research = Research.objects.get(research_user=user, title=record.get('research_title', None))
+                if record.get('research_url', None) is not None or record.get('research_url') != '':
+                    research.url = record.get('research_url', None)
+                if record.get('research_author', None) is not None or record.get('research_author', None) != '':
+                    research.author = record.get('research_author', None)
+                if record.get('research_publication') is not None or record.get('research_publication', None):
+                    research.publication = record.get('research_publication', None)
+                if record.get('research_year') is not None or record.get('research_year') != '':
+                    research.year = record.get('research_year', None)
+                if record.get('research_page_count') is not None or record.get('research_page_count', None):
+                    research.page_count = record.get('research_page_count', None)
+                if record.get('research_link') is not None or record.get('research_link', None) != '':
+                    research.research_link = record.get('research_link', None)
+                research.save()
+            # add work experience
+            if record.get('work_experience_organization') is not None or record.get('work_experience_organization') != '':
+                work_experience = WorkExperience.objects.filter(work_experience_user=user,
+                                                                work_experience_organization=record.get('work_experience_organization', None))
+                if work_experience.count() == 0:
+                    work_experience = WorkExperience(work_experience_user=user,
+                                                     work_experience_organization=record.get('work_experience_organization', None))
+                else:
+                    work_experience = WorkExperience.objects.get(work_experience_user=user,
+                                                                 work_experience_organization=record.get('work_experience_organization', None))
+                if record.get('work_experience_name', None) is not None or record.get('work_experience_name', None) != '':
+                    work_experience.name = record.get('work_experience_name', None)
+                if record.get('work_experience_position', None) is not None or record.get('work_experience_position', None) != '':
+                    work_experience.position = record.get('work_experience_position', None)
+                if record.get('work_experience_from_date', None) is not None or record.get('work_experience_from_date') != '':
+                    work_experience.from_date = record.get('work_experience_from_date', None)
+                if record.get('work_experience_to_date', None) is not None or record.get('work_experience_to_date', None) != '':
+                    work_experience.to_date = record.get('work_experience_to_date', None)
+                work_experience.save()
+
         response = {
             'errors': errors
         }
