@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
@@ -226,7 +227,7 @@ pre_save.connect(set_child_name, sender=BaseTown)
 
 class BaseSocialType(Base):
     social_logo = models.CharField(max_length=255)
-    social_name = models.CharField(max_length=30)
+    social_name = models.CharField(max_length=30, unique=True)
     social_base_url = models.CharField(max_length=50)
     social_sort = models.IntegerField()
 
@@ -239,9 +240,11 @@ pre_save.connect(set_child_name, sender=BaseSocialType)
 
 class BaseSocial(Base):
     base_social_related_social_type = models.ForeignKey(BaseSocialType, related_name='base_social_parent',
-                                                   db_index=True, on_delete=models.CASCADE, help_text='Integer')
+                                                        db_index=True, on_delete=models.CASCADE, help_text='Integer')
     base_social_parent = models.ForeignKey(Base, related_name='social_parent', db_index=True, on_delete=models.CASCADE,
-                                      help_text='Integer')
+                                           help_text='Integer')
+    base_social_value = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+                                         help_text='String(256)')
 
 
 # Cache Model Data After Update

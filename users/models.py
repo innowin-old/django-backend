@@ -133,11 +133,11 @@ class Profile(Base):
     yahoo_contacts = models.TextField(blank=True, null=True)
     profile_strength = models.SmallIntegerField(default=10)
     address = models.CharField(max_length=100, blank=True, null=True)
-    profile_rellated_country = models.ForeignKey(BaseCountry, related_name='profile_country', db_index=True, blank=True
+    profile_related_country = models.ForeignKey(BaseCountry, related_name='profile_country', db_index=True, blank=True
                                                  , null=True, on_delete=models.CASCADE, help_text='Integer')
-    profile_rellated_province = models.ForeignKey(BaseProvince, related_name='profile_province', db_index=True, blank=True,
+    profile_related_province = models.ForeignKey(BaseProvince, related_name='profile_province', db_index=True, blank=True,
                                                   null=True, on_delete=models.CASCADE, help_text='Integer')
-    profile_rellated_town = models.ForeignKey(BaseTown, related_name='profile_town', db_index=True, blank=True, null=True,
+    profile_related_town = models.ForeignKey(BaseTown, related_name='profile_town', db_index=True, blank=True, null=True,
                                               on_delete=models.CASCADE, help_text='Integer')
     profile_banner = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_banner_media",
                                        help_text='Integer', blank=True, null=True)
@@ -170,8 +170,8 @@ class Education(Base):
     grade = models.CharField(max_length=100, help_text='String(100)')
     university = models.CharField(max_length=100, help_text='String(100)')
     field_of_study = models.CharField(max_length=100, help_text='String(100)')
-    from_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
-    to_date = models.CharField(max_length=7, blank=True, null=True, help_text='String(7)')
+    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
+    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
     average = models.FloatField(
         validators=[
             MaxValueValidator(20),
