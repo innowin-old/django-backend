@@ -20,7 +20,7 @@ from rest_framework.serializers import (
 from base.serializers import BaseSerializer
 from media.serializers import MediaMiniSerializer
 from organizations.utils import OrganizationListSerializer
-from organizations.models import Confirmation
+from organizations.models import Confirmation, Organization
 from .models import (
     Identity,
     Profile,
@@ -835,3 +835,38 @@ class UserMetaDataSerializer(BaseSerializer):
 class ForgetPasswordSerializer(Serializer):
     mobile = CharField(required=False, max_length=20)
     email = EmailField(required=False)
+
+
+class OrganizationMiniSerializer(BaseSerializer):
+    class Meta:
+        model = Organization
+        fields = ['username', 'official_name', 'national_code', 'country', 'province', 'city', 'ownership_type', 'business_type', 'owner']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
+class UserOrganizationSerializer(BaseSerializer):
+    organization = OrganizationMiniSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'organization']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'id': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        organization_data = validated_data.pop('organization')
+        user = User.objects.create_user(**validated_data)
+        organization = Organization.objects.create(owner=user, **organization_data)
+        response = {
+            'id': user.id,
+            'username': user.username,
+            'password': user.password,
+            'first_name': user.last_name,
+            'email': user.email,
+            'organization': organization
+        }
+        return response

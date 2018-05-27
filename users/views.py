@@ -53,7 +53,8 @@ from .serializers import (
     UserArticleRisSerializer,
     DeviceSerializer,
     UserMetaDataSerializer,
-    ForgetPasswordSerializer
+    ForgetPasswordSerializer,
+    UserOrganizationSerializer
 )
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
 
@@ -723,6 +724,17 @@ class UserMetaDataViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return UserMetaDataSerializer
+
+
+class UserOrganizationViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UserOrganizationSerializer
 
 
 def login_page(request):
