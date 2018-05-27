@@ -27,7 +27,7 @@ class BaseSerializer(ModelSerializer):
 class HashtagParentSerializer(BaseSerializer):
     class Meta:
         model = HashtagParent
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -36,7 +36,7 @@ class HashtagParentSerializer(BaseSerializer):
 class HashtagSerializer(BaseSerializer):
     class Meta:
         model = Hashtag
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'related_parent': {'read_only': True},
             'updated_time': {'read_only': True}
@@ -48,6 +48,8 @@ class HashtagSerializer(BaseSerializer):
             parent_instance = HashtagParent.objects.create(title=validated_data['title'])
         else:
             parent_instance = HashtagParent.objects.get(title=validated_data['title'])
+            parent_instance.usage += 1
+            parent_instance.save()
         instance.related_parent = parent_instance
         instance.save()
         self.check_hashtag_profile_strength()
@@ -78,6 +80,7 @@ class HashtagSerializer(BaseSerializer):
 class HashtagRelationSerializer(BaseSerializer):
     class Meta:
         model = HashtagRelation
+        depth = 1
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}

@@ -38,7 +38,8 @@ post_save.connect(update_cache, sender=Base)
 
 
 class HashtagParent(Base):
-    title = models.CharField(db_index=True, max_length=50, help_text='String(50)')
+    title = models.CharField(db_index=True, unique=True, max_length=50, help_text='String(50)')
+    usage = models.BigIntegerField(default=0)
 
     objects = BaseManager()
 

@@ -1,5 +1,8 @@
 import json
 from django.db.models import Q
+from django.core import serializers
+from rest_framework import status
+from rest_framework.decorators import list_route
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -91,7 +94,7 @@ class BaseViewset(ModelViewSet):
 
 class HashtagParentViewset(BaseModelViewSet):
     # queryset = HashtagParent.objects.all()
-    permisison_classes = ""
+    permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = HashtagParent.objects.all()
@@ -108,7 +111,7 @@ class HashtagParentViewset(BaseModelViewSet):
     
 class HashtagViewset(BaseModelViewSet):
     # queryset = Hashtag.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = Hashtag.objects.all()
@@ -154,6 +157,26 @@ class HashtagRelationViewset(BaseModelViewSet):
             queryset = queryset.filter(active=active)
 
         return queryset
+
+    @list_route(methods=['get'])
+    def search(self, request):
+        relations = HashtagRelation.objects.filter(delete_flag=False)
+
+        hashtag_text = self.request.query_params.get('hashtag_text')
+        if hashtag_text is not None:
+            try:
+                hashtag_id = HashtagParent.objects.get(title=hashtag_text).id
+            except HashtagParent.DoesNotExist:
+                return []
+            relations = relations.filter(Q(hashtag_first_id=hashtag_id) | Q(hashtag_second_id=hashtag_id))
+            results = []
+            for relation in relations:
+                if relation.hashtag_first.id != hashtag_id:
+                    results.append(relation.hashtag_first)
+                else:
+                    results.append(relation.hashtag_second)
+            results_sorted = sorted(results, key=lambda x: x.usage, reverse=True)
+        return Response(serializers.serialize('json', results_sorted), status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         return HashtagRelationSerializer
