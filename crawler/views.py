@@ -5,7 +5,7 @@ import string
 from django.db import transaction
 from django.http import HttpResponse
 
-from crawler.models import Topic, VitrinOrganization, ResearchGateTopic
+from crawler.models import Topic, VitrinOrganization, ResearchGateTopic, SkillemaTags
 from .category_lists import VITRINNET_CATEGORIES, RESEARCH_GATE_CHARACTER_BLACK_LIST
 
 
@@ -214,6 +214,77 @@ def export_vitrin_net_to_excel(request):
     font_style = xlwt.XFStyle()
 
     rows = VitrinOrganization.objects.all().values_list('name', 'phone', 'mobile', 'website', 'telegram_link', 'instagram_link')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
+
+
+def fetch_skillema_tags():
+    url = 'https://www.skillema.ir/api/tags/lists'
+    resp = requests.get(url=url)
+    json_tags = resp.json()
+    print(len(json_tags))
+    # add all tags to database
+    for json_tag in json_tags:
+        try:
+            tag = SkillemaTags.objects.get(name=json_tag.get('name'))
+        except SkillemaTags.DoesNotExist:
+            tag = SkillemaTags.objects.create(name=json_tag.get('name'),
+                                              created_at=json_tag.get('created_at'),
+                                              updated_at=json_tag.get('updated_at'))
+        tag.save()
+    print('tags added to database !')
+    # set tag relations
+    for json_tag in json_tags:
+        try:
+            tag = SkillemaTags.objects.get(name=json_tag.get('name'))
+        except SkillemaTags.DoesNotExist:
+            tag = None
+            print('tag not found !')
+        if tag is not None:
+            json_find_flag = False
+            for json_tag_parent in json_tags:
+                if json_tag_parent.get('id') == json_tag.get('parent_id'):
+                    json_find_flag = True
+                    try:
+                        tag_parent = SkillemaTags.objects.get(name=json_tag_parent.get('name'))
+                    except SkillemaTags.DoesNotExist:
+                        tag_parent = None
+                        print('parent tag not found !')
+                    if tag_parent is not None:
+                        tag.parent = tag_parent
+                        tag.save()
+            if not json_find_flag:
+                print('parent tag not found in json')
+    print('success !')
+
+
+def export_skillema_tags_to_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="skillema-tags.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('SkillemaTags')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['id', 'name', 'created_at', 'updated_at', 'parent_id']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = SkillemaTags.objects.all().values_list('id', 'name', 'created_at', 'updated_at', 'parent_id')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
