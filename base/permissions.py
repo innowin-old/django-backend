@@ -18,6 +18,13 @@ class BlockPostMethod(permissions.BasePermission):
         return True
 
 
+class OnlyPostMethod(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            return True
+        return False
+
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == 'GET':

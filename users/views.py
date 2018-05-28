@@ -19,7 +19,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly
+from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly, OnlyPostMethod
 from base.models import BaseSocialType, BaseSocial
 from .models import (
     Identity,
@@ -727,7 +727,7 @@ class UserMetaDataViewset(ModelViewSet):
 
 
 class UserOrganizationViewset(ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [OnlyPostMethod]
 
     def get_queryset(self):
         queryset = User.objects.all()
