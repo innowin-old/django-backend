@@ -352,7 +352,6 @@ class FollowViewset(BaseModelViewSet):
 
 
 class AbilityViewset(BaseModelViewSet):
-    # queryset = Ability.objects.all()
     owner_field = 'ability_organization'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
