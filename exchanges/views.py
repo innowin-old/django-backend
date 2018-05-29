@@ -1,6 +1,6 @@
 import json
 
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
@@ -102,7 +102,7 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsExchangeFull]
 
     def get_queryset(self):
-        queryset = ExchangeIdentity.objects.all()
+        queryset = ExchangeIdentity.objects.filter(delete_flag=False)
 
         exchange_id = self.request.query_params.get('exchange_id', None)
         if exchange_id is not None:

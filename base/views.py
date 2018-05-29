@@ -7,13 +7,14 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from django.http import HttpResponse
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 from .permissions import (
     IsRollOwnerOrReadOnly,
     IsRollPermissionOwnerOrReadOnly,
     IfExchangeIsAcceptedOrNotAccess,
-    IsAdminUserOrReadOnly
+    IsAdminUserOrReadOnly,
+    IsHashtagOwnerOrReadOnly
 )
 
 from .models import (
@@ -42,6 +43,8 @@ from .serializers import (
 
 
 class BaseModelViewSet(ModelViewSet):
+    permission_classes = [IsAdminUser]
+
     def destroy(self, request, *args, **kwargs):
         """class DynamicDeleteSerializer(ModelSerializer, BaseSerializer):
             class Meta:
@@ -59,9 +62,8 @@ class BaseModelViewSet(ModelViewSet):
             # serializer.is_valid(raise_exception=True)
             instance.delete_flag = True
             instance.save()
-            #return Response({status: "SUCCESS"}, status=status.HTTP_200_OK)
-            response = HttpResponse(json.dumps({'message': 'record deleted.'}), 
-                content_type='application/json')
+            # return Response({status: "SUCCESS"}, status=status.HTTP_200_OK)
+            response = HttpResponse(json.dumps({'message': 'record deleted.'}), content_type='application/json')
             response.status_code = 200
             return response
         except Exception as e:
@@ -78,8 +80,7 @@ class BaseModelViewSet(ModelViewSet):
 
 
 class BaseViewset(ModelViewSet):
-    # queryset = Base.objects.all()
-    permission_classes = ""
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         queryset = Base.objects.all()
@@ -93,11 +94,10 @@ class BaseViewset(ModelViewSet):
 
 
 class HashtagParentViewset(BaseModelViewSet):
-    # queryset = HashtagParent.objects.all()
     permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
 
     def get_queryset(self):
-        queryset = HashtagParent.objects.all()
+        queryset = HashtagParent.objects.filter(delete_flag=False)
 
         title = self.request.query_params.get('title', None)
         if title is not None:
@@ -110,11 +110,10 @@ class HashtagParentViewset(BaseModelViewSet):
 
     
 class HashtagViewset(BaseModelViewSet):
-    # queryset = Hashtag.objects.all()
-    permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
+    permission_classes = [IsAuthenticated, IsHashtagOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = Hashtag.objects.all()
+        queryset = Hashtag.objects.filter(delete_flag=False)
         
         related_parent = self.request.query_params.get('related_parent', None)
         if related_parent is not None:
@@ -158,7 +157,7 @@ class HashtagRelationViewset(BaseModelViewSet):
 
         return queryset
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=[IsAuthenticated])
     def search(self, request):
         relations = HashtagRelation.objects.filter(delete_flag=False)
 
@@ -183,12 +182,11 @@ class HashtagRelationViewset(BaseModelViewSet):
 
 
 class BaseCommentViewset(BaseModelViewSet):
-    # queryset = BaseComment.objects.all()
     parent_field = 'comment_parent'
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = BaseComment.objects.all()
+        queryset = BaseComment.objects.filter(delete_flag=False)
 
         comment_parent = self.request.query_params.get('comment_parent', None)
         if comment_parent is not None:
@@ -209,7 +207,6 @@ class BaseCommentViewset(BaseModelViewSet):
 
 
 class PostViewSet(BaseModelViewSet):
-    # queryset = Post.objects.all()
     parent_field = 'post_parent'
     permission_classes = [IsAuthenticated]
 
@@ -260,12 +257,10 @@ class PostViewSet(BaseModelViewSet):
 
 
 class CertificateViewSet(BaseModelViewSet):
-    #queryset = BaseCertificate.objects.all()
-
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = BaseCertificate.objects.all()
+        queryset = BaseCertificate.objects.filter(delete_flag=False)
 
         certificate_identity = self.request.query_params.get('certificate_identity', None)
         if certificate_identity is not None:
@@ -285,7 +280,7 @@ class RollViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsRollOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = BaseRoll.objects.all()
+        queryset = BaseRoll.objects.filter(delete_flag=False)
 
         name = self.request.query_params.get('name', None)
         if name is not None:
@@ -313,7 +308,7 @@ class RollPermissionViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsRollPermissionOwnerOrReadOnly]
 
     def get_queryset(self):
-        queryset = RollPermission.objects.all()
+        queryset = RollPermission.objects.filter(delete_flag=False)
 
         roll_permission_related_roll = self.request.query_params.get('roll_permission_related_roll', None)
         if roll_permission_related_roll is not None:

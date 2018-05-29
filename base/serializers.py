@@ -56,7 +56,7 @@ class HashtagSerializer(BaseSerializer):
         return instance
 
     def check_hashtag_profile_strength(self):
-        request = self.context.get('request')
+        request = self.context.get("request")
         try:
             identity = Identity.objects.get(identity_user=request.user)
         except Identity.DoesNotExist:

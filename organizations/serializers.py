@@ -37,25 +37,25 @@ class OrganizationSerializer(BaseSerializer):
 class MetaDataSerializer(BaseSerializer):
     class Meta:
         model = MetaData
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
 
     def create(self, validated_data):
         if validated_data['meta_type'] == 'address':
-            idnetity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
+            identity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
                                                          meta_type=validated_data['meta_type'])
-            if idnetity_meta_data.count() >= 3:
+            if identity_meta_data.count() >= 3:
                 error = {'message': "organization have more than 3 " + validated_data['meta_type'] + ' !'}
                 raise serializers.ValidationError(error)
             elif len(validated_data['meta_value']) > 100:
                 error = {'message': "organization have more than 100 character !"}
                 raise serializers.ValidationError(error)
         elif validated_data['meta_type'] == 'address':
-            idnetity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
+            identity_meta_data = MetaData.objects.filter(meta_identity=validated_data['meta_identity'],
                                                          meta_type=validated_data['meta_type'])
-            if idnetity_meta_data.count() >= 4:
+            if identity_meta_data.count() >= 4:
                 error = {'message': "organization have more than 4 " + validated_data['meta_type'] + ' !'}
                 raise serializers.ValidationError(error)
             elif len(validated_data['meta_value']) > 20:
@@ -100,7 +100,7 @@ class OrganizationListViewSerializer(BaseSerializer):
 class StaffCountSerializer(BaseSerializer):
     class Meta:
         model = StaffCount
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -109,7 +109,7 @@ class StaffCountSerializer(BaseSerializer):
 class OrganizationPictureSerializer(BaseSerializer):
     class Meta:
         model = OrganizationPicture
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -126,7 +126,7 @@ class StaffListViewSerializer(BaseSerializer):
 class StaffSerializer(BaseSerializer):
     class Meta:
         model = Staff
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -135,7 +135,7 @@ class StaffSerializer(BaseSerializer):
 class FollowSerializer(BaseSerializer):
     class Meta:
         model = Follow
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -168,7 +168,7 @@ class FollowSerializer(BaseSerializer):
 class AbilitySerializer(BaseSerializer):
     class Meta:
         model = Ability
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -177,7 +177,7 @@ class AbilitySerializer(BaseSerializer):
 class ConfirmationSerializer(BaseSerializer):
     class Meta:
         model = Confirmation
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -202,13 +202,13 @@ class ConfirmationListViewSerializer(BaseSerializer):
 
     class Meta:
         model = Confirmation
-        exclude = ['updated_time']
+        exclude = ['updated_time', 'child_name']
 
 
 class CustomerSerializer(BaseSerializer):
     class Meta:
         model = Customer
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }

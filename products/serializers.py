@@ -59,32 +59,16 @@ class ProductListViewSerializer(BaseSerializer):
 class PriceSerializer(BaseSerializer):
     class Meta:
         model = Price
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        '''
-            post object level permission
-        '''
-        product_id = validated_data.get('price_product')
-        product = Product.objects.get(pk=product_id)
-        '''if product.product_user != request.user and not request.user.is_superuser:
-            return JsonResponse(data={})'''
-        '''
-            create price object
-        '''
-        price = Price.objects.create(**validated_data)
-        price.save()
-        return price
 
 
 class PictureSerializer(BaseSerializer):
     class Meta:
         model = Picture
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
@@ -93,7 +77,7 @@ class PictureSerializer(BaseSerializer):
 class CommentSerializer(BaseSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }

@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
 import json
 
-from base.permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
+from base.permissions import IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
 
 from .permissions import (
@@ -117,7 +117,7 @@ class OrganizationViewset(BaseModelViewSet):
         return OrganizationSerializer
 
     @list_route(
-        permission_classes=[IsAdminUserOrReadOnly],
+        permission_classes=[IsAdminUser],
         methods=['post'])
     def import_organizations(self, request):
         jsonString = request.data.get('records', None)

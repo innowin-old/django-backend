@@ -153,7 +153,7 @@ class ProductViewset(BaseModelViewSet):
         return ProductSerializer
 
     @list_route(
-      permission_classes=[AllowAny],
+      permission_classes=[IsAdminUser],
       methods=['post']
     )
     def import_products(self, request):
