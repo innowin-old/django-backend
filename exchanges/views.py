@@ -27,7 +27,7 @@ class ExchangeViewSet(BaseModelViewSet):
 
         owner_name = self.request.query_params.get('owner_name')
         if owner_name is not None:
-            queryset = queryset.filter(owner__name__contains=owner_name)
+            queryset = queryset.filter(owner__name=owner_name)
 
         name = self.request.query_params.get('name', None)
         if name is not None:

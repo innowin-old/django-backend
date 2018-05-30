@@ -90,10 +90,19 @@ class HashtagRelationSerializer(BaseSerializer):
 class BaseCommentSerializer(BaseSerializer):
     class Meta:
         model = BaseComment
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'comment_sender': {'required': False}
         }
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if 'comment_sender' not in validated_data or not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['comment_sender'] = identity
+        comment = BaseComment.objects.create(**validated_data)
+        return comment
 
 
 class PostSerializer(BaseSerializer):

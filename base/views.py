@@ -14,7 +14,8 @@ from .permissions import (
     IsRollPermissionOwnerOrReadOnly,
     IfExchangeIsAcceptedOrNotAccess,
     IsAdminUserOrReadOnly,
-    IsHashtagOwnerOrReadOnly
+    IsHashtagOwnerOrReadOnly,
+    IsCommentOwnerOrReadOnly
 )
 
 from .models import (
@@ -182,8 +183,7 @@ class HashtagRelationViewset(BaseModelViewSet):
 
 
 class BaseCommentViewset(BaseModelViewSet):
-    parent_field = 'comment_parent'
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = BaseComment.objects.filter(delete_flag=False)

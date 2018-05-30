@@ -163,3 +163,41 @@ class IsHashtagOwnerOrReadOnly(permissions.BasePermission):
                 if child_object.identity_organization.owner == request.user:
                     return True
         return False
+
+
+class IsCommentOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        owner_object = ContentType.objects.get(model=obj.comment_parent.child_name).__str__()
+        child_object = getattr(obj.comment_parent, owner_object)
+        owner_identity = Identity.objects.get(pk=obj.comment_sender)
+        # check sender access
+        if owner_identity.identity_user is not None:
+            if owner_identity.identity_user == request.user:
+                return True
+        elif owner_identity.identity_organization is not None:
+            if owner_identity.identity_organization.owner == request.user:
+                return True
+        # check parent access
+        if request.user.is_superuser:
+            return True
+        elif owner_object == 'organization':
+            if child_object.owner == request.user:
+                return True
+        elif owner_object == 'exchange':
+            if child_object.owner.identity_user is not None:
+                if child_object.owner.identity_user == request.user:
+                    return True
+            else:
+                if child_object.owner.identity_organization.owner == request.user:
+                    return True
+        elif owner_object == 'product':
+            if child_object.product_user == request.user:
+                return True
+        elif owner_object == 'identity':
+            if child_object.identity_user is not None:
+                if child_object.identity_user == request.user:
+                    return True
+            else:
+                if child_object.identity_organization.owner == request.user:
+                    return True
+        return False

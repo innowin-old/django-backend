@@ -303,7 +303,7 @@ class StaffViewset(BaseModelViewSet):
 
 
 class FollowViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, FollowOwner]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Follow.objects.filter(delete_flag=False)

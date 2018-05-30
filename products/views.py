@@ -6,7 +6,12 @@ from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
-from .permissions import IsPriceProductOwnerOrReadOnly, IsPictureProductOwnerOrReadOnly, IsCommentOwnerOrReadOnly
+from .permissions import (
+    IsPriceProductOwnerOrReadOnly,
+    IsPictureProductOwnerOrReadOnly,
+    IsCommentOwnerOrReadOnly,
+    IsProductOrganizationOwnerOrReadOnly
+)
 
 from .models import (
     Category,
@@ -86,7 +91,7 @@ class CategoryFieldViewset(BaseModelViewSet):
 
 class ProductViewset(BaseModelViewSet):
     owner_field = 'product_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly, IsProductOrganizationOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Product.objects.filter(delete_flag=False)

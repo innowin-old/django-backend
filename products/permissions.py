@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from .models import Product
+from users.models import Identity
 
 
 class IsPriceProductOwnerOrReadOnly(permissions.BasePermission):
@@ -55,3 +56,28 @@ class IsCommentOwnerOrReadOnly(permissions.BasePermission):
                 return True
             return False
         return True
+
+
+class IsProductOrganizationOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            owner_id = request.POST.get('product_owner', None)
+            identity = Identity.objects.get(pk=owner_id)
+            if identity.identity_user is not None:
+                if identity.identity_user == request.user or request.user.is_superuser:
+                    return True
+            else:
+                if identity.identity_organization.owner == request.user or request.user.is_superuser:
+                    return True
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        identity = Identity.objects.get(id=obj.product_owner_id)
+        if identity.identity_user is not None:
+            if identity.identity_user == request.user or request.user.is_superuser:
+                return True
+        else:
+            if identity.identity_organization.owner == request.user or request.user.is_superuser:
+                return True
+        return False
