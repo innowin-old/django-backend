@@ -11,7 +11,10 @@ from .models import (
     BaseCertificate,
     BaseRoll,
     RollPermission,
-    HashtagRelation
+    HashtagRelation,
+    BaseCountry,
+    BaseProvince,
+    BaseTown
 )
 
 
@@ -108,7 +111,7 @@ class BaseCommentSerializer(BaseSerializer):
 class PostSerializer(BaseSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
             'post_user': {'read_only': True}
@@ -162,7 +165,7 @@ class PostSerializer(BaseSerializer):
 class CertificateSerializer(BaseSerializer):
     class Meta:
         model = BaseCertificate
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
         }
@@ -171,7 +174,7 @@ class CertificateSerializer(BaseSerializer):
 class RollSerializer(BaseSerializer):
     class Meta:
         model = BaseRoll
-        fields = '__all__'
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
         }
@@ -180,7 +183,34 @@ class RollSerializer(BaseSerializer):
 class RollPermissionSerializer(BaseSerializer):
     class Meta:
         model = RollPermission
-        fields = '__all__'
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class BaseCountrySerializer(BaseSerializer):
+    class Meta:
+        model = BaseCountry
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class BaseProvinceSerializer(BaseSerializer):
+    class Meta:
+        model = BaseProvince
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class BaseTownSerializer(BaseSerializer):
+    class Meta:
+        model = BaseTown
+        exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
         }

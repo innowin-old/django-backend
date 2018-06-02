@@ -1,4 +1,5 @@
 import json
+from django.db import transaction
 from django.db.models import Q
 from django.core import serializers
 from rest_framework import status
@@ -27,7 +28,10 @@ from .models import (
     BaseCertificate,
     BaseRoll,
     RollPermission,
-    HashtagRelation
+    HashtagRelation,
+    BaseCountry,
+    BaseProvince,
+    BaseTown
 )
 
 from .serializers import (
@@ -39,7 +43,10 @@ from .serializers import (
     CertificateSerializer,
     RollSerializer,
     RollPermissionSerializer,
-    HashtagRelationSerializer
+    HashtagRelationSerializer,
+    BaseCountrySerializer,
+    BaseProvinceSerializer,
+    BaseTownSerializer
 )
 
 
@@ -326,3 +333,152 @@ class RollPermissionViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return RollPermissionSerializer
+
+
+class BaseCountryViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BaseCountry.objects.filter(delete_flag=False)
+
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+
+        code = self.request.query_params.get('code', None)
+        if code is not None:
+            queryset = queryset.filter(code=code)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return BaseCountrySerializer
+
+
+class BaseProvinceViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BaseProvince.objects.filter(delete_flag=False)
+
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+
+        province_related_country = self.request.query_params.get('province_related_country', None)
+        if province_related_country is not None:
+            queryset = queryset.filter(province_related_country=province_related_country)
+
+        province_related_country_name = self.request.query_params.get('province_related_country_name', None)
+        if province_related_country_name is not None:
+            queryset = queryset.filter(province_related_country__name=province_related_country_name)
+
+        code = self.request.query_params.get('code', None)
+        if code is not None:
+            queryset = queryset.filter(code=code)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return BaseProvinceSerializer
+
+
+class BaseTownViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BaseTown.objects.filter(delete_flag=False)
+
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+
+        town_related_province = self.request.query_params.get('town_related_province', None)
+        if town_related_province is not None:
+            queryset = queryset.filter(town_related_province=town_related_province)
+
+        town_related_province_name = self.request.query_params.get('town_related_province_name', None)
+        if town_related_province_name is not None:
+            queryset = queryset.filter(town_related_province__name=town_related_province_name)
+
+        code = self.request.query_params.get('code', None)
+        if code is not None:
+            queryset = queryset.filter(code=code)
+
+        return queryset
+
+    def get_serializer_class(self):
+        return BaseTownSerializer
+
+    @list_route(
+        permission_classes=[IsAdminUser],
+        methods=['post'])
+    def import_towns(self, request):
+        jsonString = request.data.get('records', None)
+        country_name = request.data.get('country', None)
+        data = json.loads(jsonString)
+        errors = []
+        for record in data:
+            properties = record.get('properties', None)
+            country_count = BaseCountry.objects.filter(name=country_name).count()
+            if country_count != 0:
+                try:
+                    country_obj = BaseCountry.objects.get(name=country_name)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            else:
+                try:
+                    country_obj = BaseCountry.objects.create(name=country_name)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            province_count = BaseProvince.objects.filter(name=properties.get('ostn_name', None),
+                                                         province_related_country=country_obj).count()
+            if province_count != 0:
+                try:
+                    province_obj = BaseProvince.objects.get(name=properties.get('ostn_name', None),
+                                                            province_related_country=country_obj)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            else:
+                try:
+                    province_obj = BaseProvince.objects.create(name=properties.get('ostn_name', None),
+                                                               province_related_country=country_obj)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            town_count = BaseTown.objects.filter(name=properties.get('city_name', None),
+                                                 town_related_province=province_obj).count()
+            if town_count != 0:
+                try:
+                    town_obj = BaseTown.objects.get(name=properties.get('city_name', None),
+                                                    town_related_province=province_obj)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            else:
+                try:
+                    town_obj = BaseTown.objects.create(name=properties.get('city_name', None),
+                                                       town_related_province=province_obj)
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+            town_obj.save()
+        response = {
+            'errors': errors
+        }
+        return Response(response, status=status.HTTP_200_OK)

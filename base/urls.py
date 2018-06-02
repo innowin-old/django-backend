@@ -10,12 +10,17 @@ from .views import (
         RollViewSet,
         RollPermissionViewSet,
         HashtagRelationViewset,
-        #CertificateViewSet
+        BaseCountryViewSet,
+        BaseProvinceViewSet,
+        BaseTownViewSet
     )
 
 
 router = DefaultRouter()
-#router.register(r'certificates', CertificateViewSet, 'certificates')
+
+router.register(r'towns', BaseTownViewSet, 'Towns')
+router.register(r'provinces', BaseProvinceViewSet, 'Provinces')
+router.register(r'countries', BaseCountryViewSet, 'Countries')
 router.register(r'hashtag-relations', HashtagRelationViewset, 'Hashtag Relations')
 router.register(r'rolls', RollViewSet, 'Rolls')
 router.register(r'permissions', RollPermissionViewSet, 'Permissions')
