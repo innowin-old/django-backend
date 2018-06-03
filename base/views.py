@@ -262,7 +262,7 @@ class PostViewSet(BaseModelViewSet):
 
 
 class CertificateViewSet(BaseModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = BaseCertificate.objects.filter(delete_flag=False)

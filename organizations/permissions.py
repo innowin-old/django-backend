@@ -5,35 +5,67 @@ from rest_framework import permissions
 from .models import Organization, MetaData
 
 
-class StaffOrganizationOwner(permissions.BasePermission):
+class IsStaffOrganizationOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            organization_id = request.POST.get('staff_organization', None)
+            if organization_id is not None:
+                try:
+                    organization_obj = Organization.objects.get(pk=organization_id)
+                except Organization.DoesNotExist:
+                    return False
+                if organization_obj.owner == request.user or request.user.is_superuser:
+                    return True
+            return False
+        return True
+
     def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
-            return True
-        else:
-            if obj and (
-                    request.user == obj.staff_organization.owner or request.user == obj.staff_organization.admins or request.user.is_superuser):
+        if request.method != 'GET':
+            if request.user == obj.staff_organization.owner or request.user == obj.staff_organization.admins or request.user.is_superuser:
+                return True
+        return True
+
+
+class IsStaffCountOrganizationOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            organization_id = request.POST.get('staff_count_organization', None)
+            if organization_id is not None:
+                try:
+                    organization_obj = Organization.objects.get(pk=organization_id)
+                except Organization.DoesNotExist:
+                    return False
+                if organization_obj.owner == request.user or request.user.is_superuser:
+                    return True
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method != 'GET':
+            if request.user == obj.staff_count_organization.owner or request.user in obj.staff_count_organization.admins or request.user.is_superuser:
                 return False
-        return False
+        return True
 
 
-class StaffCountOrganizationOwner(permissions.BasePermission):
+class IsPictureOrganizationOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            organization_id = request.POST.get('picture_organization', None)
+            if organization_id is not None:
+                try:
+                    organization_obj = Organization.objects.get(pk=organization_id)
+                except Organization.DoesNotExist:
+                    return False
+                if organization_obj.owner == request.user or request.user.is_superuser:
+                    return True
+            return False
+        return True
+
     def has_object_permission(self, request, view, obj):
         if request.method == 'GET':
             return True
         else:
-            if obj and (
-                    request.user == obj.staff_count_organization.owner or request.user == obj.staff_count_organization.admins or request.user.is_superuser):
-                return False
-        return False
-
-
-class PictureOrganizationOwner(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
-            return True
-        else:
-            if obj and (
-                    request.user == obj.picture_organization.owner or request.user == obj.picture_organization.admins or request.user.is_superuser):
+            if request.user == obj.picture_organization.owner or request.user == obj.picture_organization.admins or request.user.is_superuser:
                 return False
         return False
 
@@ -47,13 +79,10 @@ class FollowOwner(permissions.BasePermission):
 
 class CustomerOrganizationOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
-            return True
-        else:
-            if obj and (
-                    request.user == obj.customer_organization.owner or request.user == obj.customer_organization.admins or request.user.is_superuser):
+        if request.method == 'POST':
+            if request.user == obj.customer_organization.owner or request.user == obj.customer_organization.admins or request.user.is_superuser:
                 return False
-        return False
+        return True
 
 
 class ConfirmationOwner(permissions.BasePermission):

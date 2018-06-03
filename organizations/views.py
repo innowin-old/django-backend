@@ -9,9 +9,9 @@ from base.permissions import IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
 
 from .permissions import (
-    StaffOrganizationOwner,
-    StaffCountOrganizationOwner,
-    PictureOrganizationOwner,
+    IsStaffOrganizationOwnerOrReadOnly,
+    IsStaffCountOrganizationOwnerOrReadOnly,
+    IsPictureOrganizationOwnerOrReadOnly,
     CustomerOrganizationOwner,
     ConfirmationOwner,
     IsMetaDataOrganizationOwner
@@ -198,7 +198,7 @@ class OrganizationViewset(BaseModelViewSet):
 
 
 class StaffCountViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, StaffCountOrganizationOwner]
+    permission_classes = [IsAuthenticated, IsStaffCountOrganizationOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = StaffCount.objects.filter(delete_flag=False)
@@ -207,11 +207,11 @@ class StaffCountViewset(BaseModelViewSet):
         if organization_id is not None:
             queryset = queryset.filter(staff_count_organization_id=organization_id)
 
-        organization_nike_name = self.request.query_params.get('organization_nike_name')
+        organization_nike_name = self.request.query_params.get('organization_nike_name', None)
         if organization_nike_name is not None:
             queryset = queryset.filter(staff_count_organization__nike_name__contains=organization_nike_name)
 
-        organization_username = self.request.query_params.get('organization_username')
+        organization_username = self.request.query_params.get('organization_username', None)
         if organization_username is not None:
             queryset = queryset.filter(staff_count_organization__username__contains=organization_username)
 
@@ -222,7 +222,7 @@ class StaffCountViewset(BaseModelViewSet):
 
 
 class OrganizationPictureViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, PictureOrganizationOwner]
+    permission_classes = [IsAuthenticated, IsPictureOrganizationOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = OrganizationPicture.objects.filter(delete_flag=False)
@@ -246,7 +246,7 @@ class OrganizationPictureViewset(BaseModelViewSet):
 
 
 class StaffViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, StaffOrganizationOwner]
+    permission_classes = [IsAuthenticated, IsStaffOrganizationOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Staff.objects.filter(delete_flag=False)
