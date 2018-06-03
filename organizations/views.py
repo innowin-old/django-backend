@@ -12,7 +12,6 @@ from .permissions import (
     StaffOrganizationOwner,
     StaffCountOrganizationOwner,
     PictureOrganizationOwner,
-    FollowOwner,
     CustomerOrganizationOwner,
     ConfirmationOwner,
     IsMetaDataOrganizationOwner

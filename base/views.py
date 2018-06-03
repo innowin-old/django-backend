@@ -1,5 +1,5 @@
 import json
-from django.db import transaction
+
 from django.db.models import Q
 from django.core import serializers
 from rest_framework import status
@@ -13,7 +13,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from .permissions import (
     IsRollOwnerOrReadOnly,
     IsRollPermissionOwnerOrReadOnly,
-    IfExchangeIsAcceptedOrNotAccess,
     IsAdminUserOrReadOnly,
     IsHashtagOwnerOrReadOnly,
     IsCommentOwnerOrReadOnly
@@ -238,7 +237,6 @@ class PostViewSet(BaseModelViewSet):
 
         post_related_product_is_null = self.request.query_params.get('post_related_product_is_null')
         if post_related_product_is_null is not None and post_related_product_is_null == '0':
-            print('salam')
             queryset = queryset.filter(~Q(post_related_product_id=None))
 
         post_title = self.request.query_params.get('post_title', None)

@@ -98,7 +98,6 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Identity Exchange Views
     """
-    # queryset = ExchangeIdentity.objects.all()
     permission_classes = [IsAuthenticated, IsExchangeFull]
 
     def get_queryset(self):
