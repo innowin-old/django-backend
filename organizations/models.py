@@ -191,8 +191,8 @@ pre_save.connect(set_child_name, sender=Ability)
 class Confirmation(Base):
     confirmation_corroborant = models.ForeignKey('users.Identity', related_name='confirmation_corroborant',
                                                  db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmaed', db_index=True,
-                                               on_delete=models.CASCADE, help_text='Integer')
+    confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmed', db_index=True,
+                                               on_delete=models.CASCADE, help_text='Integer', blank=True, null=True)
     title = models.CharField(max_length=50, db_index=True, help_text='String(String(50))')
     description = models.TextField(help_text='Text')
     link = models.CharField(max_length=200, help_text='String(200)')

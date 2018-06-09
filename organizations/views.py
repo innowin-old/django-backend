@@ -13,7 +13,7 @@ from .permissions import (
     IsStaffCountOrganizationOwnerOrReadOnly,
     IsPictureOrganizationOwnerOrReadOnly,
     CustomerOrganizationOwner,
-    ConfirmationOwner,
+    IsConfirmationOwner,
     IsMetaDataOrganizationOwner
 )
 
@@ -391,7 +391,7 @@ class AbilityViewset(BaseModelViewSet):
 
 
 class ConfirmationViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, ConfirmationOwner]
+    permission_classes = [IsAuthenticated, IsConfirmationOwner]
 
     def get_queryset(self):
         queryset = Confirmation.objects.filter(delete_flag=False)

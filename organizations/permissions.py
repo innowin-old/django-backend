@@ -2,7 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import permissions
 
-from .models import Organization, MetaData
+from users.models import Identity
+from .models import Organization, MetaData, Confirmation
 
 
 class IsStaffOrganizationOwnerOrReadOnly(permissions.BasePermission):
@@ -85,21 +86,27 @@ class CustomerOrganizationOwner(permissions.BasePermission):
         return True
 
 
-class ConfirmationOwner(permissions.BasePermission):
+class IsConfirmationOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            if 'confirm_flag' not in request.POST or request.user.is_superuser:
+                return True
+            return False
+        return True
+
     def has_object_permission(self, request, view, obj):
+        if request.method == 'PATCH' or request.method == 'PUT':
+            if obj.confirm_flag is False and request.POST.get('confirm_flag') is True:
+                confirmed_identity = Identity.objects.get(pk=obj.confirmation_confirmed.id)
+                if confirmed_identity.identity_user is not None:
+                    if confirmed_identity.identity_user == request.user or request.user.is_superuser:
+                        return True
+                else:
+                    if confirmed_identity.identity_organization.owner == request.user or request.user.is_superuser:
+                        return True
         if obj.confirmation_corroborant.identity_user == request.user or obj.confirmation_confirmed.identity_user == request.user or request.user.is_superuser:
             return True
         return False
-
-
-class IsOrganizationOwnerOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method == "POST":
-            try:
-                organization = Organization.objects.get(Q(owner=request.user) | Q(admins__in=request.user))
-            except ObjectDoesNotExist:
-                return False
-        return True
 
 
 class IsMetaDataOrganizationOwner(permissions.BasePermission):

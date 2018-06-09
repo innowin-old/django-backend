@@ -182,6 +182,17 @@ class ConfirmationSerializer(BaseSerializer):
             'updated_time': {'read_only': True}
         }
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if 'confirmation_corroborant' not in validated_data or not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['confirmation_corroborant'] = identity
+        if 'confirmation_confirmed' in validated_data:
+            validated_data.pop('confirmation_confirmed', None)
+        confirmation = Confirmation.objects.create(**validated_data)
+        confirmation.save()
+        return confirmation
+
     def update(self, instance, validated_data):
         if 'confirm_flag' in validated_data:
             experience = WorkExperience.objects.get(pk=instance.confirmation_parent_id)
