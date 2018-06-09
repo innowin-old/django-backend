@@ -223,3 +223,8 @@ class CustomerSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+
+class OrganizationMetaSerializer(serializers.Serializer):
+    owner_ships = serializers.ListField()
+    business_types = serializers.ListField()

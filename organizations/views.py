@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
@@ -114,6 +115,18 @@ class OrganizationViewset(BaseModelViewSet):
         if self.action == 'list':
             return OrganizationListViewSerializer
         return OrganizationSerializer
+
+    @list_route(
+        permission_classes=[AllowAny],
+        methods=['get']
+    )
+    def get_meta_data(self, request):
+        organization = Organization()
+        response = {
+            'ownership_types': organization.OWNERSHIP_TYPES,
+            'business_types': organization.BUSINESS_TYPES
+        }
+        return Response(response, status=status.HTTP_200_OK)
 
     @list_route(
         permission_classes=[IsAdminUser],
