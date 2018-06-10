@@ -224,7 +224,11 @@ class CustomerSerializer(BaseSerializer):
             'updated_time': {'read_only': True}
         }
 
-
-class OrganizationMetaSerializer(serializers.Serializer):
-    owner_ships = serializers.ListField()
-    business_types = serializers.ListField()
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if 'related_customer' not in validated_data or not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['related_customer'] = identity
+        customer = Customer.objects.create(**validated_data)
+        customer.save()
+        return customer

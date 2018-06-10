@@ -1,9 +1,7 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 from rest_framework import permissions
 
 from users.models import Identity
-from .models import Organization, MetaData, Confirmation
+from .models import Organization
 
 
 class IsStaffOrganizationOwnerOrReadOnly(permissions.BasePermission):
@@ -78,10 +76,10 @@ class FollowOwner(permissions.BasePermission):
         return False
 
 
-class CustomerOrganizationOwner(permissions.BasePermission):
+class IsCustomerOrganizationOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method == 'POST':
-            if request.user == obj.customer_organization.owner or request.user == obj.customer_organization.admins or request.user.is_superuser:
+        if request.method != 'GET':
+            if request.user == obj.customer_organization.owner or request.user in obj.customer_organization.admins or request.user.is_superuser:
                 return False
         return True
 
@@ -95,7 +93,7 @@ class IsConfirmationOwner(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        if request.method == 'PATCH' or request.method == 'PUT':
+        if request.method != 'GET':
             if obj.confirm_flag is False and request.POST.get('confirm_flag') is True:
                 confirmed_identity = Identity.objects.get(pk=obj.confirmation_confirmed.id)
                 if confirmed_identity.identity_user is not None:

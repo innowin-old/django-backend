@@ -13,7 +13,7 @@ from .permissions import (
     IsStaffOrganizationOwnerOrReadOnly,
     IsStaffCountOrganizationOwnerOrReadOnly,
     IsPictureOrganizationOwnerOrReadOnly,
-    CustomerOrganizationOwner,
+    IsCustomerOrganizationOwner,
     IsConfirmationOwner,
     IsMetaDataOrganizationOwner
 )
@@ -460,7 +460,7 @@ class ConfirmationViewset(BaseModelViewSet):
 
 
 class CustomerViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, CustomerOrganizationOwner]
+    permission_classes = [IsAuthenticated, IsCustomerOrganizationOwner]
 
     def get_queryset(self):
         queryset = Customer.objects.filter(delete_flag=False)
