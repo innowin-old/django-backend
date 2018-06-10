@@ -6,7 +6,6 @@ from users.models import Identity
 from base.models import Base, Hashtag, BaseManager
 from base.signals import update_cache, set_child_name
 from media.models import Media
-from users.models import Identity
 
 
 # Create your models here.
@@ -37,7 +36,8 @@ class Exchange(Base):
         help_text='Integer',
     )
     private = models.BooleanField(default=False, help_text='Boolean')
-    members_count = models.IntegerField(default=100, help_text='Boolean')
+    members_count = models.BigIntegerField(default=100, help_text='Boolean')
+    is_default_exchange = models.BooleanField(default=False, help_text='Boolean')
     active_flag = models.BooleanField(default=True, help_text='Boolean')
 
     objects = BaseManager()

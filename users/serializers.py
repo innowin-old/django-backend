@@ -36,6 +36,7 @@ from .models import (
     StrengthStates,
     UserMetaData
 )
+from .utils import add_user_to_default_exchange
 
 
 class SuperAdminUserSerializer(ModelSerializer):
@@ -78,6 +79,8 @@ class SuperAdminUserSerializer(ModelSerializer):
             user_strength.profile_media_obtained = True
         user_strength.registration_obtained = True
         user_strength.save()
+        # add user to default exchange
+        add_user_to_default_exchange(user)
         return user
 
     def update(self, instance, validated_data):
@@ -214,6 +217,8 @@ class UserSerializer(ModelSerializer):
             user_strength.profile_media_obtained = True
         user_strength.registration_obtained = True
         user_strength.save()
+        # add user to default exchange
+        add_user_to_default_exchange(user)
         return user
 
     def update(self, instance, validated_data):
@@ -865,6 +870,8 @@ class UserOrganizationSerializer(BaseSerializer):
     def create(self, validated_data):
         organization_data = validated_data.pop('organization')
         user = User.objects.create_user(**validated_data)
+        # add user to default exchange
+        add_user_to_default_exchange(user)
         organization = Organization.objects.create(owner=user, **organization_data)
         response = {
             'id': user.id,
