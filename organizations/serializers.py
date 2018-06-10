@@ -19,7 +19,6 @@ from users.models import Identity, Profile, StrengthStates, WorkExperience
 class OrganizationSerializer(BaseSerializer):
     class Meta:
         model = Organization
-        depth = 1
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
@@ -29,9 +28,25 @@ class OrganizationSerializer(BaseSerializer):
         request = self.context.get('request')
         if 'owner' not in validated_data or not request.user.is_superuser:
             validated_data['owner'] = request.user
-        organization = Organization(**validated_data)
+        organization = Organization.objects.create(**validated_data)
         organization.save()
         return organization
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if 'owner' not in validated_data or not request.user.is_superuser:
+            instance.owner = request.user
+        else:
+            instance.owner = validated_data.get('owner', None)
+
+        # set validated data to organization instance
+        for key in validated_data:
+            if key != 'owner':
+                setattr(instance,  key, validated_data.get(key))
+
+        instance.save
+
+        return instance
 
 
 class MetaDataSerializer(BaseSerializer):
@@ -97,12 +112,23 @@ class OrganizationListViewSerializer(BaseSerializer):
                   'meta_data']
 
 
+class OrganizationGetObjectSerializer(BaseSerializer):
+    class Meta:
+        model = Organization
+        depth = 1
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
 class StaffCountSerializer(BaseSerializer):
     class Meta:
         model = StaffCount
         exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'staff_count_organization': {'required': False}
         }
 
 

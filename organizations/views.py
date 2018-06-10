@@ -15,7 +15,8 @@ from .permissions import (
     IsPictureOrganizationOwnerOrReadOnly,
     IsCustomerOrganizationOwner,
     IsConfirmationOwner,
-    IsMetaDataOrganizationOwner
+    IsMetaDataOrganizationOwner,
+    IsAbilityOrganizationOwnerOrReadOnly
 )
 
 from .models import (
@@ -33,6 +34,7 @@ from .models import (
 from .serializers import (
     OrganizationSerializer,
     OrganizationListViewSerializer,
+    OrganizationGetObjectSerializer,
     StaffCountSerializer,
     OrganizationPictureSerializer,
     StaffSerializer,
@@ -114,6 +116,8 @@ class OrganizationViewset(BaseModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return OrganizationListViewSerializer
+        elif self.request.method == 'GET':
+            return OrganizationGetObjectSerializer
         return OrganizationSerializer
 
     @list_route(
@@ -364,8 +368,7 @@ class FollowViewset(BaseModelViewSet):
 
 
 class AbilityViewset(BaseModelViewSet):
-    owner_field = 'ability_organization'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsAbilityOrganizationOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Ability.objects.filter(delete_flag=False)
