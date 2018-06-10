@@ -433,7 +433,8 @@ class EducationSerializer(BaseSerializer):
             instance.education_user = validated_data['education_user']
 
         for key in validated_data:
-            setattr(instance, key, validated_data.get(key))
+            if key != 'education_user':
+                setattr(instance, key, validated_data.get(key))
 
         instance.save()
         return instance
@@ -482,7 +483,8 @@ class ResearchSerializer(BaseSerializer):
 
         # set validated data to instance object
         for key in validated_data:
-            setattr(instance, key, validated_data.get(key))
+            if key != 'research_user':
+                setattr(instance, key, validated_data.get(key))
 
         instance.save()
         return instance
@@ -515,7 +517,8 @@ class CertificateSerializer(BaseSerializer):
 
         # set validated data to certificate instance
         for key in validated_data:
-            setattr(instance, key, validated_data.get(key))
+            if key != 'certificate_user':
+                setattr(instance, key, validated_data.get(key))
 
         instance.save()
         return instance
@@ -616,7 +619,8 @@ class SkillSerializer(BaseSerializer):
 
         # set validated data to skill instance
         for key in validated_data:
-            setattr(instance, key, validated_data.get(key))
+            if key != 'skill_user':
+                setattr(instance, key, validated_data.get(key))
 
         instance.save()
         return instance
@@ -648,7 +652,8 @@ class BadgeSerializer(BaseSerializer):
             instance.badge_user = validated_data['badge_user']
 
         for key in validated_data:
-            setattr(instance, key, validated_data.get(key))
+            if key != 'badge_user':
+                setattr(instance, key, validated_data.get(key))
 
         instance.save()
         return instance
