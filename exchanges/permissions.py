@@ -74,9 +74,23 @@ class IsExchangeFull(permissions.BasePermission):
                     exchange_obj = Exchange.objects.get(pk=exchange_id)
                 except Exchange.DoesNotExist:
                     return False
-                exchange_count = ExchangeIdentity.objects.filter(exchange_identity_related_exchange_id=exchange_id).count()
+                exchange_count = ExchangeIdentity.objects.filter(exchange_identity_related_exchange_id=exchange_id,
+                                                                 active_flag=True).count()
                 if exchange_count >= exchange_obj.members_count:
                     return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method != "GET":
+            active_flag = request.POST.get('active_flag', None)
+            if active_flag is not None:
+                if obj.active_flag is False and active_flag is True:
+                    exchange_count = ExchangeIdentity.objects.filter(
+                        exchange_identity_related_exchange=obj.exchange_identity_related_exchange, active_flag=True)
+                    if exchange_count < obj.exchange_identity_related_exchange.members_count:
+                        return True
+                    return False
+            return False
         return True
 
 
@@ -102,4 +116,18 @@ class IsAgentOrReadOnly(permissions.BasePermission):
                         organization = Organization.objects.get(pk=identity.identity_organization)
                         if organization.owner != user:
                             return False
+        return True
+
+
+class IsFirstDefaultExchange(permissions.BasePermission):
+    message = "Default Exchange Already Exist"
+
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            is_default_exchange = request.POST.get('is_default_exchange', None)
+            if is_default_exchange is not None:
+                default_exchange_count = Exchange.objects.filter(is_default_exchange=True).count()
+                if default_exchange_count >= 1:
+                    return False
+            return True
         return True

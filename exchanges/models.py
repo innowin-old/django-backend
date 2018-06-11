@@ -36,7 +36,7 @@ class Exchange(Base):
         help_text='Integer',
     )
     private = models.BooleanField(default=False, help_text='Boolean')
-    members_count = models.BigIntegerField(default=100, help_text='Boolean')
+    members_count = models.BigIntegerField(default=100, help_text='BigInteger')
     is_default_exchange = models.BooleanField(default=False, help_text='Boolean')
     active_flag = models.BooleanField(default=True, help_text='Boolean')
 
