@@ -116,7 +116,7 @@ class OrganizationViewset(BaseModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return OrganizationListViewSerializer
-        elif self.request.method == 'GET':
+        elif self.action == 'read':
             return OrganizationGetObjectSerializer
         return OrganizationSerializer
 
