@@ -804,16 +804,8 @@ class DeviceSerializer(BaseSerializer):
         model = Device
         exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True},
-            'device_user': {'required': False, 'read_only': True}
+            'updated_time': {'read_only': True}
         }
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        user = get_object_or_404(User, pk=request.user.id)
-        device = Device.objects.create(device_user=user, **validated_data)
-        device.save()
-        return device
 
 
 class UserMetaDataSerializer(BaseSerializer):

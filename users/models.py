@@ -396,7 +396,7 @@ pre_save.connect(set_child_name, sender=Agent)
 
 class Device(Base):
     device_user = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE, help_text='Integer')
-    fingerprint = models.CharField(max_length=50)
+    fingerprint = models.CharField(max_length=50, unique=True)
     browser_name = models.CharField(max_length=20, blank=True, null=True)
     browser_version = models.CharField(max_length=30, blank=True, null=True)
     browser_major_version = models.SmallIntegerField(blank=True, null=True)

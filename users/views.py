@@ -684,15 +684,15 @@ class DeviceViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Device.objects.filter(delete_flag=False)
 
-        device_user = self.request.query_params.get('device_user')
+        device_user = self.request.query_params.get('device_user', None)
         if device_user is not None:
             queryset = queryset.filter(device_user=device_user)
 
-        fingerprint = self.request.query_params.get('fingerprint')
+        fingerprint = self.request.query_params.get('fingerprint', None)
         if fingerprint is not None:
             queryset = queryset.filter(fingerprint=fingerprint)
 
-        browser_name = self.request.query_params.get('browser_name')
+        browser_name = self.request.query_params.get('browser_name', None)
         if browser_name is not None:
             queryset = queryset.filter(browser_name=browser_name)
 
