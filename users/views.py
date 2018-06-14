@@ -56,7 +56,7 @@ from .serializers import (
     ForgetPasswordSerializer,
     UserOrganizationSerializer
 )
-from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly
+from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
 
 class UserViewset(ModelViewSet):
@@ -679,7 +679,7 @@ class UserArticleRisViewset(ModelViewSet):
 
 
 class DeviceViewset(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsDeviceOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Device.objects.filter(delete_flag=False)

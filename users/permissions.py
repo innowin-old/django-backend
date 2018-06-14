@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.contrib.auth.models import User
 
 
 class IsIdentityOwnerOrReadOnly(permissions.BasePermission):
@@ -37,3 +38,19 @@ class IsAuthenticatedOrCreateOnly(permissions.BasePermission):
         elif request.user.is_authenticated:
             return True
         return False
+
+
+class IsDeviceOwnerOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            device_user_id = request.POST.get('device_user', None)
+            if device_user_id is not None:
+                if device_user_id.isdigit():
+                    try:
+                        user = User.objects.get(pk=device_user_id)
+                    except User.DoesNotExist:
+                        return False
+                    if user == request.user:
+                        return True
+            return False
+        return True
