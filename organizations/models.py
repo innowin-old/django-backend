@@ -38,23 +38,28 @@ class Organization(Base):
     public_email = models.EmailField(blank=True, null=True, help_text='Text')
     nike_name = models.CharField(max_length=20, db_index=True, null=True, blank=True, help_text='String(100)')
     official_name = models.CharField(max_length=50, db_index=True, unique=True, help_text='String(75)')
-    national_code = models.CharField(max_length=11, db_index=True, help_text='String(20)')
+    national_code = models.CharField(max_length=11, db_index=True, null=True, blank=True, help_text='String(20)')
     registration_ads_url = models.URLField(db_index=True, null=True, blank=True, help_text='URL')
     registrar_organization = models.CharField(max_length=100, db_index=True, null=True, blank=True,
                                               help_text='String(100)')
-    country = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    province = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    city = models.CharField(max_length=50, db_index=True, help_text='String(50)')
+    country = models.CharField(max_length=50, db_index=True, null=True, blank=True, help_text='String(50)')
+    province = models.CharField(max_length=50, db_index=True, null=True, blank=True, help_text='String(50)')
+    city = models.CharField(max_length=50, db_index=True, null=True, blank=True, help_text='String(50)')
     address = models.TextField(blank=True, null=True, db_index=True, help_text='Text')
     phone = ArrayField(PhoneField(), blank=True, null=True, db_index=True, default=[], help_text='Phone')
     web_site = models.URLField(null=True, db_index=True, blank=True, help_text='URL')
     established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
-        max_length=20)
+        max_length=20,
+        null=True,
+        blank=True
+    )
     business_type = models.CharField(
         choices=BUSINESS_TYPES,
         max_length=30,
+        null=True,
+        blank=True,
         help_text='Array(String(30))'
     )
     organization_logo = models.ForeignKey(
@@ -78,6 +83,7 @@ class Organization(Base):
     social_network = ArrayField(models.CharField(max_length=100), blank=True, null=True, default=[],
                                 help_text='Array(String(100))')
     staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
+    active_flag = models.BooleanField(default=False)
 
     objects = BaseManager()
 

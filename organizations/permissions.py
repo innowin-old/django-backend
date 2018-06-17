@@ -148,3 +148,23 @@ class IsAbilityOrganizationOwnerOrReadOnly(permissions.BasePermission):
             if request.user == obj.ability_organization.owner or request.user == obj.ability_organization.admins or request.user.is_superuser:
                 return True
         return True
+
+
+class IsAdminUserOrCanNotActive(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            active_flag = request.POST.get('active_flag', None)
+            if active_flag is not None:
+                if request.user.is_superuser:
+                    return True
+                return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method != "GET":
+            active_flag = request.POST.get('active_flag', None)
+            if active_flag is not None:
+                if request.user.is_superuser:
+                    return True
+                return False
+        return True

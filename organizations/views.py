@@ -16,7 +16,8 @@ from .permissions import (
     IsCustomerOrganizationOwner,
     IsConfirmationOwner,
     IsMetaDataOrganizationOwner,
-    IsAbilityOrganizationOwnerOrReadOnly
+    IsAbilityOrganizationOwnerOrReadOnly,
+    IsAdminUserOrCanNotActive
 )
 
 from .models import (
@@ -50,7 +51,7 @@ from .serializers import (
 
 class OrganizationViewset(BaseModelViewSet):
     owner_field = 'owner'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly, IsAdminUserOrCanNotActive]
 
     def get_queryset(self):
         queryset = Organization.objects.filter(delete_flag=False)
@@ -110,6 +111,12 @@ class OrganizationViewset(BaseModelViewSet):
         established_year = self.request.query_params.get('established_year', None)
         if established_year is not None:
             queryset = queryset.filter(established_year=established_year)
+
+        # only admin users can filter active organizations
+        if self.request.user.is_superuser:
+            active_flag = self.request.query_params.get('active_flag', None)
+            if active_flag is not None:
+                queryset = queryset.filter(active_flag=active_flag)
 
         return queryset
 
