@@ -161,23 +161,6 @@ class ProductViewset(BaseModelViewSet):
         return ProductSerializer
 
     @list_route(
-        permission_classes=[IsAuthenticated],
-        methods=['get']
-    )
-    def get_related_products(self, request):
-        posts = Post.objects.filter(delete_flag=False).exclude(post_related_product__isnull=True)
-        print('salam')
-        post_parent = self.request.query_params.get('post_parent', None)
-        if post_parent is not None:
-            posts = posts.filter(post_parent=post_parent)
-        post_type = self.request.query_params.get('post_type', None)
-        if post_type is not None:
-            posts = posts.filter(post_type=post_type)
-        products = posts.select_related('post_related_product').all()
-        response = serializers.serialize('json', products)
-        return Response(response)
-
-    @list_route(
       permission_classes=[IsAdminUser],
       methods=['post']
     )

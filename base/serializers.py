@@ -162,6 +162,17 @@ class PostSerializer(BaseSerializer):
             user_strength.save()
 
 
+class PostListSerializer(BaseSerializer):
+    class Meta:
+        model = Post
+        exclude = ['child_name']
+        depth = 1
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'post_user': {'read_only': True}
+        }
+
+
 class CertificateSerializer(BaseSerializer):
     class Meta:
         model = BaseCertificate
