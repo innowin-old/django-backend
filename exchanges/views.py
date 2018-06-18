@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAdminUser
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsAgentOrReadOnly, IsFirstDefaultExchange
-from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer
+from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, ExchangeMiniSerializer
 
 
 # Create your views here.
@@ -60,6 +60,8 @@ class ExchangeViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return ExchangeMiniSerializer
         return ExchangeSerializer
 
     @list_route(

@@ -7,8 +7,7 @@ from users.models import Identity, Profile, StrengthStates
 class ExchangeSerializer(BaseSerializer):
     class Meta:
         model = Exchange
-        exclude = ['child_name']
-        depth = 1
+        exclude = ['child_name', 'is_default_exchange']
         extra_kwargs = {
             'owner': {'required': False},
             'updated_time': {'read_only': True}
@@ -32,6 +31,7 @@ class ExchangeSerializer(BaseSerializer):
 class ExchangeMiniSerializer(BaseSerializer):
     class Meta:
         model = Exchange
+        depth = 1
         exclude = ['created_time', 'updated_time', 'delete_flag', 'active_flag', 'child_name']
 
 
