@@ -1,5 +1,7 @@
 import json
 
+from django.http import Http404
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -63,6 +65,15 @@ class ExchangeViewSet(BaseModelViewSet):
         if self.action == 'list':
             return ExchangeMiniSerializer
         return ExchangeSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
         permission_classes=[IsAdminUser],
@@ -135,3 +146,12 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
         if self.action == 'list':
             return ExchangeIdentityListViewSerializer
         return ExchangeIdentitySerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)

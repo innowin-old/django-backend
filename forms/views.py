@@ -1,3 +1,6 @@
+from django.http import Http404
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
@@ -42,6 +45,15 @@ class FormViewSet(ModelViewSet):
     def get_serializer_class(self):
         return FormSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class GroupViewSet(ModelViewSet):
     """
@@ -61,6 +73,15 @@ class GroupViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return GroupSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FormGroupViewSet(ModelViewSet):
@@ -98,6 +119,15 @@ class FormGroupViewSet(ModelViewSet):
     def get_serializer_class(self):
         return FormGroupSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ElementViewSet(ModelViewSet):
     """
@@ -117,6 +147,15 @@ class ElementViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return ElementSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FormGroupElementViewSet(ModelViewSet):
@@ -151,6 +190,15 @@ class FormGroupElementViewSet(ModelViewSet):
     def get_serializer_class(self):
         return FormGroupElementSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class DataViewSet(ModelViewSet):
     """
@@ -174,3 +222,12 @@ class DataViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return DataSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)

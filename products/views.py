@@ -1,6 +1,8 @@
 import json
 
 from django.core import serializers
+from django.http import Http404
+from rest_framework import status
 
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
@@ -59,6 +61,15 @@ class CategoryViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return CategorySerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CategoryFieldViewset(BaseModelViewSet):
     permission_classes = [IsAdminUser]
@@ -90,6 +101,15 @@ class CategoryFieldViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return CategoryFieldSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProductViewset(BaseModelViewSet):
@@ -191,6 +211,15 @@ class ProductViewset(BaseModelViewSet):
         }
         return Response(response)
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class PriceViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsPriceProductOwnerOrReadOnly]
@@ -253,6 +282,15 @@ class PriceViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return PriceSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class PictureViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsPictureProductOwnerOrReadOnly]
@@ -272,6 +310,15 @@ class PictureViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return PictureSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CommentViewset(BaseModelViewSet):
@@ -296,3 +343,12 @@ class CommentViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return CommentSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -7,7 +7,7 @@ from rest_framework.decorators import list_route
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 from .permissions import (
@@ -39,7 +39,6 @@ from .serializers import (
     HashtagParentSerializer,
     BaseCommentSerializer,
     PostSerializer,
-    PostListSerializer,
     CertificateSerializer,
     RollSerializer,
     RollPermissionSerializer,
@@ -100,6 +99,15 @@ class BaseViewset(ModelViewSet):
     def get_serializer_class(self):
         return BaseSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class HashtagParentViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]
@@ -115,6 +123,15 @@ class HashtagParentViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return HashtagParentSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     
 class HashtagViewset(BaseModelViewSet):
@@ -135,6 +152,15 @@ class HashtagViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return HashtagSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class HashtagRelationViewset(BaseModelViewSet):
@@ -188,6 +214,15 @@ class HashtagRelationViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return HashtagRelationSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class BaseCommentViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsCommentOwnerOrReadOnly]
@@ -211,6 +246,15 @@ class BaseCommentViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return BaseCommentSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PostViewSet(BaseModelViewSet):
@@ -259,9 +303,16 @@ class PostViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'list':
-            return PostListSerializer
         return PostSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CertificateViewSet(BaseModelViewSet):
@@ -282,6 +333,15 @@ class CertificateViewSet(BaseModelViewSet):
 
     def get_serializer_class(self):
         return CertificateSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RollViewSet(ModelViewSet):
@@ -311,6 +371,15 @@ class RollViewSet(ModelViewSet):
     def get_serializer_class(self):
         return RollSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class RollPermissionViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsRollPermissionOwnerOrReadOnly]
@@ -335,6 +404,15 @@ class RollPermissionViewSet(ModelViewSet):
     def get_serializer_class(self):
         return RollPermissionSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class BaseCountryViewSet(ModelViewSet):
     permission_classes = [AllowAny]
@@ -354,6 +432,15 @@ class BaseCountryViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return BaseCountrySerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BaseProvinceViewSet(ModelViewSet):
@@ -383,6 +470,15 @@ class BaseProvinceViewSet(ModelViewSet):
     def get_serializer_class(self):
         return BaseProvinceSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class BaseTownViewSet(ModelViewSet):
     permission_classes = [AllowAny]
@@ -410,6 +506,15 @@ class BaseTownViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return BaseTownSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
         permission_classes=[IsAdminUser],

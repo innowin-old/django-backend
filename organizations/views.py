@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.decorators import list_route
@@ -127,6 +128,15 @@ class OrganizationViewset(BaseModelViewSet):
             return OrganizationGetObjectSerializer
         return OrganizationSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @list_route(
         permission_classes=[AllowAny],
         methods=['get']
@@ -244,6 +254,15 @@ class StaffCountViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return StaffCountSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class OrganizationPictureViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsPictureOrganizationOwnerOrReadOnly]
@@ -267,6 +286,15 @@ class OrganizationPictureViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return OrganizationPictureSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class StaffViewset(BaseModelViewSet):
@@ -324,6 +352,15 @@ class StaffViewset(BaseModelViewSet):
             return StaffListViewSerializer
         return StaffSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class FollowViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -373,6 +410,15 @@ class FollowViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return FollowSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class AbilityViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsAbilityOrganizationOwnerOrReadOnly]
@@ -411,6 +457,15 @@ class AbilityViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return AbilitySerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ConfirmationViewset(BaseModelViewSet):
@@ -468,6 +523,15 @@ class ConfirmationViewset(BaseModelViewSet):
             return ConfirmationListViewSerializer
         return ConfirmationSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CustomerViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsCustomerOrganizationOwner]
@@ -500,6 +564,15 @@ class CustomerViewset(BaseModelViewSet):
     def get_serializer_class(self):
         return CustomerSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class MetaDataViewSet(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsMetaDataOrganizationOwner]
@@ -510,3 +583,12 @@ class MetaDataViewSet(BaseModelViewSet):
 
     def get_serializer_class(self):
         return MetaDataSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)

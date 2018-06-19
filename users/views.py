@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -413,6 +413,15 @@ class IdentityViewset(ModelViewSet):
     def get_serializer_class(self):
         return IdentitySerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ProfileViewset(ModelViewSet):
     owner_field = 'profile_user'
@@ -464,6 +473,15 @@ class ProfileViewset(ModelViewSet):
             return ProfileListSerializer
         return ProfileSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class EducationViewset(ModelViewSet):
     owner_field = 'education_user'
@@ -499,6 +517,15 @@ class EducationViewset(ModelViewSet):
     def get_serializer_class(self):
         return EducationSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ResearchViewset(ModelViewSet):
     owner_field = 'research_user'
@@ -520,6 +547,15 @@ class ResearchViewset(ModelViewSet):
     def get_serializer_class(self):
         return ResearchSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CertificateViewset(ModelViewSet):
     owner_field = 'certificate_user'
@@ -540,6 +576,15 @@ class CertificateViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return CertificateSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class WorkExperienceViewset(ModelViewSet):
@@ -582,6 +627,15 @@ class WorkExperienceViewset(ModelViewSet):
     def get_serializer_class(self):
         return WorkExperienceSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SkillViewset(ModelViewSet):
     owner_field = 'skill_user'
@@ -602,6 +656,15 @@ class SkillViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return SkillSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BadgeViewset(ModelViewSet):
@@ -624,6 +687,15 @@ class BadgeViewset(ModelViewSet):
     def get_serializer_class(self):
         return BadgeSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class IdentityUrlViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, IsUrlOwnerOrReadOnly]
@@ -643,6 +715,15 @@ class IdentityUrlViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return IdentityUrlSerilizer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserArticleViewset(ModelViewSet):
@@ -664,6 +745,15 @@ class UserArticleViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return UserArticleListSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserArticleRisViewset(ModelViewSet):
@@ -701,6 +791,15 @@ class DeviceViewset(ModelViewSet):
     def get_serializer_class(self):
         return DeviceSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class UserMetaDataViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -724,6 +823,15 @@ class UserMetaDataViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return UserMetaDataSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserOrganizationViewset(ModelViewSet):
