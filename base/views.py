@@ -39,6 +39,7 @@ from .serializers import (
     HashtagParentSerializer,
     BaseCommentSerializer,
     PostSerializer,
+    PostListSerializer,
     CertificateSerializer,
     RollSerializer,
     RollPermissionSerializer,
@@ -303,6 +304,8 @@ class PostViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list':
+            return PostListSerializer
         return PostSerializer
 
     def destroy(self, request, *args, **kwargs):
