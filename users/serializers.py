@@ -4,7 +4,6 @@ import base64
 
 from django.core.files.base import ContentFile
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
 from rest_framework.serializers import (
@@ -357,6 +356,7 @@ class IdentityMiniSerializer(BaseSerializer):
 
     class Meta:
         model = Identity
+        depth = 1
         exclude = ['updated_time']
 
 

@@ -1,7 +1,7 @@
 from base.serializers import BaseSerializer
 from .models import Exchange, ExchangeIdentity
 from users.models import Identity, Profile, StrengthStates
-
+from users.serializers import IdentityMiniSerializer
 
 # Create Serializers Here
 class ExchangeSerializer(BaseSerializer):
@@ -37,8 +37,10 @@ class ExchangeMiniSerializer(BaseSerializer):
 
 class ExchangeIdentityListViewSerializer(BaseSerializer):
     exchange_identity_related_exchange = ExchangeMiniSerializer()
+    exchange_identity_related_identity = IdentityMiniSerializer()
 
     class Meta:
+        depth = 1
         model = ExchangeIdentity
         exclude = ['updated_time', 'child_name']
 
