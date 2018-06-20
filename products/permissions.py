@@ -73,11 +73,13 @@ class IsProductOrganizationOwnerOrReadOnly(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        identity = Identity.objects.get(id=obj.product_owner_id)
-        if identity.identity_user is not None:
-            if identity.identity_user == request.user or request.user.is_superuser:
-                return True
-        else:
-            if identity.identity_organization.owner == request.user or request.user.is_superuser:
-                return True
-        return False
+        if request.method != "GET":
+            identity = Identity.objects.get(id=obj.product_owner_id)
+            if identity.identity_user is not None:
+                if identity.identity_user == request.user or request.user.is_superuser:
+                    return True
+            else:
+                if identity.identity_organization.owner == request.user or request.user.is_superuser:
+                    return True
+            return False
+        return True
