@@ -135,11 +135,13 @@ class Profile(Base):
     profile_strength = models.SmallIntegerField(default=10)
     address = models.CharField(max_length=100, blank=True, null=True)
     profile_related_country = models.ForeignKey(BaseCountry, related_name='profile_country', db_index=True, blank=True
-                                                 , null=True, on_delete=models.CASCADE, help_text='Integer')
-    profile_related_province = models.ForeignKey(BaseProvince, related_name='profile_province', db_index=True, blank=True,
-                                                  null=True, on_delete=models.CASCADE, help_text='Integer')
-    profile_related_town = models.ForeignKey(BaseTown, related_name='profile_town', db_index=True, blank=True, null=True,
-                                              on_delete=models.CASCADE, help_text='Integer')
+                                                , null=True, on_delete=models.CASCADE, help_text='Integer')
+    profile_related_province = models.ForeignKey(BaseProvince, related_name='profile_province', db_index=True,
+                                                 blank=True,
+                                                 null=True, on_delete=models.CASCADE, help_text='Integer')
+    profile_related_town = models.ForeignKey(BaseTown, related_name='profile_town', db_index=True, blank=True,
+                                             null=True,
+                                             on_delete=models.CASCADE, help_text='Integer')
     profile_banner = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_banner_media",
                                        help_text='Integer', blank=True, null=True)
 
@@ -360,7 +362,8 @@ pre_save.connect(set_child_name, sender=Badge)
 
 class IdentityUrl(Base):
     url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
-    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE, help_text='Integer')
+    identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,
+                                                         help_text='Integer')
 
 
 # Cache Model Data After Update
@@ -432,7 +435,8 @@ def create_strength(sender, instance, created, **kwargs):
 
 
 class StrengthStates(Base):
-    strength_user = models.OneToOneField(User, related_name='strength', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    strength_user = models.OneToOneField(User, related_name='strength', db_index=True, on_delete=models.CASCADE,
+                                         help_text='Integer')
     registration_obtained = models.BooleanField(default=False)
     profile_media_obtained = models.BooleanField(default=False)
     first_last_name_obtained = models.BooleanField(default=False)

@@ -20,6 +20,13 @@ class Exchange(Base):
         null=True,
         help_text='Integer',
     )
+    exchange_banner = models.ForeignKey(
+        Media,
+        related_name="exchange_banner",
+        blank=True,
+        null=True,
+        help_text="Integer",
+    )
     link = models.URLField(blank=True, help_text='Url')
     description = models.TextField(
         max_length=300,
