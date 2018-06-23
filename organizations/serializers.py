@@ -33,7 +33,6 @@ class OrganizationSerializer(BaseSerializer):
         return organization
 
     def update(self, instance, validated_data):
-        print('salaaaaaaaam')
         request = self.context.get('request')
         if 'owner' not in validated_data or not request.user.is_superuser:
             instance.owner = request.user
@@ -43,10 +42,7 @@ class OrganizationSerializer(BaseSerializer):
         # set validated data to organization instance
         for key in validated_data:
             if key != 'owner':
-                print(validated_data.get(key))
                 setattr(instance,  key, validated_data.get(key))
-
-        #instance.save
 
         return instance
 
