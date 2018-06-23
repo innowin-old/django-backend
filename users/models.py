@@ -126,6 +126,7 @@ class Profile(Base):
         help_text='Male | Female'
     )
     is_plus_user = models.BooleanField(default=False)
+    is_user_organization = models.BooleanField(default=False)
     google_plus_address = models.CharField(max_length=255, blank=True, null=True)
     social_image_url = models.CharField(max_length=255, blank=True, null=True)
     linkedin_headline = models.CharField(max_length=255, blank=True, null=True)
