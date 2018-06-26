@@ -343,23 +343,6 @@ post_save.connect(update_cache, sender=Skill)
 pre_save.connect(set_child_name, sender=Skill)
 
 
-class Badge(Base):
-    badge_user = models.ForeignKey(User, related_name="badges",
-                                   on_delete=models.CASCADE, help_text='Integer')
-    title = models.CharField(max_length=100, help_text='String(100)')
-
-    objects = BaseManager()
-
-    def __str__(self):
-        return "%s(%s)" % (self.badge_user.username, self.badge_user)
-
-
-# Cache Model Data After Update
-post_save.connect(update_cache, sender=Badge)
-# Set Child Name
-pre_save.connect(set_child_name, sender=Badge)
-
-
 class IdentityUrl(Base):
     url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
     identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,

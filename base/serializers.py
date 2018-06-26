@@ -14,7 +14,9 @@ from .models import (
     HashtagRelation,
     BaseCountry,
     BaseProvince,
-    BaseTown
+    BaseTown,
+    BadgeCategory,
+    Badge,
 )
 
 
@@ -221,6 +223,43 @@ class BaseProvinceSerializer(BaseSerializer):
 class BaseTownSerializer(BaseSerializer):
     class Meta:
         model = BaseTown
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class BadgeCategorySerializer(BaseSerializer):
+    class Meta:
+        model = BadgeCategory
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if not request.user.is_superuser or 'badge_related_user' not in validated_data:
+            validated_data['badge_related_user'] = request.user
+        badge_category = BadgeCategory.objects.create(**validated_data)
+        return badge_category
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if not request.user.is_superuser or 'badge_related_user' not in validated_data:
+            validated_data['badge_related_user'] = request.user
+
+        for key in validated_data:
+            if key != 'badge_related_user':
+                setattr(instance, key, validated_data.get(key, None))
+
+        instance.save()
+        return instance
+
+
+class BadgeSerializer(BaseSerializer):
+    class Meta:
+        model = Badge
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},

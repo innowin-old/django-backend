@@ -3,6 +3,7 @@ from .models import Exchange, ExchangeIdentity
 from users.models import Identity, Profile, StrengthStates
 from users.serializers import IdentityMiniSerializer
 
+
 # Create Serializers Here
 class ExchangeSerializer(BaseSerializer):
     class Meta:

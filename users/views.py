@@ -29,7 +29,6 @@ from .models import (
     Certificate,
     WorkExperience,
     Skill,
-    Badge,
     IdentityUrl,
     UserArticle,
     Device,
@@ -47,7 +46,6 @@ from .serializers import (
     CertificateSerializer,
     WorkExperienceSerializer,
     SkillSerializer,
-    BadgeSerializer,
     IdentityUrlSerilizer,
     UserArticleListSerializer,
     UserArticleRisSerializer,
@@ -656,36 +654,6 @@ class SkillViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return SkillSerializer
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            instance.delete_flag = True
-            instance.save()
-        except Http404:
-            pass
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class BadgeViewset(ModelViewSet):
-    owner_field = 'badge_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-    def get_queryset(self):
-        queryset = Badge.objects.filter(delete_flag=False)
-
-        badge_user = self.request.query_params.get('badge_user')
-        if badge_user is not None:
-            queryset = queryset.filter(badge_user_id=badge_user)
-
-        title = self.request.query_params.get('title')
-        if title is not None:
-            queryset = queryset.filter(title=title)
-
-        return queryset
-
-    def get_serializer_class(self):
-        return BadgeSerializer
 
     def destroy(self, request, *args, **kwargs):
         try:

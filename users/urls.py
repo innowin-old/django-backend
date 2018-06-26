@@ -11,7 +11,6 @@ from .views import (
     CertificateViewset,
     WorkExperienceViewset,
     SkillViewset,
-    BadgeViewset,
     IdentityUrlViewset,
     UserArticleViewset,
     UserArticleRisViewset,
@@ -36,7 +35,6 @@ router.register(r'researches', ResearchViewset, 'researches')
 router.register(r'certificates', CertificateViewset, 'certificates')
 router.register(r'work-experiences', WorkExperienceViewset, 'work-experiences')
 router.register(r'skills', SkillViewset, 'skills')
-router.register(r'badges', BadgeViewset, 'badges')
 router.register(r'urls', IdentityUrlViewset, 'urls')
 router.register(r'user-meta', UserMetaDataViewset, 'user-meta')
 router.register(r'user-articles', UserArticleViewset, 'articles')

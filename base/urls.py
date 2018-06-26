@@ -12,12 +12,16 @@ from .views import (
         HashtagRelationViewset,
         BaseCountryViewSet,
         BaseProvinceViewSet,
-        BaseTownViewSet
+        BaseTownViewSet,
+        BadgeCategoryViewSet,
+        BadgeViewSet,
     )
 
 
 router = DefaultRouter()
 
+router.register(r'badges', BadgeViewSet, 'Badges')
+router.register(r'badge-categories', BadgeCategoryViewSet, 'Badge Categories')
 router.register(r'towns', BaseTownViewSet, 'Towns')
 router.register(r'provinces', BaseProvinceViewSet, 'Provinces')
 router.register(r'countries', BaseCountryViewSet, 'Countries')

@@ -15,7 +15,9 @@ from .permissions import (
     IsRollPermissionOwnerOrReadOnly,
     IsAdminUserOrReadOnly,
     IsHashtagOwnerOrReadOnly,
-    IsCommentOwnerOrReadOnly
+    IsCommentOwnerOrReadOnly,
+    IsBadgeCategoryOwnerOrReadOnly,
+    BadgePermission,
 )
 
 from .models import (
@@ -30,7 +32,9 @@ from .models import (
     HashtagRelation,
     BaseCountry,
     BaseProvince,
-    BaseTown
+    BaseTown,
+    BadgeCategory,
+    Badge,
 )
 
 from .serializers import (
@@ -46,7 +50,9 @@ from .serializers import (
     HashtagRelationSerializer,
     BaseCountrySerializer,
     BaseProvinceSerializer,
-    BaseTownSerializer
+    BaseTownSerializer,
+    BadgeCategorySerializer,
+    BadgeSerializer,
 )
 
 
@@ -591,3 +597,43 @@ class BaseTownViewSet(ModelViewSet):
             'errors': errors
         }
         return Response(response, status=status.HTTP_200_OK)
+
+
+class BadgeCategoryViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsBadgeCategoryOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = BadgeCategory.objects.filter(delete_flag=False)
+        badge_title = self.request.query_params.get('badge_title', None)
+        if badge_title is not None:
+            queryset.filter(badge_title=badge_title)
+        badge_related_media = self.request.query_params.get('badge_related_media', None)
+        if badge_related_media is not None:
+            queryset.filter(badge_related_media=badge_related_media)
+        badge_related_user = self.request.query_params.get('badge_related_user', None)
+        if badge_related_user is not None:
+            queryset.filter(badge_related_user=badge_related_user)
+        return queryset
+
+    def get_serializer_class(self):
+        return BadgeCategorySerializer
+
+
+class BadgeViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, BadgePermission]
+
+    def get_queryset(self):
+        queryset = Badge.objects.filter(delete_flag=False)
+        badge_related_badge_category = self.request.query_params.get('badge_related_badge_category', None)
+        if badge_related_badge_category is not None:
+            queryset.filter(badge_related_badge_category=badge_related_badge_category)
+        badge_related_parent = self.request.query_params.get('badge_related_parent', None)
+        if badge_related_parent is not None:
+            queryset.filter(badge_related_parent=badge_related_parent)
+        badge_active = self.request.query_params.get('badge_related_parent', None)
+        if badge_active is not None:
+            queryset.filter(badge_related_parent=badge_related_parent)
+        return queryset
+
+    def get_serializer_class(self):
+        return BadgeSerializer

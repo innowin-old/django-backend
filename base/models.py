@@ -252,3 +252,57 @@ class BaseSocial(Base):
 post_save.connect(update_cache, sender=BaseSocial)
 # Set Child Name
 pre_save.connect(set_child_name, sender=BaseSocial)
+
+
+class BadgeCategory(Base):
+    badge_title = models.CharField(max_length=50, unique=True)
+    badge_related_media = models.ForeignKey(
+        "media.Media",
+        related_name="badge_media",
+        on_delete=models.CASCADE,
+        help_text="Integer",
+    )
+    badge_description = models.TextField(blank=True, null=True)
+    badge_related_user = models.ForeignKey(
+        User,
+        related_name="badge_user",
+        on_delete=models.SET_NULL,
+        help_text="Integer",
+        null=True,
+        blank=True,
+    )
+    badge_category_related_parent = models.ForeignKey(
+        Base,
+        related_name="badge_parent",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BadgeCategory)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BadgeCategory)
+
+
+class Badge(Base):
+    badge_related_badge_category = models.ForeignKey(
+        BadgeCategory,
+        related_name="badge_category",
+        on_delete=models.CASCADE,
+        help_text="Integer"
+    )
+    badge_related_parent = models.ForeignKey(
+        Base,
+        related_name="badge_base",
+        on_delete=models.CASCADE,
+        help_text="Integer"
+    )
+    badge_active = models.BooleanField(default=False)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Badge)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Badge)

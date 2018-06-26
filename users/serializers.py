@@ -28,7 +28,6 @@ from .models import (
     Certificate,
     WorkExperience,
     Skill,
-    Badge,
     IdentityUrl,
     UserArticle,
     Device,
@@ -629,55 +628,6 @@ class SkillSerializer(BaseSerializer):
 
         instance.save()
         return instance
-
-
-class BadgeSerializer(BaseSerializer):
-    class Meta:
-        model = Badge
-        exclude = ['child_name']
-        extra_kwargs = {
-            'updated_time': {'read_only': True},
-            'badge_user': {'required': False}
-        }
-
-    def create(self, validated_data):
-        request = self.context.get("request")
-        if not request.user.is_superuser or 'badge_user' not in validated_data:
-            validated_data['badge_user'] = request.user
-        badge = Badge.objects.create(**validated_data)
-        badge.save()
-        self.check_badge_profile_strength(badge.badge_user)
-        return badge
-
-    def update(self, instance, validated_data):
-        request = self.context.get("request")
-        if not request.user.is_superuser or 'badge_user' not in validated_data:
-            instance.badge_user = request.user
-        else:
-            instance.badge_user = validated_data['badge_user']
-
-        for key in validated_data:
-            if key != 'badge_user':
-                setattr(instance, key, validated_data.get(key))
-
-        instance.save()
-        return instance
-
-    def check_badge_profile_strength(self, user):
-        badges = Badge.objects.filter(badge_user=user)
-        try:
-            user_strength = StrengthStates.objects.get(strength_user=user)
-        except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(strength_user=user)
-        if user_strength.badge_obtained is False and badges.count() == 1:
-            try:
-                profile = Profile.objects.get(profile_user=user)
-            except Profile.DoesNotExist:
-                profile = Profile.objects.create(profile_user=user)
-            profile.profile_strength += 5
-            profile.save()
-            user_strength.badge_obtained = True
-            user_strength.save()
 
 
 class IdentityUrlSerilizer(BaseSerializer):
