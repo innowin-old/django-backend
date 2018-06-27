@@ -418,6 +418,7 @@ class BadgePermission(permissions.BasePermission):
                         return False
                     return False
             return True
+        return True
 
     def has_object_permission(self, request, view, obj):
         if request.method != "POST":

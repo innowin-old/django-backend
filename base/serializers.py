@@ -257,6 +257,15 @@ class BadgeCategorySerializer(BaseSerializer):
         return instance
 
 
+class BadgeCategoryListSerializer(BaseSerializer):
+    class Meta:
+        model = BadgeCategory
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
 class BadgeSerializer(BaseSerializer):
     class Meta:
         model = Badge
@@ -264,3 +273,13 @@ class BadgeSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True},
         }
+
+
+class BadgeListSerializer(BaseSerializer):
+    class Meta:
+        model = Badge
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+        depth = 1

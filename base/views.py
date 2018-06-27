@@ -52,7 +52,9 @@ from .serializers import (
     BaseProvinceSerializer,
     BaseTownSerializer,
     BadgeCategorySerializer,
+    BadgeCategoryListSerializer,
     BadgeSerializer,
+    BadgeListSerializer,
 )
 
 
@@ -616,7 +618,18 @@ class BadgeCategoryViewSet(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return BadgeCategoryListSerializer
         return BadgeCategorySerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BadgeViewSet(ModelViewSet):
@@ -636,4 +649,15 @@ class BadgeViewSet(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return BadgeListSerializer
         return BadgeSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete_flag = True
+            instance.save()
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
