@@ -484,7 +484,8 @@ class ProfileViewset(ModelViewSet):
 
 
 class SettingViewset(ModelViewSet):
-    permission_classes = [AllowAny]
+    owner_field = 'setting_user'
+    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Setting.objects.filter(delete_flag=False)
