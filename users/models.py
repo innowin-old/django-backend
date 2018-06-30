@@ -167,6 +167,43 @@ post_save.connect(update_cache, sender=Profile)
 pre_save.connect(set_child_name, sender=Profile)
 
 
+@receiver(post_save, sender=User)
+def create_setting(sender, instance, created, **kwargs):
+    if created:
+        Setting.objects.create(setting_user=instance)
+
+
+class Setting(Base):
+    USER_TYPE = (
+        ('all', "همه ی کاربران"),
+        ('followers', "دنبال کنندگان"),
+        ('no body', "هیچ کس"),
+    )
+    ACCOUNT_TYPE = (
+        ('public', "عمومی"),
+        ('private', "خصوصی"),
+    )
+    setting_user = models.OneToOneField(User, related_name="setting",
+                                        on_delete=models.CASCADE, help_text='Integer')
+    image_auto_download = models.BooleanField(default=True, help_text='Boolean')
+    video_auto_download = models.BooleanField(default=True, help_text='Boolean')
+    who_can_read_base_info = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_activity = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_work_experiences = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_badges = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_certificates = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_followers = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_followings = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_exchanges = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
+    account_type = models.CharField(choices=ACCOUNT_TYPE, default='all', max_length=10, help_text='public | private')
+    send_notifications_by_email = models.BooleanField(default=True, help_text='Boolean')
+    send_follow_requests_by_email = models.BooleanField(default=False, help_text='Boolean')
+    send_join_exchange_join_by_email = models.BooleanField(default=False, help_text='Boolean')
+    send_supply_demand_recommends_by_email = models.BooleanField(default=False, help_text='Boolean')
+    send_messages_notifications_by_email = models.BooleanField(default=False, help_text='Boolean')
+    send_exchange_updates_by_email = models.BooleanField(default=False, help_text='Boolean')
+
+
 class Education(Base):
     education_user = models.ForeignKey(User, related_name="educations",
                                        on_delete=models.CASCADE, help_text='Integer')
