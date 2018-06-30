@@ -23,6 +23,7 @@ from organizations.models import Confirmation, Organization
 from .models import (
     Identity,
     Profile,
+    Setting,
     Education,
     Research,
     Certificate,
@@ -405,6 +406,16 @@ class ProfileListSerializer(BaseSerializer):
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True}
+        }
+
+
+class SettingSerializer(BaseSerializer):
+    class Meta:
+        model = Setting
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'setting_user': {'read_only': True}
         }
 
 

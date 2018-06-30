@@ -24,6 +24,7 @@ from base.models import BaseSocialType, BaseSocial
 from .models import (
     Identity,
     Profile,
+    Setting,
     Education,
     Research,
     Certificate,
@@ -41,6 +42,7 @@ from .serializers import (
     IdentitySerializer,
     ProfileSerializer,
     ProfileListSerializer,
+    SettingSerializer,
     EducationSerializer,
     ResearchSerializer,
     CertificateSerializer,
@@ -479,6 +481,17 @@ class ProfileViewset(ModelViewSet):
         except Http404:
             pass
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SettingViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Setting.objects.filter(delete_flag=False)
+        return queryset
+
+    def get_serializer_class(self):
+        return SettingSerializer
 
 
 class EducationViewset(ModelViewSet):

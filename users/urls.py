@@ -6,6 +6,7 @@ from .views import (
     UserViewset,
     IdentityViewset,
     ProfileViewset,
+    SettingViewset,
     EducationViewset,
     ResearchViewset,
     CertificateViewset,
@@ -30,6 +31,7 @@ router.register(r'forget-password', ForgetPasswordViewset, 'forget-password')
 router.register(r'devices', DeviceViewset, 'devices')
 router.register(r'identities', IdentityViewset, 'identities')
 router.register(r'profiles', ProfileViewset, 'profiles')
+router.register(r'settings', SettingViewset, 'settings')
 router.register(r'educations', EducationViewset, 'educations')
 router.register(r'researches', ResearchViewset, 'researches')
 router.register(r'certificates', CertificateViewset, 'certificates')
