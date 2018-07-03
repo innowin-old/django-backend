@@ -18,6 +18,7 @@ from .permissions import (
     IsCommentOwnerOrReadOnly,
     IsBadgeCategoryOwnerOrReadOnly,
     BadgePermission,
+    CanReadBadge,
 )
 
 from .models import (
@@ -606,15 +607,19 @@ class BadgeCategoryViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = BadgeCategory.objects.filter(delete_flag=False)
+
         badge_title = self.request.query_params.get('badge_title', None)
         if badge_title is not None:
-            queryset.filter(badge_title=badge_title)
+            queryset = queryset.filter(badge_title=badge_title)
+
         badge_related_media = self.request.query_params.get('badge_related_media', None)
         if badge_related_media is not None:
-            queryset.filter(badge_related_media=badge_related_media)
+            queryset = queryset.filter(badge_related_media=badge_related_media)
+
         badge_related_user = self.request.query_params.get('badge_related_user', None)
         if badge_related_user is not None:
-            queryset.filter(badge_related_user=badge_related_user)
+            queryset = queryset.filter(badge_related_user=badge_related_user)
+
         return queryset
 
     def get_serializer_class(self):
@@ -633,19 +638,23 @@ class BadgeCategoryViewSet(ModelViewSet):
 
 
 class BadgeViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, BadgePermission]
+    permission_classes = [IsAuthenticated, BadgePermission, CanReadBadge]
 
     def get_queryset(self):
         queryset = Badge.objects.filter(delete_flag=False)
+
         badge_related_badge_category = self.request.query_params.get('badge_related_badge_category', None)
         if badge_related_badge_category is not None:
-            queryset.filter(badge_related_badge_category=badge_related_badge_category)
+            queryset = queryset.filter(badge_related_badge_category=badge_related_badge_category)
+
         badge_related_parent = self.request.query_params.get('badge_related_parent', None)
         if badge_related_parent is not None:
-            queryset.filter(badge_related_parent=badge_related_parent)
-        badge_active = self.request.query_params.get('badge_related_parent', None)
+            queryset = queryset.filter(badge_related_parent_id=badge_related_parent)
+
+        badge_active = self.request.query_params.get('badge_active', None)
         if badge_active is not None:
-            queryset.filter(badge_related_parent=badge_related_parent)
+            queryset = queryset.filter(badge_active=badge_active)
+
         return queryset
 
     def get_serializer_class(self):

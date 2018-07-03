@@ -19,7 +19,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly, OnlyPostMethod
+from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly, OnlyPostMethod, CanReadContent
 from base.models import BaseSocialType, BaseSocial
 from .models import (
     Identity,
@@ -424,8 +424,11 @@ class IdentityViewset(ModelViewSet):
 
 
 class ProfileViewset(ModelViewSet):
+    # this field use for IsOwnerOrReadOnly, CanReadContent permissions
     owner_field = 'profile_user'
-    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly]
+    # this field use for CanReadContent permission
+    content_target_field = 'who_can_read_base_info'
+    permission_classes = [IsAuthenticated, BlockPostMethod, IsOwnerOrReadOnly, CanReadContent]
 
     def get_queryset(self):
         queryset = Profile.objects.all()
@@ -570,8 +573,12 @@ class ResearchViewset(ModelViewSet):
 
 
 class CertificateViewset(ModelViewSet):
+    # this field use for IsOwnerOrReadOnly, CanReadContent permissions
     owner_field = 'certificate_user'
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+    # this field use for CanReadContent permission
+    content_target_field = 'who_can_read_certificates'
+
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated, CanReadContent]
 
     def get_queryset(self):
         queryset = Certificate.objects.filter(delete_flag=False)
@@ -600,8 +607,12 @@ class CertificateViewset(ModelViewSet):
 
 
 class WorkExperienceViewset(ModelViewSet):
+    # this field use for IsOwnerOrReadOnly, CanReadContent permissions
     owner_field = 'work_experience_user'
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    # this field use for CanReadContent permission
+    content_target_field = 'who_can_read_work_experiences'
+
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly, CanReadContent]
 
     def get_queryset(self):
         queryset = WorkExperience.objects.filter(delete_flag=False)

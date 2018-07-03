@@ -3,7 +3,8 @@ from django.contrib.contenttypes.models import ContentType
 from exchanges.models import Exchange
 from organizations.models import Organization
 from products.models import Product
-from users.models import Identity
+from users.models import Identity, Setting
+from organizations.models import Follow
 from .models import Base, BaseRoll
 
 
@@ -36,6 +37,141 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if getattr(obj, owner_field_name) == request.user or request.user.is_superuser:
             return True
         return False
+
+
+class CanReadContent(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "GET":
+            if request.user.is_superuser:
+                return True
+            content_owner_field = view.owner_field
+            user_id = request.GET.get(content_owner_field, None)
+            if user_id is not None:
+                try:
+                    user_setting = Setting.objects.get(setting_user_id=user_id)
+                except Setting.DoesNotExist:
+                    return True
+                content_target_field = view.content_target_field
+                content_target_value = getattr(user_setting, content_target_field)
+                if content_target_value == "all" or request.user.is_superuser:
+                    return True
+                elif content_target_value == "followers":
+                    try:
+                        follower_identity = Identity.objects.get(identity_user=request.user)
+                    except Identity.DoesNotExist:
+                        return False
+                    try:
+                        followed_identity = Identity.objects.get(identity_user_id=user_id)
+                    except Identity.DoesNotExist:
+                        return False
+                    try:
+                        follow = Follow.objects.get(follow_follower=follower_identity,
+                                                    follow_followed=followed_identity)
+                    except Follow.DoesNotExist:
+                        return False
+                    if follow.follow_accepted:
+                        return True
+                    return False
+                else:
+                    return False
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == "GET":
+            content_owner_field = view.owner_field
+            try:
+                user_setting = Setting.objects.get(setting_user=getattr(obj, content_owner_field))
+            except Setting.DoesNotExist:
+                return False
+            content_target_field = view.content_target_field
+            content_target_value = getattr(user_setting, content_target_field)
+            if content_target_value == "all" or request.user.is_superuser:
+                return True
+            elif content_target_value == "followers":
+                try:
+                    follower_identity = Identity.objects.get(identity_user=request.user)
+                except Identity.DoesNotExist:
+                    return False
+                try:
+                    followed_identity = Identity.objects.get(identity_user=getattr(obj, content_owner_field))
+                except Identity.DoesNotExist:
+                    return False
+                try:
+                    follow = Follow.objects.get(follow_follower=follower_identity, follow_followed=followed_identity)
+                except Follow.DoesNotExist:
+                    return False
+                if follow.follow_accepted:
+                    return True
+                return False
+            else:
+                return False
+        return True
+
+
+class CanReadBadge(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "GET":
+            badge_related_parent_id = request.GET.get('badge_related_parent', None)
+            if badge_related_parent_id is not None:
+                try:
+                    base_object = Base.objects.get(id=badge_related_parent_id)
+                except Base.DoesNotExist:
+                    return False
+                owner_name = base_object.child_name
+                if owner_name == 'identity':
+                    identity = Identity.objects.get(id=base_object.id)
+                    if identity.identity_user is not None:
+                        try:
+                            user_setting = Setting.objects.get(setting_user=identity.identity_user)
+                        except Setting.DoesNotExist:
+                            return False
+                        if user_setting.who_can_read_badges == 'all' or request.user.is_superuser:
+                            return True
+                        elif user_setting.who_can_read_badges == 'followers':
+                            follower_identity = Identity.objects.get(identity_user=request.user)
+                            try:
+                                follow = Follow.objects.get(follow_follower=follower_identity, follow_followed=identity, follow_accepted=True)
+                            except Follow.DoesNotExist:
+                                return False
+                            return True
+                        else:
+                            return False
+                    return True
+                return True
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == "GET":
+            owner_object = ContentType.objects.get(model=obj.badge_related_parent.child_name).__str__()
+            child_object = getattr(obj.badge_related_parent, owner_object)
+            if owner_object == 'identity':
+                if child_object.identity_user is not None:
+                    try:
+                        user_setting = Setting.objects.get(setting_user=child_object.identity_user)
+                    except Setting.DoesNotExist:
+                        return False
+                    if user_setting.who_can_read_badges == 'all' or request.user.is_superuser:
+                        return True
+                    elif user_setting.who_can_read_badges == 'followers':
+                        try:
+                            follower_identity = Identity.objects.get(identity_user=request.user)
+                        except Identity.DoesNotExist:
+                            return False
+                        try:
+                            follow = Follow.objects.get(follow_follower=follower_identity, follow_followed=child_object)
+                        except Follow.DoesNotExist:
+                            return False
+                        if follow.follow_accepted:
+                            return True
+                        return False
+                    else:
+                        return False
+                else:
+                    return True
+            return True
+        return True
 
 
 class IsRollOwnerOrReadOnly(permissions.BasePermission):
@@ -421,7 +557,7 @@ class BadgePermission(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        if request.method != "POST":
+        if request.method != "GET":
             owner_object = ContentType.objects.get(model=obj.badge_related_parent.child_name).__str__()
             child_object = getattr(obj.badge_related_parent, owner_object)
             if request.user.is_superuser:
