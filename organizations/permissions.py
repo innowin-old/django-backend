@@ -77,6 +77,21 @@ class FollowOwner(permissions.BasePermission):
 
 
 class IsCustomerOrganizationOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method != 'GET':
+            customer_active = request.POST.get('customer_active', None)
+            if customer_active is not None:
+                customer_organization = request.POST.get('customer_organization', None)
+                try:
+                    organization = Organization.objects.get(pk=customer_organization)
+                except Organization.DoesNotExist:
+                    return False
+                if request.user == organization.owner or request.user.is_superuser:
+                    return True
+                return False
+            return True
+        return True
+
     def has_object_permission(self, request, view, obj):
         if request.method != 'GET':
             if request.user == obj.customer_organization.owner or request.user.is_superuser:
