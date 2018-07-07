@@ -222,6 +222,7 @@ class Customer(Base):
                                          on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
     customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer')
+    customer_active = models.BooleanField(default=False)
 
     objects = BaseManager()
 
