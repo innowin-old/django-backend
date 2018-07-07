@@ -1,3 +1,5 @@
+from distutils.command.install import install
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
@@ -43,7 +45,7 @@ class OrganizationSerializer(BaseSerializer):
         for key in validated_data:
             if key != 'owner':
                 setattr(instance,  key, validated_data.get(key))
-
+        instance.save()
         return instance
 
 
