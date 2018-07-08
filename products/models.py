@@ -62,6 +62,10 @@ pre_save.connect(set_child_name, sender=CategoryField)
 
 
 class Product(Base):
+    PRICE_CHOICES = (
+        ('specified', 'معین'),
+        ('call', 'تماس'),
+    )
     product_owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE,
                                       db_index=True, help_text='Integer')
     product_category = models.ForeignKey(Category, related_name="category_products", on_delete=models.CASCADE, db_index=True,
@@ -74,6 +78,7 @@ class Product(Base):
     attrs = JSONField(null=True, blank=True, help_text='JSON')
     custom_attrs = JSONField(null=True, blank=True, help_text='JSON')
     product_user = models.ForeignKey(User, related_name="user_products", on_delete=models.CASCADE, db_index=True, help_text="Integer")
+    product_price_type = models.CharField(max_length=10, choices=PRICE_CHOICES, default='specified', help_text='specified | call')
 
     objects = BaseManager()
 
@@ -88,9 +93,21 @@ pre_save.connect(set_child_name, sender=Product)
 
 
 class Price(Base):
+    CURRENCY_CHOICES = (
+        ('IRR', 'ریال'),
+        ('USD', 'دلار'),
+        ('EUR', 'یورو'),
+        ('JPY', 'ژاپن'),
+        ('GBP', 'پوند'),
+        ('AUD', 'دلار استرالیا'),
+        ('CAD', 'دلار کانادا'),
+        ('CHF', 'یوان'),
+        ('CNY', 'کرونا سوئد'),
+    )
     price_product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True,
                                       help_text='Integer')
     value = models.FloatField(help_text='Float')
+    price_currency = models.CharField(max_length=20, choices=CURRENCY_CHOICES, default='IRR', help_text='IRR | USD | EUR | JPY | GBP | AUD | CAD | CHF | CNY')
 
     objects = BaseManager()
 
@@ -111,6 +128,7 @@ class Picture(Base):
                                       help_text='Integer')
     order = models.IntegerField(default=0, help_text='Integer')
     description = models.TextField(blank=True, db_index=True, help_text='Text')
+    picture_original = models.BooleanField(default=False)
 
     objects = BaseManager()
 
