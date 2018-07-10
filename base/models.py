@@ -145,6 +145,8 @@ class BaseCertificate(Base):
                                             related_name="base_certificate_picture",
                                             help_text='Integer')
     title = models.CharField(max_length=250, help_text='String(250)')
+    validation_flag = models.BooleanField(default=False)
+    validation_request_flag = models.BooleanField(default=False)
 
     objects = BaseManager()
 
