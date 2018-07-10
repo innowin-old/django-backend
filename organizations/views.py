@@ -63,7 +63,7 @@ class OrganizationViewset(BaseModelViewSet):
 
         username = self.request.query_params.get('username', None)
         if username is not None:
-            queryset = queryset.filter(username__contains=username)
+            queryset = queryset.filter(username=username)
 
         nike_name = self.request.query_params.get('nike_name', None)
         if nike_name is not None:
@@ -71,7 +71,7 @@ class OrganizationViewset(BaseModelViewSet):
 
         official_name = self.request.query_params.get('official_name', None)
         if official_name is not None:
-            queryset = queryset.filter(official_name__contains=official_name)
+            queryset = queryset.filter(official_name=official_name)
 
         national_code = self.request.query_params.get('national_code', None)
         if national_code is not None:
