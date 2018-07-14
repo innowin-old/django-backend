@@ -783,7 +783,6 @@ class UserMetaDataSerializer(BaseSerializer):
         if not request.user.is_superuser or 'user_meta_related_user' not in validated_data:
             validated_data['user_meta_related_user'] = request.user
         if validated_data['user_meta_type'] == 'phone' or validated_data['user_meta_type'] == 'mobile':
-            print('phone or mobile')
             user_related_meta_data = UserMetaData.objects.filter(
                 user_meta_related_user=validated_data['user_meta_related_user'],
                 user_meta_type=validated_data['user_meta_type'])

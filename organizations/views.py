@@ -18,7 +18,10 @@ from .permissions import (
     IsConfirmationOwner,
     IsMetaDataOrganizationOwner,
     IsAbilityOrganizationOwnerOrReadOnly,
-    IsAdminUserOrCanNotActive
+    IsAdminUserOrCanNotActive,
+    IsAdminUserOrCanNotCreateAccepted,
+    IsFollowedOrReadOnly,
+    IsAdminOrCanNotChangeIdentities,
 )
 
 from .models import (
@@ -363,7 +366,7 @@ class StaffViewset(BaseModelViewSet):
 
 
 class FollowViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUserOrCanNotCreateAccepted, IsFollowedOrReadOnly, IsAdminOrCanNotChangeIdentities]
 
     def get_queryset(self):
         queryset = Follow.objects.filter(delete_flag=False)
