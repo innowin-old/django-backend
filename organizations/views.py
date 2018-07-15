@@ -250,7 +250,7 @@ class StaffCountViewset(BaseModelViewSet):
 
         organization_username = self.request.query_params.get('organization_username', None)
         if organization_username is not None:
-            queryset = queryset.filter(staff_count_organization__username__contains=organization_username)
+            queryset = queryset.filter(staff_count_organization__username=organization_username)
 
         return queryset
 
@@ -283,7 +283,7 @@ class OrganizationPictureViewset(BaseModelViewSet):
 
         organization_username = self.request.query_params.get('organization_username')
         if organization_username is not None:
-            queryset = queryset.filter(staff_count_organization__username__contains=organization_username)
+            queryset = queryset.filter(staff_count_organization__username=organization_username)
 
         return queryset
 
@@ -315,11 +315,11 @@ class StaffViewset(BaseModelViewSet):
 
         organization_username = self.request.query_params.get('organization_username', None)
         if organization_username is not None:
-            queryset = queryset.filter(staff_organization__username__contains=organization_username)
+            queryset = queryset.filter(staff_organization__username=organization_username)
 
         organization_official_name = self.request.query_params.get('organization_official_name', None)
         if organization_official_name is not None:
-            queryset = queryset.filter(staff_organization__official_name__contains=organization_official_name)
+            queryset = queryset.filter(staff_organization__official_name=organization_official_name)
 
         organization_nike_name = self.request.query_params.get('organization_nike_name', None)
         if organization_official_name is not None:
@@ -334,7 +334,7 @@ class StaffViewset(BaseModelViewSet):
 
         user_username = self.request.query_params.get('user_username', None)
         if user_username is not None:
-            queryset = queryset.filter(staff_user__username__contains=user_username)
+            queryset = queryset.filter(staff_user__username=user_username)
 
         user_email = self.request.query_params.get('user_email', None)
         if user_email is not None:
@@ -438,11 +438,11 @@ class AbilityViewset(BaseModelViewSet):
 
         organization_username = self.request.query_params.get('organization_username', None)
         if organization_username is not None:
-            queryset = queryset.filter(ability_organization__username__contains=organization_username)
+            queryset = queryset.filter(ability_organization__username=organization_username)
 
         organization_official_name = self.request.query_params.get('organization_official_name', None)
         if organization_official_name is not None:
-            queryset = queryset.filter(ability_organization__official_name__contains=organization_official_name)
+            queryset = queryset.filter(ability_organization__official_name=organization_official_name)
 
         organization_nike_name = self.request.query_params.get('organization_nike_name', None)
         if organization_official_name is not None:
@@ -490,7 +490,7 @@ class ConfirmationViewset(BaseModelViewSet):
 
         corroborant_username = self.request.query_params.get('corroborant_username', None)
         if corroborant_username is not None:
-            queryset = queryset.filter(confirmation_corroborant__identity_user__username__contains=corroborant_username)
+            queryset = queryset.filter(confirmation_corroborant__identity_user__username=corroborant_username)
 
         """
             Confirmed Filter Options
@@ -505,7 +505,7 @@ class ConfirmationViewset(BaseModelViewSet):
 
         confirmed_username = self.request.query_params.get('confirmed_username', None)
         if confirmed_username is not None:
-            queryset = queryset.filter(confirmation_confirmed__identity_user__username__contains=confirmed_username)
+            queryset = queryset.filter(confirmation_confirmed__identity_user__username=confirmed_username)
 
         title = self.request.query_params.get('title', None)
         if title is not None:
@@ -556,7 +556,7 @@ class CustomerViewset(BaseModelViewSet):
         related_customer_user_username = self.request.query_params.get('related_customer_user_username', None)
         if related_customer_user_username is not None:
             queryset = queryset.filter(
-                related_customer__identity_user__username__contains=related_customer_user_username)
+                related_customer__identity_user__username=related_customer_user_username)
 
         title = self.request.query_params.get('title', None)
         if title is not None:

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Message
 from .serializers import MessageSerializer
 
+
 # Create your views here.
 class MessageViewSet(ModelViewSet):
     """

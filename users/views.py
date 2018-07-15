@@ -79,7 +79,7 @@ class UserViewset(ModelViewSet):
 
         username = self.request.query_params.get('username')
         if username is not None:
-            queryset = queryset.filter(username__contains=username)
+            queryset = queryset.filter(username=username)
 
         first_name = self.request.query_params.get('first_name')
         if first_name is not None:
@@ -116,7 +116,7 @@ class UserViewset(ModelViewSet):
 
         username = self.request.query_params.get('username')
         if username is not None:
-            queryset = queryset.filter(username__contains=username)
+            queryset = queryset.filter(username=username)
 
         first_name = self.request.query_params.get('first_name')
         if first_name is not None:

@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAdminUser
 
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsAgentOrReadOnly, IsFirstDefaultExchange
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange
 from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, ExchangeMiniSerializer
 
 
