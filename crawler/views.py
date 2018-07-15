@@ -5,7 +5,7 @@ import string
 from django.db import transaction
 from django.http import HttpResponse
 
-from crawler.models import Topic, VitrinOrganization, ResearchGateTopic, SkillemaTags
+from crawler.models import VitrinOrganization, ResearchGateTopic, SkillemaTags
 from .category_lists import VITRINNET_CATEGORIES, RESEARCH_GATE_CHARACTER_BLACK_LIST
 
 
@@ -61,7 +61,7 @@ def normalize_research_gate_data():
 def research_gate_all_flag_true():
     topics = ResearchGateTopic.objects.all()
     for topic in topics:
-        topic.delete_flag=False
+        topic.delete_flag = False
         topic.save()
     print('OK !')
 
@@ -101,7 +101,6 @@ def crawl_vitrin_net():
     categories = VITRINNET_CATEGORIES
     organizations_crawled = []
     with transaction.atomic():
-        organizations_entities = []
         print('start crawling ...')
         for category in categories:
             print('in category ' + category)
@@ -130,9 +129,9 @@ def crawl_vitrin_net():
                             organization_soup = BeautifulSoup(organization_response.content.decode('utf-8'),
                                                               'html.parser')
                             organization_loader = organization_soup.find(name='a', attrs={'id': 'LoadContactInfo'})
-                            contact_resposne = requests.post('https://vitrinnet.com/Handler/LoadContactInfo.ashx',
+                            contact_response = requests.post('https://vitrinnet.com/Handler/LoadContactInfo.ashx',
                                                              data={'BrandId': organization_loader['data-brandinfoid']})
-                            contact_soup = BeautifulSoup(contact_resposne.content.decode('utf-8'), 'html.parser')
+                            contact_soup = BeautifulSoup(contact_response.content.decode('utf-8'), 'html.parser')
                             organization_object = VitrinOrganization(name=organization_soup.find(name='h1').get_text(),
                                                                      internal_link=organization_name['href'])
                             a_tags = contact_soup.find_all(name='a')
@@ -149,7 +148,6 @@ def crawl_vitrin_net():
                                 elif 'fa-instagram' in contact_type['class']:
                                     organization_object.instagram_link = a_tag.get_text()
                             organization_object.save()
-                            '''organizations_entities.append(organization_object)'''
                             organizations_crawled.append(organization_name['href'])
                     print(category_base_url + 'data added to array !')
             else:
@@ -185,7 +183,6 @@ def crawl_vitrin_net():
                             elif 'fa-instagram' in contact_type['class']:
                                 organization_object.instagram_link = a_tag.get_text()
                         organization_object.save()
-                        '''organizations_entities.append(organization_object)'''
                         organizations_crawled.append(organization_name['href'])
                 print(category_url + 'data added to array !')
         print('Adding organizations to database :))))))))))')

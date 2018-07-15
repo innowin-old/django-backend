@@ -77,35 +77,35 @@ class UserViewset(ModelViewSet):
     def superuser_queryset(self):
         queryset = User.objects.all()
 
-        username = self.request.query_params.get('username')
+        username = self.request.query_params.get('username', None)
         if username is not None:
             queryset = queryset.filter(username=username)
 
-        first_name = self.request.query_params.get('first_name')
+        first_name = self.request.query_params.get('first_name', None)
         if first_name is not None:
             queryset = queryset.filter(first_name__contains=first_name)
 
-        last_name = self.request.query_params.get('last_name')
+        last_name = self.request.query_params.get('last_name', None)
         if last_name is not None:
             queryset = queryset.filter(last_name__contains=last_name)
 
-        email = self.request.query_params.get('email')
+        email = self.request.query_params.get('email', None)
         if email is not None:
             queryset = queryset.filter(email__contains=email)
 
-        is_staff = self.request.query_params.get('is_staff')
+        is_staff = self.request.query_params.get('is_staff', None)
         if is_staff is not None:
             queryset = queryset.filter(is_staff=is_staff)
 
-        is_superuser = self.request.query_params.get('is_superuser')
+        is_superuser = self.request.query_params.get('is_superuser', None)
         if is_superuser is not None:
             queryset = queryset.filter(is_superuser=is_superuser)
 
-        is_active = self.request.query_params.get('is_active')
+        is_active = self.request.query_params.get('is_active', None)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active)
 
-        date_joined = self.request.query_params.get('date_joined')
+        date_joined = self.request.query_params.get('date_joined', None)
         if date_joined is not None:
             queryset = queryset.filter(date_joined=date_joined)
 
@@ -114,19 +114,19 @@ class UserViewset(ModelViewSet):
     def user_queryset(self):
         queryset = User.objects.filter(is_active=True)
 
-        username = self.request.query_params.get('username')
+        username = self.request.query_params.get('username', None)
         if username is not None:
             queryset = queryset.filter(username=username)
 
-        first_name = self.request.query_params.get('first_name')
+        first_name = self.request.query_params.get('first_name', None)
         if first_name is not None:
             queryset = queryset.filter(first_name__contains=first_name)
 
-        last_name = self.request.query_params.get('last_name')
+        last_name = self.request.query_params.get('last_name', None)
         if last_name is not None:
             queryset = queryset.filter(last_name__contains=last_name)
 
-        email = self.request.query_params.get('email')
+        email = self.request.query_params.get('email', None)
         if email is not None:
             queryset = queryset.filter(email__contains=email)
 
@@ -384,27 +384,27 @@ class IdentityViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Identity.objects.filter(delete_flag=False)
 
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name=name)
 
-        accepted = self.request.query_params.get('accepted')
+        accepted = self.request.query_params.get('accepted', None)
         if accepted is not None:
             queryset = queryset.filter(accepted=accepted)
 
-        user_id = self.request.query_params.get('identity_user')
+        user_id = self.request.query_params.get('identity_user', None)
         if user_id is not None:
             queryset = queryset.filter(identity_user_id=user_id)
 
-        user_username = self.request.query_params.get('identity_user_username')
+        user_username = self.request.query_params.get('identity_user_username', None)
         if user_username is not None:
             queryset = queryset.filter(identity_user__username=user_username)
 
-        organization_id = self.request.query_params.get('identity_organization')
+        organization_id = self.request.query_params.get('identity_organization', None)
         if organization_id is not None:
             queryset = queryset.filter(identity_organization_id=organization_id)
 
-        organization_username = self.request.query_params.get('identity_organization_username')
+        organization_username = self.request.query_params.get('identity_organization_username', None)
         if organization_username is not None:
             queryset = queryset.filter(identity_organization__username=organization_username)
 
@@ -433,39 +433,39 @@ class ProfileViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Profile.objects.all()
 
-        profile_user = self.request.query_params.get('profile_user')
+        profile_user = self.request.query_params.get('profile_user', None)
         if profile_user is not None:
             queryset = queryset.filter(profile_user_id=profile_user)
 
-        public_email = self.request.query_params.get('public_email')
+        public_email = self.request.query_params.get('public_email', None)
         if public_email is not None:
             queryset = queryset.filter(public_email=public_email)
 
-        national_code = self.request.query_params.get('national_code')
+        national_code = self.request.query_params.get('national_code', None)
         if national_code is not None:
             queryset = queryset.filter(national_code=national_code)
 
-        birth_date = self.request.query_params.get('birth_date')
+        birth_date = self.request.query_params.get('birth_date', None)
         if birth_date is not None:
             queryset = queryset.filter(birth_date=birth_date)
 
-        birth_date = self.request.query_params.get('birth_date')
+        birth_date = self.request.query_params.get('birth_date', None)
         if birth_date is not None:
             queryset = queryset.filter(birth_date=birth_date)
 
-        fax = self.request.query_params.get('fax')
+        fax = self.request.query_params.get('fax', None)
         if fax is not None:
             queryset = queryset.filter(fax=fax)
 
-        telegram_account = self.request.query_params.get('telegram_account')
+        telegram_account = self.request.query_params.get('telegram_account', None)
         if telegram_account is not None:
             queryset = queryset.filter(telegram_account=telegram_account)
 
-        gender = self.request.query_params.get('gender')
+        gender = self.request.query_params.get('gender', None)
         if gender is not None:
             queryset = queryset.filter(gender=gender)
 
-        is_plus_user = self.request.query_params.get('is_plus_user')
+        is_plus_user = self.request.query_params.get('is_plus_user', None)
         if is_plus_user is not None:
             queryset = queryset.filter(is_plus_user=is_plus_user)
 
@@ -504,27 +504,27 @@ class EducationViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Education.objects.filter(delete_flag=False)
-        education_user = self.request.query_params.get('education_user')
+        education_user = self.request.query_params.get('education_user', None)
         if education_user is not None:
             queryset = queryset.filter(education_user_id=education_user)
 
-        grade = self.request.query_params.get('grade')
+        grade = self.request.query_params.get('grade', None)
         if grade is not None:
             queryset = queryset.filter(grade=grade)
 
-        university = self.request.query_params.get('university')
+        university = self.request.query_params.get('university', None)
         if university is not None:
             queryset = queryset.filter(university=university)
 
-        field_of_study = self.request.query_params.get('field_of_study')
+        field_of_study = self.request.query_params.get('field_of_study', None)
         if field_of_study is not None:
             queryset = queryset.filter(field_of_study=field_of_study)
 
-        from_date = self.request.query_params.get('from_date')
+        from_date = self.request.query_params.get('from_date', None)
         if from_date is not None:
             queryset = queryset.filter(from_date=from_date)
 
-        to_date = self.request.query_params.get('to_date')
+        to_date = self.request.query_params.get('to_date', None)
         if to_date is not None:
             queryset = queryset.filter(to_date=to_date)
         return queryset
@@ -553,7 +553,7 @@ class ResearchViewset(ModelViewSet):
         if research_user is not None:
             queryset = queryset.filter(research_user_id=research_user)
 
-        title = self.request.query_params.get('title')
+        title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title=title)
 
@@ -587,7 +587,7 @@ class CertificateViewset(ModelViewSet):
         if certificate_user is not None:
             queryset = queryset.filter(certificate_user_id=certificate_user)
 
-        title = self.request.query_params.get('title')
+        title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title=title)
 
@@ -617,31 +617,31 @@ class WorkExperienceViewset(ModelViewSet):
     def get_queryset(self):
         queryset = WorkExperience.objects.filter(delete_flag=False)
 
-        work_experience_user = self.request.query_params.get('work_experience_user')
+        work_experience_user = self.request.query_params.get('work_experience_user', None)
         if work_experience_user is not None:
             queryset = queryset.filter(work_experience_user_id=work_experience_user)
 
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name__contains=name)
 
-        work_experience_organization = self.request.query_params.get('work_experience_organization')
+        work_experience_organization = self.request.query_params.get('work_experience_organization', None)
         if work_experience_organization is not None:
             queryset = queryset.filter(work_experience_organization=work_experience_organization)
 
-        position = self.request.query_params.get('position')
+        position = self.request.query_params.get('position', None)
         if position is not None:
             queryset = queryset.filter(position=position)
 
-        from_date = self.request.query_params.get('from_date')
+        from_date = self.request.query_params.get('from_date', None)
         if from_date is not None:
             queryset = queryset.filter(from_date=from_date)
 
-        to_date = self.request.query_params.get('to_date')
+        to_date = self.request.query_params.get('to_date', None)
         if to_date is not None:
             queryset = queryset.filter(to_date=to_date)
 
-        experience_status = self.request.query_params.get('status')
+        experience_status = self.request.query_params.get('status', None)
         if experience_status is not None:
             queryset = queryset.filter(status=experience_status)
 
@@ -667,11 +667,11 @@ class SkillViewset(ModelViewSet):
     def get_queryset(self):
         queryset = Skill.objects.filter(delete_flag=False)
 
-        skill_user = self.request.query_params.get('skill_user')
+        skill_user = self.request.query_params.get('skill_user', None)
         if skill_user is not None:
             queryset = queryset.filter(skill_user_id=skill_user)
 
-        title = self.request.query_params.get('title')
+        title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title=title)
 
@@ -696,11 +696,11 @@ class IdentityUrlViewset(ModelViewSet):
     def get_queryset(self):
         queryset = IdentityUrl.objects.filter(delet_flag=False)
 
-        url = self.request.query_params.get('url')
+        url = self.request.query_params.get('url', None)
         if url is not None:
             queryset = queryset.filter(url=url)
 
-        identity_url_related_identity = self.request.query_params.get('identity_url_related_identity')
+        identity_url_related_identity = self.request.query_params.get('identity_url_related_identity', None)
         if identity_url_related_identity is not None:
             queryset = queryset.filter(identity_url_related_identity=identity_url_related_identity)
 
@@ -726,11 +726,11 @@ class UserArticleViewset(ModelViewSet):
     def get_queryset(self):
         queryset = UserArticle.objects.filter(delete_flag=False)
 
-        publisher = self.request.query_params.get('publisher')
+        publisher = self.request.query_params.get('publisher', None)
         if publisher is not None:
             queryset = queryset.filter(publisher=publisher)
 
-        title = self.request.query_params.get('title')
+        title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title=title)
 
@@ -800,15 +800,15 @@ class UserMetaDataViewset(ModelViewSet):
     def get_queryset(self):
         queryset = UserMetaData.objects.filter(delete_flag=False)
 
-        user_meta_related_user = self.request.query_params.get('user_meta_related_user')
+        user_meta_related_user = self.request.query_params.get('user_meta_related_user', None)
         if user_meta_related_user is not None:
             queryset = queryset.filter(user_meta_related_user=user_meta_related_user)
 
-        user_meta_type = self.request.query_params.get('user_meta_related_user')
+        user_meta_type = self.request.query_params.get('user_meta_related_user', None)
         if user_meta_type is not None:
             queryset = queryset.filter(user_meta_type=user_meta_type)
 
-        user_meta_value = self.request.query_params.get('user_meta_value')
+        user_meta_value = self.request.query_params.get('user_meta_value', None)
         if user_meta_value is not None:
             queryset = queryset.filter(user_meta_value=user_meta_value)
 
