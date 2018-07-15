@@ -802,9 +802,10 @@ class ForgetPasswordSerializer(Serializer):
 class OrganizationMiniSerializer(BaseSerializer):
     class Meta:
         model = Organization
-        fields = ['username', 'official_name', 'national_code', 'country', 'province', 'city', 'ownership_type', 'business_type', 'owner']
+        fields = ['id', 'username', 'official_name', 'national_code', 'country', 'province', 'city', 'ownership_type', 'business_type', 'owner']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'id': {'read_only': True, 'required': False},
         }
 
 
