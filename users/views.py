@@ -578,7 +578,7 @@ class CertificateViewset(ModelViewSet):
     # this field use for CanReadContent permission
     content_target_field = 'who_can_read_certificates'
 
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated, CanReadContent]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly, CanReadContent]
 
     def get_queryset(self):
         queryset = Certificate.objects.filter(delete_flag=False)

@@ -41,7 +41,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 class CanReadContent(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET":
+        if view.action in ['list']:
             if request.user.is_superuser:
                 return True
             content_owner_field = view.owner_field
@@ -86,7 +86,7 @@ class CanReadContent(permissions.BasePermission):
                 return False
             content_target_field = view.content_target_field
             content_target_value = getattr(user_setting, content_target_field)
-            if content_target_value == "all" or request.user.is_superuser:
+            if content_target_value == "all" or request.user.is_superuser or request.user == user_setting.setting_user:
                 return True
             elif content_target_value == "followers":
                 try:
