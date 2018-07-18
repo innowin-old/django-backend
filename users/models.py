@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import re
+import uuid
 
 from django.db import models, transaction
 from django.db.models.signals import post_save, pre_save
@@ -95,7 +96,9 @@ User.save = user_save
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(profile_user=instance)
+        profile = Profile.objects.create(profile_user=instance)
+        profile.profile_secret_key = str(uuid.uuid4())
+        profile.save()
 
 
 class Profile(Base):
@@ -144,6 +147,7 @@ class Profile(Base):
                                              on_delete=models.CASCADE, help_text='Integer')
     profile_banner = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_banner_media",
                                        help_text='Integer', blank=True, null=True)
+    profile_secret_key = models.CharField(blank=True, null=True, max_length=100)
 
     objects = BaseManager()
 
