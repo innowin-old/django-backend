@@ -62,7 +62,10 @@ class IsProductOrganizationOwnerOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
             owner_id = request.POST.get('product_owner', None)
-            identity = Identity.objects.get(pk=owner_id)
+            try:
+                identity = Identity.objects.get(pk=owner_id)
+            except Identity.DoesNotExist:
+                return False
             if identity.identity_user is not None:
                 if identity.identity_user == request.user or request.user.is_superuser:
                     return True
@@ -74,7 +77,10 @@ class IsProductOrganizationOwnerOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method != "GET":
-            identity = Identity.objects.get(id=obj.product_owner_id)
+            try:
+                identity = Identity.objects.get(id=obj.product_owner_id)
+            except Identity.DoesNotExist:
+                return False
             if identity.identity_user is not None:
                 if identity.identity_user == request.user or request.user.is_superuser:
                     return True
