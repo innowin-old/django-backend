@@ -1,5 +1,3 @@
-from distutils.command.install import install
-
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from base.serializers import BaseSerializer
