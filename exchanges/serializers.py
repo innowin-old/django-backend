@@ -8,7 +8,7 @@ from users.serializers import IdentityMiniSerializer
 class ExchangeSerializer(BaseSerializer):
     class Meta:
         model = Exchange
-        exclude = ['child_name', 'is_default_exchange']
+        exclude = ['child_name']
         extra_kwargs = {
             'owner': {'required': False},
             'updated_time': {'read_only': True}
