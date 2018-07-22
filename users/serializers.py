@@ -826,6 +826,9 @@ class UserOrganizationSerializer(BaseSerializer):
         # add user to default exchange
         add_user_to_default_exchange(user)
         organization = Organization.objects.create(owner=user, **organization_data)
+        profile = Profile.objects.get(profile_user=user)
+        profile.is_user_organization = True
+        profile.save()
         response = {
             'id': user.id,
             'username': user.username,
