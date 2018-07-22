@@ -15,11 +15,13 @@ from .views import (
         BaseTownViewSet,
         BadgeCategoryViewSet,
         BadgeViewSet,
+        CertificateViewSet,
     )
 
 
 router = DefaultRouter()
 
+router.register(r'certificates', CertificateViewSet, 'Certificates')
 router.register(r'badges', BadgeViewSet, 'Badges')
 router.register(r'badge-categories', BadgeCategoryViewSet, 'Badge Categories')
 router.register(r'towns', BaseTownViewSet, 'Towns')
