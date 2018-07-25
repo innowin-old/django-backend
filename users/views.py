@@ -1,4 +1,5 @@
 import json
+from os import stat_result
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -131,6 +132,17 @@ class UserViewset(ModelViewSet):
             queryset = queryset.filter(email__contains=email)
 
         return queryset
+
+    @list_route(methods=['post'], permission_classes=[AllowAny])
+    def user_exist(self, request):
+        username = request.POST.get('username', None)
+        if username is not None:
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response(0, status=status.HTTP_404_NOT_FOUND)
+            return Response(1, status=status.HTTP_200_OK)
+        return Response('please insert username', status=status.HTTP_400_BAD_REQUEST)
 
     @list_route(methods=['post'])
     def import_users(self, request):
