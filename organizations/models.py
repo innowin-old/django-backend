@@ -37,7 +37,7 @@ class Organization(Base):
     email = models.EmailField(blank=True, null=True, help_text='Text')
     public_email = models.EmailField(blank=True, null=True, help_text='Text')
     nike_name = models.CharField(max_length=20, db_index=True, null=True, blank=True, help_text='String(100)')
-    official_name = models.CharField(max_length=50, db_index=True, unique=True, help_text='String(75)')
+    official_name = models.CharField(max_length=50, db_index=True, unique=True, help_text='String(50)')
     national_code = models.CharField(max_length=11, db_index=True, null=True, blank=True, help_text='String(20)')
     registration_ads_url = models.URLField(db_index=True, null=True, blank=True, help_text='URL')
     registrar_organization = models.CharField(max_length=100, db_index=True, null=True, blank=True,

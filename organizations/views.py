@@ -141,7 +141,24 @@ class OrganizationViewset(BaseModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated],
+        methods=['post']
+    )
+    def count(self, request):
+        organization_id = request.POST.get('organization_id', None)
+        if organization_id is not None:
+            if organization_id.isdigit():
+                try:
+                    organization = Organization.objects.get(pk=organization_id)
+                except Organization.DoesNotExist:
+                    return Response({'detail': "Not found."}, status=status.HTTP_404_NOT_FOUND)
+                followers_count = Follow.objects.filter(follow_followed=organization).count()
+                return Response({'count': followers_count}, status=status.HTTP_200_OK)
+            return Response({'detail': "organization id must be numeric"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"username": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+    @list_route(
+        permission_classes=[IsAuthenticated],
         methods=['get']
     )
     def get_meta_data(self, request):
@@ -366,7 +383,8 @@ class StaffViewset(BaseModelViewSet):
 
 
 class FollowViewset(BaseModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdminUserOrCanNotCreateAccepted, IsFollowedOrReadOnly, IsAdminOrCanNotChangeIdentities]
+    permission_classes = [IsAuthenticated, IsAdminUserOrCanNotCreateAccepted, IsFollowedOrReadOnly,
+                          IsAdminOrCanNotChangeIdentities]
 
     def get_queryset(self):
         queryset = Follow.objects.filter(delete_flag=False)

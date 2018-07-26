@@ -26,6 +26,7 @@ class OrganizationSerializer(BaseSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
+        validated_data.pop('admins')
         if 'owner' not in validated_data or not request.user.is_superuser:
             validated_data['owner'] = request.user
         organization = Organization.objects.create(**validated_data)
