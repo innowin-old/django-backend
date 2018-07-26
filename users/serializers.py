@@ -5,6 +5,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 from rest_framework.serializers import (
     ModelSerializer,
@@ -184,12 +185,13 @@ class UserSerializer(ModelSerializer):
     phone = ListField(child=CharField(max_length=23, required=False), required=False)
     mobile = ListField(child=CharField(max_length=23, required=False), required=False)
     password = CharField(max_length=255)
+    auth_mobile = CharField(required=False, validators=[RegexValidator('^[0][9][1][0-9]{8,8}$')])
 
     class Meta:
         model = User
         fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'password', 'date_joined',
                   'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account',
-                  'description', 'phone', 'mobile']
+                  'description', 'phone', 'mobile', 'auth_mobile']
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
@@ -327,6 +329,8 @@ class UserSerializer(ModelSerializer):
             profile_kwargs['phone'] = kwargs['phone']
         if 'mobile' in kwargs:
             profile_kwargs['mobile'] = kwargs['mobile']
+        if 'auth_mobile' in kwargs:
+            profile_kwargs['auth_mobile'] = kwargs['auth_mobile']
         return profile_kwargs
 
 

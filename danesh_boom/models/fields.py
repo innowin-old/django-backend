@@ -9,7 +9,7 @@ class PhoneField(CharField):
     description = _("Phone")
 
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 23
+        kwargs['max_length'] = 13
         super().__init__(*args, **kwargs)
 
     def deconstruct(self):

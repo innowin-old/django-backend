@@ -24,6 +24,7 @@ from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token
 import media.views
 # from danesh_boom.schema import schema
 # from .views import SafeGraphQLView
+from danesh_boom.views import ObtainJWTView
 
 urlpatterns = [
     url(r'^users/', include('users.urls')),
@@ -39,6 +40,7 @@ urlpatterns = [
     url(r'^forms/', include('forms.urls', namespace="forms")),
     # url(r'^', include('users.urls')),
     url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^login/', view=ObtainJWTView.as_view(), name='login'),
     url(r'^api-token-verify/', verify_jwt_token),
     url(r'^files/', include('media.urls', namespace='media')),
     #url(r'^graphql', SafeGraphQLView.as_view(graphiql=True, schema=schema))

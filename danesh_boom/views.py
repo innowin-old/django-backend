@@ -7,6 +7,10 @@ from graphql.error.located_error import GraphQLLocatedError
 from graphql.error import format_error as format_graphql_error
 from utils.Exceptions import ResponseError
 
+from rest_framework_jwt.views import ObtainJSONWebToken
+
+from .serializers import JWTSerializer
+
 
 def format_response_error(error: ResponseError):
     return {
@@ -54,3 +58,7 @@ class SafeGraphQLView(GraphQLView):
                 return format_graphql_error(error)
         except Exception as e:
             return format_internal_error(e)
+
+
+class ObtainJWTView(ObtainJSONWebToken):
+    serializer_class = JWTSerializer
