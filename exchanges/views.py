@@ -10,7 +10,8 @@ from rest_framework.permissions import IsAdminUser
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange
-from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, ExchangeMiniSerializer
+from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, \
+    ExchangeMiniSerializer
 
 
 # Create your views here.
@@ -146,6 +147,22 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
         if self.action == 'list':
             return ExchangeIdentityListViewSerializer
         return ExchangeIdentitySerializer
+
+    @list_route(
+        methods=['post'],
+        permission_classes=[IsAuthenticated]
+    )
+    def count(self, request):
+        exchange_id = request.POST.get('exchange_id', None)
+        if exchange_id is not None:
+            try:
+                exchange = Exchange.objects.get(pk=exchange_id)
+            except Exchange.DoesNotExist:
+                return Response({"detail": "Exchange Not Found"}, status=status.HTTP_404_NOT_FOUND)
+            exchange_count = ExchangeIdentity.objects.filter(exchange_identity_related_exchange=exchange,
+                                                             active_flag=True).count()
+            return Response({'count': exchange_count}, status=status.HTTP_200_OK)
+        return Response({"detail": 'Please Insert Exchange id'}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         try:
