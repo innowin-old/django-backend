@@ -295,6 +295,12 @@ class UserSerializer(ModelSerializer):
             raise ValidationError(error)
         return value
 
+    def validate_password(self, value):
+        if len(value) < 8:
+            error = {'message': "minimum length for password is 8 character"}
+            raise ValidationError(error)
+        return value
+
     def get_user_validated_args(self, **kwargs):
         user_kwargs = {}
         if 'username' in kwargs:
@@ -842,3 +848,33 @@ class UserOrganizationSerializer(BaseSerializer):
             'organization': organization
         }
         return response
+
+    def validate_first_name(self, value):
+        if len(value) > 20:
+            error = {'message': "maximum length for first name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+
+    def validate_last_name(self, value):
+        if len(value) > 20:
+            error = {'message': "maximum length for last name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+    def validate_username(self, value):
+        if len(value) < 5:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        if len(value) > 32:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            error = {'message': "minimum length for password is 8 character"}
+            raise ValidationError(error)
+        return value
+
+
