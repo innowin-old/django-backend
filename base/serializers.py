@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from django.db.models import Q
 
@@ -162,6 +163,14 @@ class PostSerializer(BaseSerializer):
             profile.save()
             user_strength.supply_demand_obtained = True
             user_strength.save()
+
+    @staticmethod
+    def validate_post_description(value):
+        if len(value) != 0:
+            if len(value) < 5:
+                error = {'message': "minimum length for post description is 5 character"}
+                raise ValidationError(error)
+        return value
 
 
 class PostListSerializer(BaseSerializer):
