@@ -34,7 +34,8 @@ from .models import (
     UserArticle,
     Device,
     StrengthStates,
-    UserMetaData
+    UserMetaData,
+    AgentRequest
 )
 from .utils import add_user_to_default_exchange
 
@@ -883,3 +884,35 @@ class UserOrganizationSerializer(BaseSerializer):
             error = {'message': "minimum length for password is 8 character"}
             raise ValidationError(error)
         return value
+
+
+class AgentRequestSerializer(BaseSerializer):
+    class Meta:
+        model = AgentRequest
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'agent_request_identity': {
+                'required': False,
+                'read_only': True,
+            },
+            'agent_request_accepted': {
+                'read_only': True,
+            }
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        identity = Identity.objects.get(identity_user=request.user)
+        validated_data['agent_request_identity'] = identity
+        agent_request = AgentRequest.objects.create(**validated_data)
+        return agent_request
+
+
+class AgentRequestAdminSerializer(BaseSerializer):
+    class Meta:
+        model = AgentRequest
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }

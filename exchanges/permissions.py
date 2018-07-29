@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import permissions
 
-from users.models import Agent, Identity
+from users.models import Identity
 from organizations.models import Organization
 from .models import ExchangeIdentity, Exchange
 
@@ -94,7 +94,7 @@ class IsExchangeFull(permissions.BasePermission):
         return True
 
 
-class IsAgentOrReadOnly(permissions.BasePermission):
+'''class IsAgentOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == "POST":
             user = request.user
@@ -116,7 +116,7 @@ class IsAgentOrReadOnly(permissions.BasePermission):
                         organization = Organization.objects.get(pk=identity.identity_organization)
                         if organization.owner != user:
                             return False
-        return True
+        return True'''
 
 
 class IsFirstDefaultExchange(permissions.BasePermission):

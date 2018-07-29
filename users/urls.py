@@ -19,13 +19,15 @@ from .views import (
     ForgetPasswordViewset,
     UserMetaDataViewset,
     UserOrganizationViewset,
+    AgentReuqestViewset,
     login_page,
     logout_page,
-    active_user
+    active_user,
 )
 
 
 router = DefaultRouter()
+router.register(r'agent-requests', AgentReuqestViewset, 'agent-request')
 router.register(r'user-organization', UserOrganizationViewset, 'user-organization')
 router.register(r'forget-password', ForgetPasswordViewset, 'forget-password')
 router.register(r'devices', DeviceViewset, 'devices')

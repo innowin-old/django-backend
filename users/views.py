@@ -1,5 +1,4 @@
 import json
-from os import stat_result
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -34,7 +33,8 @@ from .models import (
     IdentityUrl,
     UserArticle,
     Device,
-    UserMetaData
+    UserMetaData,
+    AgentRequest,
 )
 
 from .serializers import (
@@ -55,7 +55,9 @@ from .serializers import (
     DeviceSerializer,
     UserMetaDataSerializer,
     ForgetPasswordSerializer,
-    UserOrganizationSerializer
+    UserOrganizationSerializer,
+    AgentRequestSerializer,
+    AgentRequestAdminSerializer,
 )
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
@@ -848,6 +850,28 @@ class UserOrganizationViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return UserOrganizationSerializer
+
+
+class AgentReuqestViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = AgentRequest.objects.filter(delete_flag=False)
+
+        agent_request_title = self.request.query_params.get('agent_request_title', None)
+        if agent_request_title is not None:
+            queryset = queryset.filter(agent_request_title=agent_request_title)
+
+        agent_request_identity = self.request.query_params.get('agent_request_identity', None)
+        if agent_request_identity is not None:
+            queryset = queryset.filter(agent_request_identity_id=agent_request_identity)
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return AgentRequestAdminSerializer
+        return AgentRequestSerializer
 
 
 def login_page(request):

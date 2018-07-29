@@ -414,14 +414,16 @@ post_save.connect(update_cache, sender=UserArticle)
 pre_save.connect(set_child_name, sender=UserArticle)
 
 
-class Agent(Base):
-    agent_identity = models.ForeignKey(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')
+class AgentRequest(Base):
+    agent_request_identity = models.OneToOneField(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')
+    agent_request_title = models.CharField(max_length=100)
+    agent_request_accepted = models.BooleanField(default=False)
 
 
 # Cache Model Data After Update
-post_save.connect(update_cache, sender=Agent)
+post_save.connect(update_cache, sender=AgentRequest)
 # Set Child Name
-pre_save.connect(set_child_name, sender=Agent)
+pre_save.connect(set_child_name, sender=AgentRequest)
 
 
 class Device(Base):
