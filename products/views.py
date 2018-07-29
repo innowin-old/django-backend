@@ -30,9 +30,10 @@ from .serializers import (
     CategoryFieldSerializer,
     ProductSerializer,
     ProductListViewSerializer,
+    ProductReadSerializer,
     PriceSerializer,
     PictureSerializer,
-    CommentSerializer
+    CommentSerializer,
 )
 
 
@@ -176,6 +177,8 @@ class ProductViewset(BaseModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return ProductListViewSerializer
+        elif self.action == 'retrieve':
+            return ProductReadSerializer
         return ProductSerializer
 
     @list_route(

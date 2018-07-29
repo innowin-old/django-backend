@@ -56,6 +56,13 @@ class ProductListViewSerializer(BaseSerializer):
         exclude = ['child_name']
 
 
+class ProductReadSerializer(BaseSerializer):
+    class Meta:
+        model = Product
+        exclude = ['child_name']
+        depth = 1
+
+
 class PriceSerializer(BaseSerializer):
     class Meta:
         model = Price
