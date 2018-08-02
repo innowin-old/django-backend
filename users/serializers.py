@@ -133,6 +133,49 @@ class SuperAdminUserSerializer(ModelSerializer):
         user_strength.save()
         return user
 
+    @staticmethod
+    def validate_first_name(value):
+        if len(value) > 20:
+            error = {'message': "maximum length for first name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+    @staticmethod
+    def validate_email(value):
+        if len(value) > 0:
+            try:
+                user = User.objects.get(email=value)
+            except User.DoesNotExist:
+                return value
+            error = {'message': "email already exist"}
+            raise ValidationError(error)
+        return value
+
+    @staticmethod
+    def validate_last_name(value):
+        if len(value) > 20:
+            error = {'message': "maximum length for last name is 20 character"}
+            raise ValidationError(error)
+        return value
+
+    @staticmethod
+    def validate_username(value):
+        if len(value) < 5:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        if len(value) > 32:
+            error = {'message': "minimum length for last name is 5 character"}
+            raise ValidationError(error)
+        return value
+
+    @staticmethod
+    def validate_password(value):
+        if len(value) < 8:
+            error = {'message': "minimum length for password is 8 character"}
+            raise ValidationError(error)
+        return value
+
+
     def get_user_validated_args(self, **kwargs):
         user_kwargs = {'username': kwargs['username']}
         if 'first_name' in kwargs:
