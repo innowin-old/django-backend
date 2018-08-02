@@ -20,6 +20,7 @@ from .views import (
     UserMetaDataViewset,
     UserOrganizationViewset,
     AgentReuqestViewset,
+    StrengthStatesViewset,
     login_page,
     logout_page,
     active_user,
@@ -27,6 +28,7 @@ from .views import (
 
 
 router = DefaultRouter()
+router.register(r'strength-states', StrengthStatesViewset, 'strength-states')
 router.register(r'agent-requests', AgentReuqestViewset, 'agent-request')
 router.register(r'user-organization', UserOrganizationViewset, 'user-organization')
 router.register(r'forget-password', ForgetPasswordViewset, 'forget-password')

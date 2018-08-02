@@ -35,6 +35,7 @@ from .models import (
     Device,
     UserMetaData,
     AgentRequest,
+    StrengthStates,
 )
 
 from .serializers import (
@@ -58,6 +59,7 @@ from .serializers import (
     UserOrganizationSerializer,
     AgentRequestSerializer,
     AgentRequestAdminSerializer,
+    StrengthStatesSerializer,
 )
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
@@ -872,6 +874,17 @@ class AgentReuqestViewset(ModelViewSet):
         if self.request and self.request.user and self.request.user.is_superuser:
             return AgentRequestAdminSerializer
         return AgentRequestSerializer
+
+
+class StrengthStatesViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = StrengthStates.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return StrengthStatesSerializer
 
 
 def login_page(request):

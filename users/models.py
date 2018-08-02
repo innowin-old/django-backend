@@ -117,7 +117,7 @@ class Profile(Base):
     web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
     phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
     mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
-    auth_mobile = models.CharField(max_length=11, blank=True, null=True,
+    auth_mobile = models.CharField(max_length=11, blank=True, null=True, unique=True,
                                    validators=[RegexValidator('^[0][9][1][0-9]{8,8}$')], help_text='Phone')
     fax = PhoneField(blank=True, help_text='Phone')
     telegram_account = models.CharField(

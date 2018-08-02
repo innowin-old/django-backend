@@ -228,9 +228,9 @@ class UserSerializer(ModelSerializer):
         profile = Profile.objects.get(profile_user=user)
         user_validated_data = self.get_user_validated_args(**validated_data)
         try:
-            user_strength = StrengthStates.objects.get(user_strength=user)
+            user_strength = StrengthStates.objects.get(strength_user=user)
         except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(user_strength=user)
+            user_strength = StrengthStates.objects.create(strength_user=user)
         # check for first name strength rate
         if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
             user.first_name = user_validated_data['first_name']
@@ -275,21 +275,32 @@ class UserSerializer(ModelSerializer):
         return user
 
     @staticmethod
-    def validate_first_name(self, value):
+    def validate_first_name(value):
         if len(value) > 20:
             error = {'message': "maximum length for first name is 20 character"}
             raise ValidationError(error)
         return value
 
     @staticmethod
-    def validate_last_name(self, value):
+    def validate_email(value):
+        if len(value) > 0:
+            try:
+                user = User.objects.get(email=value)
+            except User.DoesNotExist:
+                return value
+            error = {'message': "email already exist"}
+            raise ValidationError(error)
+        return value
+
+    @staticmethod
+    def validate_last_name(value):
         if len(value) > 20:
             error = {'message': "maximum length for last name is 20 character"}
             raise ValidationError(error)
         return value
 
     @staticmethod
-    def validate_username(self, value):
+    def validate_username(value):
         if len(value) < 5:
             error = {'message': "minimum length for last name is 5 character"}
             raise ValidationError(error)
@@ -299,7 +310,7 @@ class UserSerializer(ModelSerializer):
         return value
 
     @staticmethod
-    def validate_password(self, value):
+    def validate_password(value):
         if len(value) < 8:
             error = {'message': "minimum length for password is 8 character"}
             raise ValidationError(error)
@@ -869,7 +880,7 @@ class UserOrganizationSerializer(BaseSerializer):
         return value
 
     @staticmethod
-    def validate_username(self, value):
+    def validate_username(value):
         if len(value) < 5:
             error = {'message': "minimum length for last name is 5 character"}
             raise ValidationError(error)
@@ -879,7 +890,7 @@ class UserOrganizationSerializer(BaseSerializer):
         return value
 
     @staticmethod
-    def validate_password(self, value):
+    def validate_password(value):
         if len(value) < 8:
             error = {'message': "minimum length for password is 8 character"}
             raise ValidationError(error)
@@ -916,3 +927,13 @@ class AgentRequestAdminSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True},
         }
+
+
+class StrengthStatesSerializer(BaseSerializer):
+    class Meta:
+        model = StrengthStates
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+        depth = 1
