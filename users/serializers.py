@@ -991,7 +991,6 @@ class BlockIdentitySerializer(BaseSerializer):
         }
 
     def create(self, validated_data):
-        print('Debug !!!!!!!!!')
         request = self.context.get('request')
         if 'blocker_identity' not in validated_data or not request.user.is_superuser:
             identity = Identity.objects.get(identity_user=request.user)
