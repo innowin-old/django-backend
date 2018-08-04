@@ -415,17 +415,18 @@ pre_save.connect(set_child_name, sender=UserArticle)
 
 
 class AgentRequest(Base):
-    REQUEST_TYPES = (
+    # TODO
+    """REQUEST_TYPES = (
         ('DIRECT_UPGRADE', 'ارتقا مستقیم به کارگزار'),
         ('RESUME_BASE_UPGRADE', ' ارتقا بر اساس سوابق کارگزاری '),
-    )
+    )"""
     agent_request_identity = models.OneToOneField(Identity, related_name='agent', on_delete=models.CASCADE, help_text='Integer')
-    agent_request_title = models.CharField(max_length=100)
-    agent_request_type = models.CharField(
+    agent_request_description = models.TextField()
+    """agent_request_type = models.CharField(
         choices=REQUEST_TYPES,
         max_length=20,
         default='DIRECT_UPGRADE',
-        help_text='DIRECT_UPGRADE | RESUME_BASE_UPGRADE')
+        help_text='DIRECT_UPGRADE | RESUME_BASE_UPGRADE')"""
     agent_request_accepted = models.BooleanField(default=False)
 
 
