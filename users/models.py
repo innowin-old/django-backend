@@ -515,3 +515,11 @@ class UserMetaData(Base):
 post_save.connect(update_cache, sender=UserMetaData)
 # Set Child Name
 pre_save.connect(set_child_name, sender=UserMetaData)
+
+
+class BlockIdentity(Base):
+    blocked_identity = models.ForeignKey(Identity, related_name='blocked_identity', db_index=True,
+                                         on_delete=models.CASCADE, help_text='Integer')
+    blocker_identity = models.ForeignKey(Identity, related_name='blocker_identity', db_index=True,
+                                         on_delete=models.CASCADE, help_text='integer')
+    active_flag = models.BooleanField(default=True)

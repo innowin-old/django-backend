@@ -24,10 +24,11 @@ from .views import (
     login_page,
     logout_page,
     active_user,
-)
+    BlockIdentityViewset)
 
 
 router = DefaultRouter()
+router.register(r'blocks', BlockIdentityViewset, 'block-identity')
 router.register(r'strength-states', StrengthStatesViewset, 'strength-states')
 router.register(r'agent-requests', AgentReuqestViewset, 'agent-request')
 router.register(r'user-organization', UserOrganizationViewset, 'user-organization')

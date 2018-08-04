@@ -35,8 +35,8 @@ from .models import (
     Device,
     StrengthStates,
     UserMetaData,
-    AgentRequest
-)
+    AgentRequest,
+    BlockIdentity)
 from .utils import add_user_to_default_exchange
 
 
@@ -327,9 +327,8 @@ class UserSerializer(ModelSerializer):
     @staticmethod
     def validate_email(value):
         if len(value) > 0:
-            try:
-                user = User.objects.get(email=value)
-            except User.DoesNotExist:
+            user_count = User.objects.filter(email=value).count()
+            if user_count == 0:
                 return value
             error = {'message': "email already exist"}
             raise ValidationError(error)
@@ -980,3 +979,35 @@ class StrengthStatesSerializer(BaseSerializer):
             'updated_time': {'read_only': True},
         }
         depth = 1
+
+
+class BlockIdentitySerializer(BaseSerializer):
+    class Meta:
+        model = BlockIdentity
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'blocker_identity': {'required': False}
+        }
+
+    def create(self, validated_data):
+        print('Debug !!!!!!!!!')
+        request = self.context.get('request')
+        if 'blocker_identity' not in validated_data or not request.user.is_superuser:
+            identity = Identity.objects.get(identity_user=request.user)
+            validated_data['blocker_identity'] = identity
+        block_identity = BlockIdentity.objects.create(**validated_data)
+        return block_identity
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if 'blocker_identity' not in validated_data or not request.user.is_superuser:
+            instance.blocker_identity = request.user
+        else:
+            instance.blocker_identity = validated_data['blocker_identity']
+        # set validated data to skill instance
+        for key in validated_data:
+            if key != 'blocker_identity':
+                setattr(instance, key, validated_data.get(key))
+        instance.save()
+        return instance

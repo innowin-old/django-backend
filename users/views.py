@@ -36,7 +36,7 @@ from .models import (
     UserMetaData,
     AgentRequest,
     StrengthStates,
-)
+    BlockIdentity)
 
 from .serializers import (
     SuperAdminUserSerializer,
@@ -60,7 +60,7 @@ from .serializers import (
     AgentRequestSerializer,
     AgentRequestAdminSerializer,
     StrengthStatesSerializer,
-)
+    BlockIdentitySerializer)
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
 
@@ -885,6 +885,30 @@ class StrengthStatesViewset(ModelViewSet):
 
     def get_serializer_class(self):
         return StrengthStatesSerializer
+
+
+class BlockIdentityViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = BlockIdentity.objects.filter(delete_flag=False)
+        blocked_identity = self.request.query_params.get('blocked_identity', None)
+        if blocked_identity is not None:
+            queryset = queryset.filter(blocked_identity_id=blocked_identity)
+        blocked_identity_name = self.request.query_params.get('blocked_identity_name', None)
+        if blocked_identity_name is not None:
+            queryset = queryset.filter(blocked_identity__name=blocked_identity_name)
+        blocker_identity = self.request.query_params.get('blocker_identity', None)
+        if blocker_identity is not None:
+            queryset = queryset.filter(blocker_identity_id=blocker_identity)
+        blocker_identity_name = self.request.query_params.get('blocker_identity_name', None)
+        if blocker_identity_name is not None:
+            queryset = queryset.filter(blocker_identity__name=blocker_identity_name)
+        return queryset
+
+    def get_serializer_class(self):
+        print('in get serializer')
+        return BlockIdentitySerializer
 
 
 def login_page(request):
