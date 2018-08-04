@@ -148,6 +148,16 @@ class UserViewset(ModelViewSet):
             return Response(1, status=status.HTTP_200_OK)
         return Response('please insert username', status=status.HTTP_400_BAD_REQUEST)
 
+    @list_route(methods=['post'], permission_classes=[AllowAny])
+    def email_exist(self, request):
+        email = request.POST.get('email', None)
+        if email is not None:
+            email_count = User.objects.filter(email=email).count()
+            if email_count == 0:
+                return Response(0, status=status.HTTP_404_NOT_FOUND)
+            return Response(1, status=status.HTTP_200_OK)
+        return Response('please insert email', status=status.HTTP_400_BAD_REQUEST)
+
     @list_route(methods=['post'])
     def import_users(self, request):
         jsonString = request.data.get('records', None)
