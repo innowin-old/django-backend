@@ -143,13 +143,13 @@ class SuperAdminUserSerializer(ModelSerializer):
     @staticmethod
     def validate_email(value):
         if len(value) > 0:
-            try:
-                user = User.objects.get(email=value)
-            except User.DoesNotExist:
+            user_count = User.objects.filter(email=value).count()
+            if user_count == 0:
                 return value
             error = {'message': "email already exist"}
             raise ValidationError(error)
-        return value
+        error = {'message': "email an not be blank"}
+        raise ValidationError(error)
 
     @staticmethod
     def validate_last_name(value):
@@ -238,6 +238,7 @@ class UserSerializer(ModelSerializer):
                   'description', 'phone', 'mobile', 'auth_mobile']
 
     def create(self, validated_data):
+        print('salaaam create')
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])
@@ -326,13 +327,17 @@ class UserSerializer(ModelSerializer):
 
     @staticmethod
     def validate_email(value):
-        if len(value) > 0:
+        if value is None:
+            error = {'message': "email field is required"}
+            raise ValidationError(error)
+        elif len(value) > 0:
             user_count = User.objects.filter(email=value).count()
             if user_count == 0:
                 return value
             error = {'message': "email already exist"}
             raise ValidationError(error)
-        return value
+        error = {'message': "email can not be blank"}
+        raise ValidationError(error)
 
     @staticmethod
     def validate_last_name(value):
