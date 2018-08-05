@@ -498,7 +498,7 @@ class ProfileViewset(ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.request == 'GET':
+        if self.action == 'list' or self.action == 'retrieve':
             return ProfileListSerializer
         return ProfileSerializer
 

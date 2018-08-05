@@ -470,12 +470,10 @@ class ProfileSerializer(BaseSerializer):
 
 
 class ProfileListSerializer(BaseSerializer):
-    profile_user = UserMiniSerializer()
-    profile_media = MediaMiniSerializer()
-
     class Meta:
         model = Profile
         exclude = ['child_name']
+        depth = 1
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
