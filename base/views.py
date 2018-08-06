@@ -2,6 +2,7 @@ import json
 
 from django.db.models import Q
 from django.core import serializers
+from requests.status_codes import title
 from rest_framework import status
 from rest_framework.decorators import list_route
 from rest_framework.viewsets import ModelViewSet
@@ -133,6 +134,89 @@ class HashtagParentViewset(BaseModelViewSet):
 
     def get_serializer_class(self):
         return HashtagParentSerializer
+
+    @list_route(methods=['post'], permission_classes=[IsAdminUser])
+    def import_hashtags(self, request):
+        jsonString = request.data.get('records', None)
+        if jsonString is not None:
+            data = json.loads(jsonString)
+            errors = []
+            # Add Hashtags First
+            for record in data:
+                if record.get('title', None) is not None:
+                    hashtag_count = HashtagParent.objects.filter(title=record.get('title', None)).count()
+                    print(record.get('title', None))
+                    if hashtag_count == 0:
+                        print('is zero')
+                        try:
+                            hashtag_object = HashtagParent.objects.create(title=record.get('title', None))
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
+                    else:
+                        print('is not zero')
+                else:
+                    errors.append({
+                        'data': record,
+                        'status': 'this record have not title'
+                    })
+            # Add Hashtag Relations
+            for record in data:
+                if record.get('title', None) is not None:
+                    try:
+                        hashtag = HashtagParent.objects.get(title=record.get('title', None))
+                    except HashtagParent.DoesNotExist:
+                        errors.append({
+                            'data': record,
+                            'status': 'hashtag not exist for set relation'
+                        })
+                        hashtag = None
+                    if hashtag is not None:
+                        hashtag_parent_id = record.get('parent_id', None)
+                        if hashtag_parent_id is not None and hashtag_parent_id != '':
+                            for parent_record in data:
+                                if parent_record.get('title', None) is not None:
+                                    if parent_record.get('id', None) == hashtag_parent_id:
+                                        try:
+                                            hashtag_parent_object = HashtagParent.objects.get(
+                                                title=parent_record.get('title', None)
+                                            )
+                                        except HashtagParent.DoesNotExist:
+                                            hashtag_parent_object = None
+                                        if hashtag_parent_object is not None:
+                                            hashtag_relation_count = HashtagRelation.objects.filter(
+                                                Q(hashtag_first=hashtag, hashtag_second=hashtag_parent_object) |
+                                                Q(hashtag_first=hashtag_parent_object, hashtag_second=hashtag)).count()
+                                            if hashtag_relation_count == 0:
+                                                try:
+                                                    hashtag_realtion_object = HashtagRelation.objects.create(
+                                                        hashtag_first=hashtag_parent_object,
+                                                        hashtag_second=hashtag
+                                                    )
+                                                except Exception as e:
+                                                    errors.append({
+                                                        'data': record,
+                                                        'status': str(e)
+                                                    })
+                                        else:
+                                            errors.append({
+                                                'data': record,
+                                                'status': 'hashtag parent object not exist'
+                                            })
+                                        break
+                    else:
+                        errors.append({
+                            'data': record,
+                            'status': 'this record have not title'
+                        })
+                else:
+                    errors.append({
+                        'data': record,
+                        'status': 'this record have not title'
+                    })
+        return Response(errors, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         try:
