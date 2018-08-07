@@ -57,6 +57,40 @@ class CategoryViewset(BaseModelViewSet):
 
         return queryset
 
+    @list_route(methods=['post'], permission_classes=[IsAdminUser])
+    def import_categories(self, request):
+        jsonString = request.data.get('records')
+        records = json.loads(jsonString)
+        error_logs = []
+        for record in records:
+            try:
+                category = Category.objects.create(name=record.get('name', None), title=record.get('name', None))
+            except Exception as e:
+                error_logs.append({
+                    'data': record,
+                    'status': str(e)
+                })
+            if record.get('parent', None) is not None and record.get('parent', None) != '':
+                try:
+                    category_parent = Category.objects.get(name=record.get('parent', None))
+                except Exception as e:
+                    error_logs.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+                    category_parent = None
+                if category_parent is None:
+                    try:
+                        category_parent = Category.objects.create(name=record.get('parent', None), title=record.get('parent', None))
+                    except Exception as e:
+                        error_logs.append({
+                            'data': record,
+                            'status': str(e)
+                        })
+                category.category_parent = category_parent
+                category.save()
+        return Response(error_logs, status=status.HTTP_200_OK)
+
     def get_serializer_class(self):
         return CategorySerializer
 
