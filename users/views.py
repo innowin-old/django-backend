@@ -9,6 +9,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
 from rest_framework import status
 
 from utils.token import validate_token
@@ -373,13 +374,13 @@ class UserViewset(ModelViewSet):
 
 
 class ForgetPasswordViewset(ViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request):
         forget_password_serializer = ForgetPasswordSerializer(data=request.POST)
         if forget_password_serializer.is_valid():
             send_sms = False
-            if 'email' in forget_password_serializer.validated_data:
+            """if 'email' in forget_password_serializer.validated_data:
                 try:
                     user = User.objects.get(email=forget_password_serializer.validated_data['email'])
                 except User.DoesNotExist:
@@ -392,13 +393,18 @@ class ForgetPasswordViewset(ViewSet):
                     return Response(status=status.HTTP_404_NOT_FOUND, data='Not Found')
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
-            random_number = random_with_N_digits(5)
+            random_number = random_with_N_digits(5)"""
             if send_sms is True:
                 print('sms')
                 # send random number via sms
             else:
                 print('email')
                 # send random number via email
+                subject = 'Thank you for registering to our site'
+                message = ' it  means a world to us '
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = ['kamankesh.amr@gmail.com', ]
+                send_mail(subject, message, email_from, recipient_list)
             return Response(status=status.HTTP_200_OK, data='Code Send')
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
