@@ -70,7 +70,8 @@ class CategoryViewset(BaseModelViewSet):
                     'data': record,
                     'status': str(e)
                 })
-            if record.get('parent', None) is not None and record.get('parent', None) != '':
+                category = None
+            if record.get('parent', None) is not None and record.get('parent', None) != '' and category is not None:
                 try:
                     category_parent = Category.objects.get(name=record.get('parent', None))
                 except Exception as e:
@@ -81,7 +82,8 @@ class CategoryViewset(BaseModelViewSet):
                     category_parent = None
                 if category_parent is None:
                     try:
-                        category_parent = Category.objects.create(name=record.get('parent', None), title=record.get('parent', None))
+                        category_parent = Category.objects.create(name=record.get('parent', None),
+                                                                  title=record.get('parent', None))
                     except Exception as e:
                         error_logs.append({
                             'data': record,
@@ -89,7 +91,8 @@ class CategoryViewset(BaseModelViewSet):
                         })
                 category.category_parent = category_parent
                 category.save()
-        return Response(error_logs, status=status.HTTP_200_OK)
+        response = {'errors': error_logs}
+        return Response(response, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         return CategorySerializer
@@ -216,8 +219,8 @@ class ProductViewset(BaseModelViewSet):
         return ProductSerializer
 
     @list_route(
-      permission_classes=[IsAdminUser],
-      methods=['post']
+        permission_classes=[IsAdminUser],
+        methods=['post']
     )
     def import_products(self, request):
         jsonString = request.data.get('records', None)
@@ -302,11 +305,13 @@ class PriceViewset(BaseModelViewSet):
 
         product_owner_username = self.request.query_params.get('product_owner_username', None)
         if product_owner_username is not None:
-            queryset = queryset.filter(price_product__product_owner__identity_user__username__contains=product_owner_username)
+            queryset = queryset.filter(
+                price_product__product_owner__identity_user__username__contains=product_owner_username)
 
         product_owner_organization = self.request.query_params.get('product_owner_organization', None)
         if product_owner_organization is not None:
-            queryset = queryset.filter(price_product__product_owner__identity_organization__name__contains=product_owner_organization)
+            queryset = queryset.filter(
+                price_product__product_owner__identity_organization__name__contains=product_owner_organization)
 
         value = self.request.query_params.get('value', None)
         if value is not None:
