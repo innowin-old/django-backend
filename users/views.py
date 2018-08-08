@@ -37,7 +37,7 @@ from .models import (
     UserMetaData,
     AgentRequest,
     StrengthStates,
-    BlockIdentity)
+    BlockIdentity, UserCode)
 
 from .serializers import (
     SuperAdminUserSerializer,
@@ -61,7 +61,7 @@ from .serializers import (
     AgentRequestSerializer,
     AgentRequestAdminSerializer,
     StrengthStatesSerializer,
-    BlockIdentitySerializer)
+    BlockIdentitySerializer, UserCodeSerializer)
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
 
@@ -371,43 +371,6 @@ class UserViewset(ModelViewSet):
             'errors': errors
         }
         return Response(response)
-
-
-class ForgetPasswordViewset(ViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request):
-        forget_password_serializer = ForgetPasswordSerializer(data=request.POST)
-        if forget_password_serializer.is_valid():
-            send_sms = False
-            """if 'email' in forget_password_serializer.validated_data:
-                try:
-                    user = User.objects.get(email=forget_password_serializer.validated_data['email'])
-                except User.DoesNotExist:
-                    return Response(status=status.HTTP_404_NOT_FOUND, data='Not Found')
-            elif 'mobile' in forget_password_serializer.validated_data:
-                send_sms = True
-                try:
-                    profile = Profile.objects.get(mobile__in=forget_password_serializer.validated_data['mobile'])
-                except Profile.DoesNotExist:
-                    return Response(status=status.HTTP_404_NOT_FOUND, data='Not Found')
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
-            random_number = random_with_N_digits(5)"""
-            if send_sms is True:
-                print('sms')
-                # send random number via sms
-            else:
-                print('email')
-                # send random number via email
-                subject = 'Thank you for registering to our site'
-                message = ' it  means a world to us '
-                email_from = settings.EMAIL_HOST_USER
-                recipient_list = ['kamankesh.amr@gmail.com', ]
-                send_mail(subject, message, email_from, recipient_list)
-            return Response(status=status.HTTP_200_OK, data='Code Send')
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
 
 
 class IdentityViewset(ModelViewSet):
@@ -925,6 +888,72 @@ class BlockIdentityViewset(ModelViewSet):
     def get_serializer_class(self):
         print('in get serializer')
         return BlockIdentitySerializer
+
+
+class ForgetPasswordViewset(ViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        forget_password_serializer = ForgetPasswordSerializer(data=request.POST)
+        if forget_password_serializer.is_valid():
+            send_sms = False
+            if 'email' in forget_password_serializer.validated_data:
+                try:
+                    user = User.objects.get(email=forget_password_serializer.validated_data['email'])
+                except User.DoesNotExist:
+                    return Response({'detail': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+            elif 'mobile' in forget_password_serializer.validated_data:
+                send_sms = True
+                try:
+                    profile = Profile.objects.get(mobile__in=forget_password_serializer.validated_data['mobile'])
+                except Profile.DoesNotExist:
+                    return Response({'detail': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+                user = User.objects.get(pk=profile.profile_user)
+            else:
+                return Response({'detail': 'please insert email or mobile'}, status=status.HTTP_400_BAD_REQUEST)
+            random_number = random_with_N_digits(5)
+            # code = '‫‪WiniO-‬‬' + str(random_number)
+            user_code = UserCode.objects.create(code=random_number, user=user)
+            if send_sms is True:
+                print('sms')
+                # send random number via sms
+            else:
+                print('email')
+                # send random number via email
+                subject = ' بازیابی رمز عبور '
+                message = settings.EMAIL_TEXT + '\n' + ' کد : ' + str(random_number)
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [user.email, ]
+                send_mail(subject, message, email_from, recipient_list)
+            return Response({'detail': 'code sended'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'detail': 'invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserCodeViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = UserCode.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UserCodeSerializer
+
+    @list_route(methods=['post'], permission_classes=[AllowAny])
+    def change_password(self, request):
+        code = request.data.get('code', None)
+        password = request.data.get('password')
+        if code is not None:
+            try:
+                user_code = UserCode.objects.get(code=code, used=False)
+            except UserCode.DoesNotExist:
+                return Response({'detail': 'code not found or used before'}, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.get(pk=user_code.user_id)
+            user.set_password(password)
+            user_code.used = True
+            user_code.save()
+        return Response({'detail': 'password changed'}, status=status.HTTP_200_OK)
 
 
 def login_page(request):

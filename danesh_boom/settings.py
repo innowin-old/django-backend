@@ -197,6 +197,10 @@ EMAIL_HOST_PASSWORD = CONFIG.get('EMAIL').get('HOST_PASSWORD')
 EMAIL_PORT = CONFIG.get('EMAIL').get('PORT')
 EMAIL_USE_TLS = CONFIG.get('EMAIL').get('USE_TLS')
 
+EMAIL_TEXT = '\n کاربر گرامی ' \
+             '\n تیم وینیو یک درخواست بازیابی رمز عبور از شما دریافت کرده است.' \
+             '\nبرای تغییر رمز عبور خود کد یکبار مصرف را در سامانه دانش بوم وارد نمایید. '
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 

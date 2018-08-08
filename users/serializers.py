@@ -36,7 +36,8 @@ from .models import (
     StrengthStates,
     UserMetaData,
     AgentRequest,
-    BlockIdentity)
+    BlockIdentity,
+    UserCode)
 from .utils import add_user_to_default_exchange
 
 
@@ -1013,3 +1014,19 @@ class BlockIdentitySerializer(BaseSerializer):
                 setattr(instance, key, validated_data.get(key))
         instance.save()
         return instance
+
+
+class UserCodeSerializer(BaseSerializer):
+    class Meta:
+        model = UserCode
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if 'user' not in validated_data or not request.user.is_superuser:
+            validated_data['user'] = request.user
+        user_code = UserCode.objects.create(**validated_data)
+        return user_code

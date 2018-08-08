@@ -525,3 +525,10 @@ class BlockIdentity(Base):
     blocker_identity = models.ForeignKey(Identity, related_name='blocker_identity', db_index=True,
                                          on_delete=models.CASCADE, help_text='integer')
     active_flag = models.BooleanField(default=True)
+
+
+class UserCode(Base):
+    code = models.CharField(max_length=15, db_index=True, unique=True)
+    user = models.ForeignKey(User, related_name='user_code', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    active = models.BooleanField(default=True)
+    used = models.BooleanField(default=False)
