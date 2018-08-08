@@ -620,15 +620,14 @@ class BaseTownViewSet(ModelViewSet):
         country_name = request.data.get('country', None)
         data = json.loads(jsonString)
         errors = []
-        for record in data:
-            properties = record.get('properties', None)
+        if country_name is not None and jsonString is not None:
             country_count = BaseCountry.objects.filter(name=country_name).count()
             if country_count != 0:
                 try:
                     country_obj = BaseCountry.objects.get(name=country_name)
                 except Exception as e:
                     errors.append({
-                        'data': record,
+                        'data': country_name,
                         'status': str(e)
                     })
             else:
@@ -636,14 +635,17 @@ class BaseTownViewSet(ModelViewSet):
                     country_obj = BaseCountry.objects.create(name=country_name)
                 except Exception as e:
                     errors.append({
-                        'data': record,
+                        'data': country_name,
                         'status': str(e)
                     })
-            province_count = BaseProvince.objects.filter(name=properties.get('ostn_name', None),
+        else:
+            return Response({'detail': 'please insert country_name'}, status=status.HTTP_400_BAD_REQUEST)
+        for record in data:
+            province_count = BaseProvince.objects.filter(name=record.get('ostn_name', None),
                                                          province_related_country=country_obj).count()
             if province_count != 0:
                 try:
-                    province_obj = BaseProvince.objects.get(name=properties.get('ostn_name', None),
+                    province_obj = BaseProvince.objects.get(name=record.get('ostn_name', None),
                                                             province_related_country=country_obj)
                 except Exception as e:
                     errors.append({
@@ -652,18 +654,18 @@ class BaseTownViewSet(ModelViewSet):
                     })
             else:
                 try:
-                    province_obj = BaseProvince.objects.create(name=properties.get('ostn_name', None),
+                    province_obj = BaseProvince.objects.create(name=record.get('ostn_name', None),
                                                                province_related_country=country_obj)
                 except Exception as e:
                     errors.append({
                         'data': record,
                         'status': str(e)
                     })
-            town_count = BaseTown.objects.filter(name=properties.get('city_name', None),
+            town_count = BaseTown.objects.filter(name=record.get('city_name', None),
                                                  town_related_province=province_obj).count()
             if town_count != 0:
                 try:
-                    town_obj = BaseTown.objects.get(name=properties.get('city_name', None),
+                    town_obj = BaseTown.objects.get(name=record.get('city_name', None),
                                                     town_related_province=province_obj)
                 except Exception as e:
                     errors.append({
@@ -672,7 +674,7 @@ class BaseTownViewSet(ModelViewSet):
                     })
             else:
                 try:
-                    town_obj = BaseTown.objects.create(name=properties.get('city_name', None),
+                    town_obj = BaseTown.objects.create(name=record.get('city_name', None),
                                                        town_related_province=province_obj)
                 except Exception as e:
                     errors.append({
