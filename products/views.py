@@ -237,6 +237,7 @@ class ProductViewset(BaseModelViewSet):
                     attrs=record.get('attrs', None),
                     custom_attrs=record.get('custom_attrs', None),
                     product_owner=record.get('product_owner', None),
+                    product_user=record.get('product_user', None),
                     product_category=record.get('product_category', None)
                 )
             except Exception as e:
