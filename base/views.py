@@ -689,7 +689,10 @@ class BaseTownViewSet(ModelViewSet):
 
 
 class BadgeCategoryViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsBadgeCategoryOwnerOrReadOnly]
+    permission_classes = [
+        IsAuthenticated,
+        # IsBadgeCategoryOwnerOrReadOnly
+    ]
 
     def get_queryset(self):
         queryset = BadgeCategory.objects.filter(delete_flag=False)
