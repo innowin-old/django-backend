@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import status
 
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
+from users.models import Identity
 from .permissions import (
     IsPriceProductOwnerOrReadOnly,
     IsPictureProductOwnerOrReadOnly,
@@ -227,24 +229,44 @@ class ProductViewset(BaseModelViewSet):
         data = json.loads(jsonString)
         errors = []
         for record in data:
-            try:
-                product = Product.objects.create(
-                    name=record.get('name', None),
-                    country=record.get('country', None),
-                    province=record.get('province', None),
-                    city=record.get('city', None),
-                    description=record.get('description', None),
-                    attrs=record.get('attrs', None),
-                    custom_attrs=record.get('custom_attrs', None),
-                    product_owner=record.get('product_owner', None),
-                    product_user=record.get('product_user', None),
-                    product_category=record.get('product_category', None)
-                )
-            except Exception as e:
-                errors.append({
-                    'data': record,
-                    'status': str(e)
-                })
+            if record.get('product_owner', None) is not None and record.get('product_owner', None) != '' and record.get('product_user', None) is not None and record.get('product_user', None) != '' and record.get('product_category', None) is not None and record.get('product_category', None) != '':
+                try:
+                    product_owner = Identity.objects.get(name=record.get('product_owner', None))
+                except Exception as e:
+                    errors.append({
+                        'data': record,
+                        'status': str(e)
+                    })
+                    product_owner = False
+                if product_owner is not None:
+                    try:
+                        product_user = User.objects.get(username=record.get('product_user', None))
+                    except Exception as e:
+                        errors.append({
+                            'data': record,
+                            'status': str(e)
+                        })
+                        product_user = False
+                    if product_user is not None:
+                        category = Category.objects.filter(name=record.get('product_category', None))
+                        if category.count() == 0:
+                            category = Category.objects.create(name=record.get('product_category', None), title=record.get('product_category', None))
+                        try:
+                            product = Product.objects.create(
+                                product_owner=product_owner,
+                                product_user=product_user,
+                                product_category=category,
+                                name=record.get('name', None),
+                                country=record.get('country', None),
+                                province=record.get('province', None),
+                                city=record.get('city', None),
+                                description=record.get('description', None)
+                            )
+                        except Exception as e:
+                            errors.append({
+                                'data': record,
+                                'status': str(e)
+                            })
         response = {
             'errors': errors
         }
