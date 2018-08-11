@@ -278,6 +278,12 @@ class UserViewset(ModelViewSet):
                 profile.address = record.get('profile_address', None)
             if record.get('profile_public_email', None) is not None and record.get('profile_public_email', None) != '':
                 profile.public_email = record.get('profile_public_email', None)
+            if record.get('profile_telegram_account', None) is not None and record.get('profile_telegram_account', None) != '':
+                profile.public_email = record.get('profile_telegram_account', None)
+            if record.get('profile_instagram_account', None) is not None and record.get('profile_instagram_account', None) != '':
+                profile.public_email = record.get('profile_instagram_account', None)
+            if record.get('profile_linkedin_account', None) is not None and record.get('profile_linkedin_account', None) != '':
+                profile.public_email = record.get('profile_linkedin_account', None)
             # add social data
             if record.get('social_name', None) is not None and record.get('social_name', None) != '':
                 try:
@@ -366,6 +372,15 @@ class UserViewset(ModelViewSet):
                 if record.get('work_experience_to_date', None) is not None and record.get('work_experience_to_date', None) != '':
                     work_experience.to_date = record.get('work_experience_to_date', None)
                 work_experience.save()
+            # add skills data
+            if record.get('skill_title', None) is not None and record.get('skill_title', None) != '':
+                skill = Skill.objects.filter(skill_user=user, title=record.get('skill_title', None))
+                if skill.count() == 0:
+                    skill = Skill.objects.create(skill_user=user, title=record.get('skill_title', None))
+                if record.get('skill_tag', None) is not None and record.get('skill_tag', None) != '':
+                    skill.tag = record.get('skill_tag', None)
+                if record.get('skill_description', None) is not None and record.get('skill_description', None) != '':
+                    skill.description = record.get('skill_description', None)
 
         response = {
             'errors': errors

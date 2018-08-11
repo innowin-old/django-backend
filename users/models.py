@@ -123,6 +123,10 @@ class Profile(Base):
     telegram_account = models.CharField(
         max_length=256, blank=True, validators=[
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
+    instagram_account = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+                                         help_text='String(256)')
+    linkedin_account = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+                                        help_text='String(256)')
     description = models.TextField(blank=True, help_text='Text', max_length=70)
     gender = models.CharField(
         choices=GENDER,
