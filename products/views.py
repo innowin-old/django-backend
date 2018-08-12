@@ -162,34 +162,34 @@ class ProductViewset(BaseModelViewSet):
         """
         product_user = self.request.query_params.get('product_user', None)
         if product_user is not None:
-            queryset = queryset.filter(product_user=product_user)
+            queryset = queryset.filter(product_user_id=product_user)
 
-        owner_id = self.request.query_params.get('owner_id', None)
+        owner_id = self.request.query_params.get('product_owner', None)
         if owner_id is not None:
             queryset = queryset.filter(product_owner_id=owner_id)
 
-        owner_name = self.request.query_params.get('owner_name', None)
+        owner_name = self.request.query_params.get('product_owner_name', None)
         if owner_name is not None:
-            queryset = queryset.filter(product_owner__name__contains=owner_name)
+            queryset = queryset.filter(product_owner__name=owner_name)
 
-        owner_username = self.request.query_params.get('owner_username', None)
+        owner_username = self.request.query_params.get('product_owner_username', None)
         if owner_username is not None:
-            queryset = queryset.filter(product_owner__identity_user__username__contains=owner_username)
+            queryset = queryset.filter(product_owner__identity_user__username=owner_username)
 
         """
             Product Category Filter
         """
-        category_id = self.request.query_params.get('category_id', None)
+        category_id = self.request.query_params.get('product_category', None)
         if category_id is not None:
             queryset = queryset.filter(product_category_id=category_id)
 
-        category_name = self.request.query_params.get('category_name', None)
+        category_name = self.request.query_params.get('product_category_name', None)
         if category_name is not None:
-            queryset = queryset.filter(product_category__name__contains=category_name)
+            queryset = queryset.filter(product_category__name=category_name)
 
-        category_title = self.request.query_params.get('category_title', None)
+        category_title = self.request.query_params.get('product_category_title', None)
         if category_title is not None:
-            queryset = queryset.filter(product_category__title__contains=category_title)
+            queryset = queryset.filter(product_category__title=category_title)
 
         name = self.request.query_params.get('name', None)
         if name is not None:
