@@ -97,6 +97,15 @@ def export_research_gate_to_excel(request):
     return response
 
 
+def get_ictstartups_organization():
+    base_url = 'http://www.ictstartups.ir/'
+    for i in range(1, 31):
+        organization_url = base_url + 'fa/company/list/companies/{0}'.format(i)
+        organization_response = requests.get(organization_url)
+        print(organization_response.content.decode('utf-8'))
+    print('salam')
+
+
 def crawl_vitrin_net():
     categories = VITRINNET_CATEGORIES
     organizations_crawled = []
