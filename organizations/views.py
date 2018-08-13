@@ -433,6 +433,19 @@ class FollowViewset(BaseModelViewSet):
             return FollowListSerializer
         return FollowSerializer
 
+    @list_route(methods=['get'], permission_classes=[IsAuthenticated])
+    def get_joint(self):
+        followed_identity = self.request.query_params.get('followed_identity')
+        if followed_identity is not None and followed_identity.isdigit():
+            followers = Follow.objects.filter(follow_followed_id=followed_identity, follow_accepted=True)
+            followers_ids = []
+            for follower in followers:
+                followers_ids.append(follower.id)
+            if len(followers_ids) != 0:
+                follower_joints = Follow.objects.filter(follow_followed=self.request.user, follow_follower__in=followers_ids)
+                print(len(follower_joints))
+        return Response(status=status.HTTP_200_OK)
+
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
