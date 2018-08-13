@@ -727,7 +727,11 @@ class BadgeCategoryViewSet(ModelViewSet):
 
 
 class BadgeViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, BadgePermission, CanReadBadge]
+    permission_classes = [
+        IsAuthenticated,
+        BadgePermission,
+        # CanReadBadge
+    ]
 
     def get_queryset(self):
         queryset = Badge.objects.filter(delete_flag=False)
