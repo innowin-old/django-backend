@@ -49,8 +49,8 @@ from .serializers import (
     ConfirmationSerializer,
     ConfirmationListViewSerializer,
     CustomerSerializer,
-    MetaDataSerializer
-)
+    MetaDataSerializer,
+    FollowListSerializer)
 
 
 class OrganizationViewset(BaseModelViewSet):
@@ -429,6 +429,8 @@ class FollowViewset(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return FollowListSerializer
         return FollowSerializer
 
     def destroy(self, request, *args, **kwargs):

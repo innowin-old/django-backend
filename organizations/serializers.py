@@ -190,6 +190,16 @@ class FollowSerializer(BaseSerializer):
             user_strength.save()
 
 
+class FollowListSerializer(BaseSerializer):
+    class Meta:
+        model = Follow
+        exclude = ['child_name']
+        depth = 1
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
 class AbilitySerializer(BaseSerializer):
     class Meta:
         model = Ability
