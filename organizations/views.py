@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core import serializers
 from django.http import Http404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -9,6 +10,7 @@ import json
 
 from base.permissions import IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
+from users.models import Identity
 
 from .permissions import (
     IsStaffOrganizationOwnerOrReadOnly,
@@ -434,17 +436,19 @@ class FollowViewset(BaseModelViewSet):
         return FollowSerializer
 
     @list_route(methods=['get'], permission_classes=[IsAuthenticated])
-    def get_joint(self):
+    def get_joint(self, request):
         followed_identity = self.request.query_params.get('followed_identity')
         if followed_identity is not None and followed_identity.isdigit():
-            followers = Follow.objects.filter(follow_followed_id=followed_identity, follow_accepted=True)
+            followers = Follow.objects.filter(follow_followed_id=followed_identity)
             followers_ids = []
             for follower in followers:
-                followers_ids.append(follower.id)
+                followers_ids.append(follower.follow_follower_id)
             if len(followers_ids) != 0:
-                follower_joints = Follow.objects.filter(follow_followed=self.request.user, follow_follower__in=followers_ids)
-                print(len(follower_joints))
-        return Response(status=status.HTTP_200_OK)
+                user_identity = Identity.objects.get(identity_user=self.request.user)
+                follower_joints = Follow.objects.filter(follow_follower=user_identity, follow_followed_id__in=followers_ids)
+                data = serializers.serialize('json', list(follower_joints), fields=('follow_followed',))
+                return Response(data, status=status.HTTP_200_OK)
+        return Response({"details": "please filter by followed_identity"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         try:
