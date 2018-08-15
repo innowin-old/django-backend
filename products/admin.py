@@ -16,7 +16,7 @@ class CategoryFieldAdmin(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
     model = Product
-    list_display = ['product_owner', 'category', 'name', 'country']
+    list_display = ['product_owner', 'category', 'name', 'product_related_country']
 
 
 class PriceAdmin(admin.ModelAdmin):

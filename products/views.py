@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from base.views import BaseModelViewSet
+from base.models import BaseCountry, BaseProvince, BaseTown
 from users.models import Identity
 from .permissions import (
     IsPriceProductOwnerOrReadOnly,
@@ -195,17 +196,17 @@ class ProductViewset(BaseModelViewSet):
         if name is not None:
             queryset = queryset.filter(name__contains=name)
 
-        country = self.request.query_params.get('country', None)
-        if country is not None:
-            queryset = queryset.filter(country=country)
+        product_related_country = self.request.query_params.get('product_related_country', None)
+        if product_related_country is not None:
+            queryset = queryset.filter(product_related_country_id=product_related_country)
 
-        province = self.request.query_params.get('province', None)
-        if province is not None:
-            queryset = queryset.filter(province=province)
+        product_related_province = self.request.query_params.get('product_related_province', None)
+        if product_related_province is not None:
+            queryset = queryset.filter(product_related_province_id=product_related_province)
 
-        city = self.request.query_params.get('city', None)
-        if city is not None:
-            queryset = queryset.filter(city=city)
+        product_related_town = self.request.query_params.get('product_related_town', None)
+        if product_related_town is not None:
+            queryset = queryset.filter(product_related_town_id=product_related_town)
 
         description = self.request.query_params.get('description')
         if description is not None:

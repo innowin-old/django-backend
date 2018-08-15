@@ -3,7 +3,7 @@ from django.db.models.signals import post_save, pre_save
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 
-from base.models import Base, BaseManager
+from base.models import Base, BaseManager, BaseCountry, BaseTown, BaseProvince
 from base.signals import update_cache, set_child_name
 from media.models import Media
 from users.models import Identity
@@ -68,12 +68,15 @@ class Product(Base):
     )
     product_owner = models.ForeignKey(Identity, related_name="identity_products", on_delete=models.CASCADE,
                                       db_index=True, help_text='Integer')
-    product_category = models.ForeignKey(Category, related_name="category_products", on_delete=models.CASCADE, db_index=True,
-                                         help_text='Integer')
+    product_category = models.ForeignKey(Category, related_name="category_products", on_delete=models.CASCADE,
+                                         db_index=True, help_text='Integer')
     name = models.CharField(max_length=100, db_index=True, help_text='String(100)')
-    country = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    province = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    city = models.CharField(max_length=50, blank=True, db_index=True, help_text='String(50)')
+    product_related_country = models.ForeignKey(BaseCountry, related_name='country_products', on_delete=models.CASCADE,
+                                                db_index=True, help_text='Integer')
+    product_related_province = models.ForeignKey(BaseProvince, related_name='province_products', on_delete=models.CASCADE,
+                                                 db_index=True, help_text='Integer')
+    product_related_town = models.ForeignKey(BaseTown, related_name='country_products', on_delete=models.CASCADE,
+                                             db_index=True, help_text='Integer')
     description = models.CharField(max_length=1000, blank=True, db_index=True, help_text='String(1000)')
     attrs = JSONField(null=True, blank=True, help_text='JSON')
     custom_attrs = JSONField(null=True, blank=True, help_text='JSON')
