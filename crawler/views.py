@@ -98,11 +98,39 @@ def export_research_gate_to_excel(request):
 
 
 def get_ictstartups_organization():
-    base_url = 'http://www.ictstartups.ir/'
+    base_url = 'http://www.ictstartups.ir'
     for i in range(1, 31):
-        organization_url = base_url + 'fa/company/list/companies/{0}'.format(i)
+        organization_url = base_url + '/fa/company/list/companies/{0}'.format(i)
         organization_response = requests.get(organization_url)
-        print(organization_response.content.decode('utf-8'))
+        organization_soup = BeautifulSoup(organization_response.content.decode('utf-8'), 'html.parser')
+        organization_elements = organization_soup.find_all(name='a', attrs={'class': 'linkPicTitle'})
+        for organization_element in organization_elements:
+            print(organization_element['href'])
+            organization_page_url = base_url + organization_element['href']
+            organization_page_content = requests.get(organization_page_url)
+            organization_page_soup = BeautifulSoup(organization_page_content.content.decode('utf-8'), 'html.parser')
+            organization_container = organization_page_soup.find(name='div', attrs={'class': 'Specifications mui-col-md-9'})
+            organization_rows = organization_container.find_all(name='div', attrs={'class': 'mui-row'})
+            for organization_row in organization_rows:
+                organization_divs = organization_row.find_all(name='div')
+                for organization_div in organization_divs:
+                    label = organization_div.find(name='label')
+                    print(label.text)
+                    if label.text.strip() == 'آدرس سایت: '.strip():
+                        print('site address')
+                    elif label.text.strip == 'شماره تماس:'.strip():
+                        print('site phone')
+                    elif label.text.strip() == 'پست‌الکترونیک:'.strip():
+                        print('site email')
+                    elif label.text.strip() == 'کشور:'.strip():
+                        print('site country')
+                    elif label.text.strip() == 'استان:'.strip():
+                        print('site province')
+                    elif label.text.strip() == 'شهر:'.strip():
+                        print('site town')
+                    elif label.text.strip() == 'معرفی کوتاه:'.strip():
+                        print('site description')
+            # print(organization_links)
     print('salam')
 
 
