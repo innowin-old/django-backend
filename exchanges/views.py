@@ -2,7 +2,7 @@ import json
 
 from django.http import Http404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
@@ -106,6 +106,11 @@ class ExchangeViewSet(BaseModelViewSet):
             'errors': errors
         }
         return Response(response)
+
+    @list_route(methods=['get'], permission_classes=[AllowAny])
+    def count(self, request):
+        exchange_count = Exchange.objects.all().count()
+        return Response({'count': exchange_count}, status=status.HTTP_200_OK)
 
 
 class ExchangeIdentityViewSet(BaseModelViewSet):
