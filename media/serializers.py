@@ -30,7 +30,6 @@ class MediaSeriaizer(ModelSerializer):
 
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
-        print(ext)
         validated_data['file'] = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         if ext == 'mp4' or ext == 'avi' or ext == 'webm':
             validated_data['file'] = compress_video(validated_data['file'])
@@ -38,7 +37,6 @@ class MediaSeriaizer(ModelSerializer):
             validated_data['file'] = compress_image(image=validated_data['file'], usage=validated_data.get('file_usage'))
         if 'file_usage' in validated_data:
             validated_data.pop('file_usage')
-        print(validated_data)
         media = Media.objects.create(**validated_data)
         return media
 
