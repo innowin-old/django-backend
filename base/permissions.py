@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import permissions
 from django.contrib.contenttypes.models import ContentType
 from exchanges.models import Exchange
@@ -81,9 +82,13 @@ class CanReadContent(permissions.BasePermission):
         if request.method == "GET":
             content_owner_field = view.owner_field
             try:
-                user_setting = Setting.objects.get(setting_user=getattr(obj, content_owner_field))
-            except Setting.DoesNotExist:
+                user = User.objects.get(username=getattr(obj, content_owner_field))
+            except User.DoesNotExist:
                 return False
+            try:
+                user_setting = Setting.objects.get(setting_user=user)
+            except Setting.DoesNotExist:
+                user_setting = Setting.objects.create(setting_user=user)
             content_target_field = view.content_target_field
             content_target_value = getattr(user_setting, content_target_field)
             if content_target_value == "all" or request.user.is_superuser or request.user == user_setting.setting_user:
