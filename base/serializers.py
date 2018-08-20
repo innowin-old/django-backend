@@ -121,8 +121,10 @@ class PostSerializer(BaseSerializer):
         }
 
     def create(self, validated_data):
-        request = self.context.get('request')
-        post = Post.objects.create(**validated_data, post_user=request.user)
+        request = self.context.get("request")
+        if not request.user.is_superuser or 'post_user' not in validated_data:
+            validated_data['post_user'] = request.user
+        post = Post.objects.create(**validated_data)
         post.save()
         if post.post_type == 'post':
             self.check_post_profile_strength()
