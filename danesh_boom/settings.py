@@ -93,10 +93,10 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ),
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '500/min',
-        'user': '1000/min'
-    }
+    # 'DEFAULT_THROTTLE_RATES': {
+    #    'anon': '500/min',
+    #    'user': '1000/min'
+    # }
 }
 
 ROOT_URLCONF = 'danesh_boom.urls'
