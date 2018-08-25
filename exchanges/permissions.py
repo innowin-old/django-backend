@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import permissions
 
-from users.models import Identity
+from users.models import Identity, AgentRequest
 from organizations.models import Organization
 from .models import ExchangeIdentity, Exchange
 
@@ -94,29 +94,21 @@ class IsExchangeFull(permissions.BasePermission):
         return True
 
 
-'''class IsAgentOrReadOnly(permissions.BasePermission):
+class IsAgentOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == "POST":
-            user = request.user
-            if 'owner' not in request.POST:
-                identity = Identity.objects.get(identity_user=user)
-                if not user.is_superuser:
-                    try:
-                        agent = Agent.objects.get(agent_identity=identity)
-                    except Agent.DoesNotExist:
-                        return False
+            if 'owner' in request.POST:
+                try:
+                    identity = Identity.objects.get(pk=request.POST.get('owner'))
+                except Identity.DoesNotExist:
+                    return False
             else:
-                if not user.is_superuser:
-                    identity = Identity.objects.get(pk=request.POST['owner'])
-                    try:
-                        agent = Agent.objects.get(agent_identity=identity)
-                    except Agent.DoesNotExist:
-                        return False
-                    if identity.identity_organization:
-                        organization = Organization.objects.get(pk=identity.identity_organization)
-                        if organization.owner != user:
-                            return False
-        return True'''
+                identity = Identity.objects.get(identity_user=request.user)
+            agent = AgentRequest.objects.filter(agent_request_identity=identity)
+            if agent.count() != 0:
+                return True
+            return False
+        return True
 
 
 class IsFirstDefaultExchange(permissions.BasePermission):

@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAdminUser
 
 from base.views import BaseModelViewSet
 from .models import Exchange, ExchangeIdentity
-from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange
+from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange, IsAgentOrReadOnly
 from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, \
     ExchangeMiniSerializer
 
@@ -19,7 +19,7 @@ class ExchangeViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Exchange Views
     """
-    permission_classes = [IsAuthenticated, IsExchangeOwnerOrReadOnly, IsFirstDefaultExchange]
+    permission_classes = [IsAuthenticated, IsExchangeOwnerOrReadOnly, IsFirstDefaultExchange, IsAgentOrReadOnly]
 
     def get_queryset(self):
         queryset = Exchange.objects.filter(delete_flag=False)
