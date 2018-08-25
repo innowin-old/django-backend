@@ -5,7 +5,7 @@ from danesh_boom import forms
 
 
 class PhoneField(CharField):
-    default_validators = [RegexValidator('^\+\d{1,3}-\d{2,3}-\d{3,14}$')]
+    default_validators = [RegexValidator('^\+\d{1,3}\d{2,3}\d{3,14}$')]
     description = _("Phone")
 
     def __init__(self, *args, **kwargs):

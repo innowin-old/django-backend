@@ -5,7 +5,7 @@ import string
 from django.db import transaction
 from django.http import HttpResponse
 
-from crawler.models import VitrinOrganization, ResearchGateTopic, SkillemaTags
+from .models import VitrinOrganization, ResearchGateTopic, SkillemaTags, IctMotherOrganization, IctExpert
 from .category_lists import VITRINNET_CATEGORIES, RESEARCH_GATE_CHARACTER_BLACK_LIST
 
 
@@ -97,6 +97,85 @@ def export_research_gate_to_excel(request):
     return response
 
 
+def get_ictstartups_expert():
+    base_url = 'http://www.ictstartups.ir'
+    with transaction.atomic():
+        for i in range(1, 64):
+            expert_url = base_url + '/fa/profile/list/expert/{0}'.format(i)
+            expert_response = requests.get(expert_url)
+            expert_soup = BeautifulSoup(expert_response.content.decode('utf-8'), 'html.parser')
+            expert_elements = expert_soup.find_all(name='a', attrs={'class': 'linkPicTitle'})
+            for expert_element in expert_elements:
+                expert_page_url = base_url + expert_element['href']
+                expert_page_content = requests.get(expert_page_url)
+                expert_page_soup = BeautifulSoup(expert_page_content.content.decode('utf-8'), 'html.parser')
+                expert_container = expert_page_soup.find(name='section', attrs={'class': 'Specifications mui-col-md-10 '})
+                expert_rows = expert_container.find_all(name='div', attrs={'class': 'mui-row'})
+                expert_name = expert_page_soup.find(name='h1', attrs={'id': 'lblName'})
+                expert_data = {'name': expert_name.text}
+                print('adding : ' + str(expert_data['name']))
+                for expert_row in expert_rows:
+                    expert_divs = expert_row.find_all(name='div')
+                    for expert_div in expert_divs:
+                        label = expert_div.find(name='label')
+                        span = expert_div.find(name='span')
+                        if span is None:
+                            span = expert_div.find(name='a')
+                        if label is not None:
+                            if label.text.strip() == 'مدرک تحصیلی: '.strip():
+                                # print('site address : ' + span.text)
+                                expert_data['education'] = str(span.text)
+                            elif label.text.strip == 'کشور:'.strip():
+                                # print('site phone : ' + span.text)
+                                expert_data['country'] = str(span.text)
+                            elif label.text.strip() == 'استان:'.strip():
+                                # print('site email : ' + span.text)
+                                expert_data['province'] = str(span.text)
+                            elif label.text.strip() == 'شهر:'.strip():
+                                # print('site country : ' + span.text)
+                                expert_data['town'] = str(span.text)
+                            elif label.text.strip() == 'آدرس محل‌کار: '.strip():
+                                # print('site province : ' + span.text)
+                                expert_data['work_address'] = str(span.text)
+                            elif label.text.strip() == ' معرفی‌: '.strip():
+                                # print('site town : ' + span.text)
+                                expert_data['description'] = str(span.text)
+                IctExpert.objects.create(**expert_data)
+                expert_data = {}
+    print('Done !!!')
+
+
+def export_ictstartups_expert(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="ict_experts.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('IctExperts')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['name', 'education', 'country', 'province', 'town', 'work_address', 'description']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = IctExpert.objects.all().values_list('name', 'education', 'country', 'province', 'town', 'work_address', 'description')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
+
+
 def get_ictstartups_organization():
     base_url = 'http://www.ictstartups.ir'
     for i in range(1, 31):
@@ -105,33 +184,76 @@ def get_ictstartups_organization():
         organization_soup = BeautifulSoup(organization_response.content.decode('utf-8'), 'html.parser')
         organization_elements = organization_soup.find_all(name='a', attrs={'class': 'linkPicTitle'})
         for organization_element in organization_elements:
-            print(organization_element['href'])
             organization_page_url = base_url + organization_element['href']
             organization_page_content = requests.get(organization_page_url)
             organization_page_soup = BeautifulSoup(organization_page_content.content.decode('utf-8'), 'html.parser')
             organization_container = organization_page_soup.find(name='div', attrs={'class': 'Specifications mui-col-md-9'})
             organization_rows = organization_container.find_all(name='div', attrs={'class': 'mui-row'})
+            organization_name = organization_page_soup.find(name='h1', attrs={'class': 'companyName'})
+            organization_data = {'name': organization_name.text}
             for organization_row in organization_rows:
                 organization_divs = organization_row.find_all(name='div')
                 for organization_div in organization_divs:
                     label = organization_div.find(name='label')
-                    print(label.text)
-                    if label.text.strip() == 'آدرس سایت: '.strip():
-                        print('site address')
-                    elif label.text.strip == 'شماره تماس:'.strip():
-                        print('site phone')
-                    elif label.text.strip() == 'پست‌الکترونیک:'.strip():
-                        print('site email')
-                    elif label.text.strip() == 'کشور:'.strip():
-                        print('site country')
-                    elif label.text.strip() == 'استان:'.strip():
-                        print('site province')
-                    elif label.text.strip() == 'شهر:'.strip():
-                        print('site town')
-                    elif label.text.strip() == 'معرفی کوتاه:'.strip():
-                        print('site description')
-            # print(organization_links)
-    print('salam')
+                    span = organization_div.find(name='span')
+                    if span is None:
+                        span = organization_div.find(name='a')
+                    if label is not None:
+                        if label.text.strip() == 'آدرس سایت: '.strip():
+                            # print('site address : ' + span.text)
+                            organization_data['web_site'] = str(span.text)
+                        elif label.text.strip == 'شماره تماس:'.strip():
+                            # print('site phone : ' + span.text)
+                            organization_data['phone'] = str(span.text)
+                        elif label.text.strip() == 'پست‌الکترونیک:'.strip():
+                            # print('site email : ' + span.text)
+                            organization_data['email'] = str(span.text)
+                        elif label.text.strip() == 'کشور:'.strip():
+                            # print('site country : ' + span.text)
+                            organization_data['country'] = str(span.text)
+                        elif label.text.strip() == 'استان:'.strip():
+                            # print('site province : ' + span.text)
+                            organization_data['province'] = str(span.text)
+                        elif label.text.strip() == 'شهر:'.strip():
+                            # print('site town : ' + span.text)
+                            organization_data['town'] = str(span.text)
+                        elif label.text.strip() == 'معرفی کوتاه:'.strip():
+                            # print('site description : ' + span.text)
+                            organization_data['description'] = str(span.text)
+            IctMotherOrganization.objects.create(**organization_data)
+            organization_data = {}
+    print('Done !!!')
+
+
+def export_ictstartups_organization(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="ict_organizations.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('IctOrganizations')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['name', 'web_site', 'phone', 'email', 'country', 'province', 'town', 'description']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = IctMotherOrganization.objects.all().values_list('name', 'web_site', 'phone', 'email', 'country', 'province', 'town', 'description')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
 
 
 def crawl_vitrin_net():
