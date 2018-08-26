@@ -429,7 +429,7 @@ class IdentityViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -492,7 +492,7 @@ class ProfileViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -548,7 +548,7 @@ class EducationViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -578,7 +578,7 @@ class ResearchViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -612,7 +612,7 @@ class CertificateViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -666,7 +666,7 @@ class WorkExperienceViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -696,7 +696,7 @@ class SkillViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -725,7 +725,7 @@ class IdentityUrlViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -755,7 +755,7 @@ class UserArticleViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -800,7 +800,7 @@ class DeviceViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -833,7 +833,7 @@ class UserMetaDataViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

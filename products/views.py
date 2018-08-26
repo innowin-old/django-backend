@@ -106,7 +106,7 @@ class CategoryViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -147,7 +147,7 @@ class CategoryFieldViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -279,7 +279,7 @@ class ProductViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -352,7 +352,7 @@ class PriceViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -381,7 +381,7 @@ class PictureViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -414,5 +414,5 @@ class CommentViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)

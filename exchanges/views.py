@@ -1,4 +1,5 @@
 import json
+from xml.sax.saxutils import prepare_input_source
 
 from django.http import Http404
 from rest_framework import status
@@ -19,7 +20,12 @@ class ExchangeViewSet(BaseModelViewSet):
     """
         A ViewSet for Handle Exchange Views
     """
-    permission_classes = [IsAuthenticated, IsExchangeOwnerOrReadOnly, IsFirstDefaultExchange, IsAgentOrReadOnly]
+    permission_classes = [
+        IsAuthenticated,
+        IsExchangeOwnerOrReadOnly,
+        IsFirstDefaultExchange,
+        # IsAgentOrReadOnly
+    ]
 
     def get_queryset(self):
         queryset = Exchange.objects.filter(delete_flag=False)
@@ -73,7 +79,7 @@ class ExchangeViewSet(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
@@ -175,5 +181,5 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)

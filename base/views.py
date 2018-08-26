@@ -94,7 +94,7 @@ class BaseModelViewSet(ModelViewSet):
                 "key": "non_field_errors",
                 "detail": "The selected object does not exist or already deleted."
             }]
-        })
+        }, status=status.HTTP_404_NOT_FOUND)
 
 
 class BaseViewset(ModelViewSet):
@@ -116,7 +116,7 @@ class BaseViewset(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -224,7 +224,7 @@ class HashtagParentViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     
@@ -253,7 +253,7 @@ class HashtagViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -314,7 +314,7 @@ class HashtagRelationViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -347,7 +347,7 @@ class BaseCommentViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -407,7 +407,7 @@ class PostViewSet(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -436,7 +436,7 @@ class CertificateViewSet(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -473,7 +473,7 @@ class RollViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -506,7 +506,7 @@ class RollPermissionViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -535,7 +535,7 @@ class BaseCountryViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -572,7 +572,7 @@ class BaseProvinceViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -609,7 +609,7 @@ class BaseTownViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
@@ -722,7 +722,7 @@ class BadgeCategoryViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -761,5 +761,5 @@ class BadgeViewSet(ModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)

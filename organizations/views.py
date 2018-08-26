@@ -139,7 +139,7 @@ class OrganizationViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(
@@ -282,7 +282,7 @@ class StaffCountViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -315,7 +315,7 @@ class OrganizationPictureViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -380,7 +380,7 @@ class StaffViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -456,7 +456,7 @@ class FollowViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -504,7 +504,7 @@ class AbilityViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -569,7 +569,7 @@ class ConfirmationViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -610,7 +610,7 @@ class CustomerViewset(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -630,5 +630,5 @@ class MetaDataViewSet(BaseModelViewSet):
             instance.delete_flag = True
             instance.save()
         except Http404:
-            pass
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
