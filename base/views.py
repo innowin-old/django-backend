@@ -238,9 +238,13 @@ class HashtagViewset(BaseModelViewSet):
         if related_parent is not None:
             queryset = queryset.filter(related_parent_id=related_parent)
 
-        title = self.request.query_params.get('title', None)
+        hashtag_title = self.request.query_params.get('title', None)
         if title is not None:
-            queryset = queryset.filter(title=title)
+            queryset = queryset.filter(title=hashtag_title)
+
+        hashtag_title_contain = self.request.query_params.get('title_contain', None)
+        if hashtag_title_contain is not None:
+            queryset = queryset.filter(title__contains=hashtag_title_contain)
 
         return queryset
 
