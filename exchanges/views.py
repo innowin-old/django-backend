@@ -125,7 +125,9 @@ class ExchangeIdentityViewSet(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsExchangeFull]
 
     def get_queryset(self):
-        queryset = ExchangeIdentity.objects.filter(delete_flag=False)
+        queryset = ExchangeIdentity.objects.filter(
+            delete_flag=False, exchange_identity_related_exchange__delete_flag=False
+        )
 
         exchange_id = self.request.query_params.get('exchange_id', None)
         if exchange_id is not None:
