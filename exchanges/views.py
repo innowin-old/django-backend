@@ -1,5 +1,4 @@
 import json
-from xml.sax.saxutils import prepare_input_source
 
 from django.http import Http404
 from rest_framework import status
@@ -69,7 +68,7 @@ class ExchangeViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action in ['list', 'retrieve']:
             return ExchangeMiniSerializer
         return ExchangeSerializer
 
