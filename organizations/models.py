@@ -88,7 +88,7 @@ class Organization(Base):
     objects = BaseManager()
 
     def __str__(self):
-        return self.official_name
+        return str(self.pk) + ': ' + self.official_name
 
     def save(self, *args, **kwargs):
         from users.models import Identity

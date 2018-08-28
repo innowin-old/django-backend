@@ -32,6 +32,9 @@ class Base(models.Model):
 
     objects = BaseManager()
 
+    def __str__(self):
+        return str(self.pk)
+
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Base)
@@ -122,7 +125,7 @@ class Post(Base):
     objects = BaseManager()
 
     def __str__(self):
-        return self.post_identity.name
+        return str(self.pk) + ': ' + self.post_title + ' (' + self.post_identity.name + ')'
 
     @property
     def user_username(self):
