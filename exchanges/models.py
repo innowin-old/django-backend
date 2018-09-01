@@ -50,6 +50,9 @@ class Exchange(Base):
 
     objects = BaseManager()
 
+    def __str__(self):
+        return str(self.pk) + ': ' + self.name
+
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=Exchange)
