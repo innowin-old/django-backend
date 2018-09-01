@@ -24,6 +24,7 @@ from .permissions import (
     IsAdminUserOrCanNotCreateAccepted,
     IsFollowedOrReadOnly,
     IsAdminOrCanNotChangeIdentities,
+    IsFollowerOwner,
 )
 
 from .models import (
@@ -386,7 +387,7 @@ class StaffViewset(BaseModelViewSet):
 
 class FollowViewset(BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminUserOrCanNotCreateAccepted, IsFollowedOrReadOnly,
-                          IsAdminOrCanNotChangeIdentities]
+                          IsAdminOrCanNotChangeIdentities, IsFollowerOwner]
 
     def get_queryset(self):
         queryset = Follow.objects.filter(delete_flag=False)

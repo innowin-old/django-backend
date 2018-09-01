@@ -233,3 +233,20 @@ class IsAdminOrCanNotChangeIdentities(permissions.BasePermission):
                     return False
             return True
         return True
+
+
+class IsFollowerOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        follow_follower = request.POST.get('follow_follower', None)
+        if follow_follower is not None:
+            try:
+                identity = Identity.objects.get(pk=follow_follower)
+            except Identity.DoesNotExist:
+                return False
+            if identity.identity_user is not None:
+                if identity.identity_user == request.user or request.user.is_superuser:
+                    return True
+            elif identity.identity_organization.owner == request.user or request.user.is_superuser:
+                return True
+            return False
+        return True

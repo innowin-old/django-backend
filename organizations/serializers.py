@@ -162,17 +162,19 @@ class FollowSerializer(BaseSerializer):
         model = Follow
         exclude = ['child_name']
         extra_kwargs = {
-            'updated_time': {'read_only': True}
+            'updated_time': {'read_only': True},
+            'follow_follower': {'required': False}
         }
 
     def create(self, validated_data):
         request = self.context.get('request')
-        if (request.user.is_superuser and 'follow_follower' not in validated_data) or not request.user.is_superuser:
+        # if (request.user.is_superuser and 'follow_follower' not in validated_data) or not request.user.is_superuser:
+        if 'follow_follower' not in validated_data:
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['follow_follower'] = identity
         follow = Follow.objects.create(**validated_data)
         follow.save()
-        self.check_follow_profile_strength(validated_data['follow_follower'])
+        # self.check_follow_profile_strength(validated_data['follow_follower'])
         return follow
 
     def check_follow_profile_strength(self, identity):
