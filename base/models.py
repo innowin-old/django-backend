@@ -118,6 +118,13 @@ class Post(Base):
                                     blank=True, null=True, help_text='integer')
     post_pinned = models.BooleanField(default=False, help_text='Boolean')
     post_promote = UnixTimeStampField(auto_now_add=True, use_numeric=True, help_text='Unix Time Stamp', db_index=True)
+    post_related_identity_image = models.ForeignKey(
+        'media.Media',
+        related_name='posts',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     objects = BaseManager()
 
