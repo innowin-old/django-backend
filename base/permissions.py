@@ -54,7 +54,9 @@ class CanReadContent(permissions.BasePermission):
                     return True
                 content_target_field = view.content_target_field
                 content_target_value = getattr(user_setting, content_target_field)
-                if content_target_value == "all" or request.user.is_superuser:
+                if request.user == user_setting.setting_user:
+                    return True
+                elif content_target_value == "all" or request.user.is_superuser:
                     return True
                 elif content_target_value == "followers":
                     try:
