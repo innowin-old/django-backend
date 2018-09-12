@@ -81,7 +81,7 @@ class IsExchangeFull(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        if request.method != "GET":
+        if view.action == "update":
             active_flag = request.POST.get('active_flag', None)
             if active_flag is not None:
                 if obj.active_flag is False and active_flag is True:
