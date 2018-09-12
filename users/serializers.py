@@ -18,7 +18,6 @@ from rest_framework.serializers import (
     ValidationError
 )
 from base.serializers import BaseSerializer
-from media.serializers import MediaMiniSerializer
 from organizations.utils import OrganizationListSerializer
 from organizations.models import Confirmation, Organization
 from .models import (
@@ -38,7 +37,7 @@ from .models import (
     AgentRequest,
     BlockIdentity,
     UserCode)
-from .utils import add_user_to_default_exchange
+from .utils import add_user_to_default_exchange, add_organization_to_default_exchange
 
 
 class SuperAdminUserSerializer(ModelSerializer):
@@ -894,9 +893,9 @@ class UserOrganizationSerializer(BaseSerializer):
     def create(self, validated_data):
         organization_data = validated_data.pop('organization')
         user = User.objects.create_user(**validated_data)
-        # add user to default exchange
-        add_user_to_default_exchange(user)
         organization = Organization.objects.create(owner=user, **organization_data)
+        # add user to default exchange
+        add_organization_to_default_exchange(organization)
         profile = Profile.objects.get(profile_user=user)
         profile.is_user_organization = True
         profile.save()
