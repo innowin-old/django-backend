@@ -75,7 +75,7 @@ class IsExchangeFull(permissions.BasePermission):
                 except Exchange.DoesNotExist:
                     return False
                 exchange_count = ExchangeIdentity.objects.filter(exchange_identity_related_exchange_id=exchange_id,
-                                                                 active_flag=True).count()
+                                                                 delete_flag=False).count()
                 if exchange_count >= exchange_obj.members_count:
                     return False
         return True
