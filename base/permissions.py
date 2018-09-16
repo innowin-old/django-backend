@@ -383,6 +383,8 @@ class IsHashtagOwnerOrReadOnly(permissions.BasePermission):
                             return True
                     elif identity.identity_organization.owner == request.user:
                         return True
+                else:
+                    return True
             return False
         return True
 
