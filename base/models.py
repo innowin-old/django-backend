@@ -315,6 +315,7 @@ class Badge(Base):
         help_text="Integer"
     )
     badge_active = models.BooleanField(default=False)
+    badge_show_navigation = models.BooleanField(default=False)
 
 
 # Cache Model Data After Update
