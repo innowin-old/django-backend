@@ -195,6 +195,16 @@ class CertificateSerializer(BaseSerializer):
         }
 
 
+class CertificateListSerializer(BaseSerializer):
+    class Meta:
+        model = BaseCertificate
+        depth = 1
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
 class RollSerializer(BaseSerializer):
     class Meta:
         model = BaseRoll

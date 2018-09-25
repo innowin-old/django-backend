@@ -47,6 +47,7 @@ from .serializers import (
     PostSerializer,
     PostListSerializer,
     CertificateSerializer,
+    CertificateListSerializer,
     RollSerializer,
     RollPermissionSerializer,
     HashtagRelationSerializer,
@@ -432,6 +433,8 @@ class CertificateViewSet(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return CertificateListSerializer
         return CertificateSerializer
 
     def destroy(self, request, *args, **kwargs):
