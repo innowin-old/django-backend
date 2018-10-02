@@ -123,3 +123,21 @@ class IsFirstDefaultExchange(permissions.BasePermission):
                     return False
             return True
         return True
+
+
+class IsJoinedBefore(permissions.BasePermission):
+    message = "you joined this exchange before"
+
+    def has_permission(self, request, view):
+        if view.action in ['create']:
+            exchange_identity_related_identity = request.POST.get('exchange_identity_related_identity', None)
+            if exchange_identity_related_identity is None:
+                exchange_identity_related_identity = Identity.objects.get(identity_user=request.user).id
+            exchange_identity = ExchangeIdentity.objects.filter(
+                exchange_identity_related_identity_id=exchange_identity_related_identity,
+                exchange_identity_related_exchange_id=request.POST.get('exchange_identity_related_exchange', None),
+                delete_flag=False
+            )
+            if exchange_identity.count() != 0:
+                return False
+        return True
