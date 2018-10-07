@@ -84,12 +84,13 @@ class IsExchangeFull(permissions.BasePermission):
         if request.method != "GET":
             active_flag = request.POST.get('active_flag', None)
             if active_flag is not None:
-                if obj.active_flag is False and active_flag is True:
+                if obj.active_flag is False and (active_flag is True or active_flag == '1' or active_flag == 'true'):
                     exchange_count = ExchangeIdentity.objects.filter(
-                        exchange_identity_related_exchange=obj.exchange_identity_related_exchange, active_flag=True)
+                        exchange_identity_related_exchange=obj.exchange_identity_related_exchange, active_flag=True).count()
                     if exchange_count < obj.exchange_identity_related_exchange.members_count:
                         return True
                     return False
+                return True
             return False
         return True
 

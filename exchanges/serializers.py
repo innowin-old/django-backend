@@ -1,4 +1,6 @@
+from rest_framework import serializers
 from base.serializers import BaseSerializer
+from organizations.serializers import FollowListSerializer
 from .models import Exchange, ExchangeIdentity
 from users.models import Identity, Profile, StrengthStates
 from users.serializers import IdentityMiniSerializer
@@ -83,3 +85,8 @@ class ExchangeIdentitySerializer(BaseSerializer):
             profile.profile_strength += 5
             profile.save()
             user_strength.exchange_obtained = True
+
+
+class ExploreSerializer(serializers.Serializer):
+    exchange = ExchangeMiniSerializer()
+    joint_follows = FollowListSerializer(many=True)
