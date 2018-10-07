@@ -1,6 +1,7 @@
 import json
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.core import serializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
@@ -8,10 +9,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 
 from base.views import BaseModelViewSet
+from organizations.models import Follow
+from users.models import Identity
 from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange, IsAgentOrReadOnly, IsJoinedBefore
 from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, \
-    ExchangeMiniSerializer
+    ExchangeMiniSerializer, ExploreSerializer
 
 
 # Create your views here.
@@ -80,6 +83,34 @@ class ExchangeViewSet(BaseModelViewSet):
         except Http404:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get']
+    )
+    def explore(self, request):
+        identity = Identity.objects.get(identity_user=request.user)
+        exchanges = Exchange.objects.filter(delete_flag=False)
+        response = []
+        for exchange in exchanges:
+            explore = {'exchange': exchange}
+            exchange_idenitities = ExchangeIdentity.objects.filter(
+                exchange_identity_related_exchange=exchange,
+                active_flag=True,
+                delete_flag=False
+            ).values('exchange_identity_related_identity')
+            print(exchange)
+            print(exchange_idenitities)
+            explore['joint_follows'] = Follow.objects.filter(
+                    follow_followed__in=exchange_idenitities,
+                    follow_follower=identity,
+                    delete_flag=False,
+                    follow_accepted=True
+                )
+            response.append(explore)
+        # serial = serializers.serialize('json', response)
+        serialize = ExploreSerializer(response, many=True)
+        return Response(serialize.data, status=status.HTTP_200_OK)
 
     @list_route(
         permission_classes=[IsAdminUser],
