@@ -1,5 +1,6 @@
 import json
 
+from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.core import serializers
 from rest_framework import status
@@ -89,8 +90,12 @@ class ExchangeViewSet(BaseModelViewSet):
         methods=['get']
     )
     def explore(self, request):
+        page = self.request.query_params.get('page', 1)
+        limit = self.request.query_params.get('limit', 10)
         identity = Identity.objects.get(identity_user=request.user)
         exchanges = Exchange.objects.filter(delete_flag=False)
+        paginator = Paginator(exchanges, limit)
+        exchanges = paginator.page(page)
         response = []
         for exchange in exchanges:
             explore = {'exchange': exchange}
@@ -99,8 +104,6 @@ class ExchangeViewSet(BaseModelViewSet):
                 active_flag=True,
                 delete_flag=False
             ).values('exchange_identity_related_identity')
-            print(exchange)
-            print(exchange_idenitities)
             explore['joint_follows'] = Follow.objects.filter(
                     follow_followed__in=exchange_idenitities,
                     follow_follower=identity,
@@ -110,7 +113,11 @@ class ExchangeViewSet(BaseModelViewSet):
             response.append(explore)
         # serial = serializers.serialize('json', response)
         serialize = ExploreSerializer(response, many=True)
-        return Response(serialize.data, status=status.HTTP_200_OK)
+        final = {
+            'results': serialize.data,
+            'count': Exchange.objects.filter(delete_flag=False).count()
+        }
+        return Response(final, status=status.HTTP_200_OK)
 
     @list_route(
         permission_classes=[IsAdminUser],
