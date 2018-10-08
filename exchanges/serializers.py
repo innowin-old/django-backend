@@ -91,3 +91,5 @@ class ExploreSerializer(serializers.Serializer):
     exchange = ExchangeMiniSerializer()
     joint_follows = FollowListSerializer(many=True)
     is_joined = serializers.BooleanField(default=False)
+    supply = serializers.IntegerField(default=0)
+    demand = serializers.IntegerField(default=0)

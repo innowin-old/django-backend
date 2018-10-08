@@ -2,7 +2,6 @@ import json
 
 from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
-from django.core import serializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
@@ -16,6 +15,7 @@ from .models import Exchange, ExchangeIdentity
 from .permissions import IsExchangeOwnerOrReadOnly, IsExchangeFull, IsFirstDefaultExchange, IsAgentOrReadOnly, IsJoinedBefore
 from .serializers import ExchangeSerializer, ExchangeIdentitySerializer, ExchangeIdentityListViewSerializer, \
     ExchangeMiniSerializer, ExploreSerializer
+from base.models import Post
 
 
 # Create your views here.
@@ -113,6 +113,9 @@ class ExchangeViewSet(BaseModelViewSet):
             for exchange_idenitity in exchange_idenitities:
                 if identity.id == exchange_idenitity['exchange_identity_related_identity']:
                     explore['is_joined'] = True
+            exchange_posts = Post.objects.filter(post_parent=exchange)
+            explore['supply'] = exchange_posts.filter(post_type='supply').count()
+            explore['demand'] = exchange_posts.filter(post_type='demand').count()
             response.append(explore)
         # serial = serializers.serialize('json', response)
         serialize = ExploreSerializer(response, many=True)
