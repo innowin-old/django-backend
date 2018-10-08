@@ -110,6 +110,9 @@ class ExchangeViewSet(BaseModelViewSet):
                     delete_flag=False,
                     follow_accepted=True
                 )
+            for exchange_idenitity in exchange_idenitities:
+                if identity.id == exchange_idenitity['exchange_identity_related_identity']:
+                    explore['is_joined'] = True
             response.append(explore)
         # serial = serializers.serialize('json', response)
         serialize = ExploreSerializer(response, many=True)

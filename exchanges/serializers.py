@@ -90,3 +90,4 @@ class ExchangeIdentitySerializer(BaseSerializer):
 class ExploreSerializer(serializers.Serializer):
     exchange = ExchangeMiniSerializer()
     joint_follows = FollowListSerializer(many=True)
+    is_joined = serializers.BooleanField(default=False)
