@@ -94,6 +94,9 @@ class ExchangeViewSet(BaseModelViewSet):
         limit = self.request.query_params.get('limit', 10)
         identity = Identity.objects.get(identity_user=request.user)
         exchanges = Exchange.objects.filter(delete_flag=False)
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            exchanges = exchanges.filter(name__contains=name)
         paginator = Paginator(exchanges, limit)
         exchanges = paginator.page(page)
         response = []
