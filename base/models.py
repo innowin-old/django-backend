@@ -93,6 +93,8 @@ class BaseComment(Base):
     comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture",
                                         blank=True, null=True, help_text='Integer')
     text = models.TextField(help_text='Text', max_length=1000)
+    comment_replied = models.ForeignKey('self', related_name='base_comment_base', db_index=True,
+                                        on_delete=models.CASCADE, help_text='Integer', null=True, blank=True)
 
     objects = BaseManager()
 
