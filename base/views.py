@@ -44,6 +44,7 @@ from .serializers import (
     HashtagSerializer,
     HashtagParentSerializer,
     BaseCommentSerializer,
+    BaseCommentListSerializer,
     PostSerializer,
     PostListSerializer,
     CertificateSerializer,
@@ -344,6 +345,8 @@ class BaseCommentViewset(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return BaseCommentListSerializer
         return BaseCommentSerializer
 
     def destroy(self, request, *args, **kwargs):

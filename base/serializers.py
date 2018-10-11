@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from django.db.models import Q
@@ -109,6 +110,42 @@ class BaseCommentSerializer(BaseSerializer):
             validated_data['comment_sender'] = identity
         comment = BaseComment.objects.create(**validated_data)
         return comment
+
+
+class UserCommentMiniSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
+
+class IdentityCommentMiniSerializer(BaseSerializer):
+    identity_user = UserCommentMiniSerializer()
+
+    class Meta:
+        model = Identity
+        depth = 1
+        exclude = ['updated_time']
+
+
+class BaseRepliedCommentSerializer(BaseSerializer):
+    comment_sender = IdentityCommentMiniSerializer(read_only=True)
+
+    class Meta:
+        model = BaseComment
+        exclude = ['child_name']
+
+
+class BaseCommentListSerializer(BaseSerializer):
+    comment_replied = BaseRepliedCommentSerializer(read_only=True)
+
+    class Meta:
+        model = BaseComment
+        depth = 1
+        fields = ['comment_parent', 'comment_sender', 'comment_picture', 'text', 'comment_replied']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+            'comment_sender': {'read_only': True}
+        }
 
 
 class PostSerializer(BaseSerializer):
