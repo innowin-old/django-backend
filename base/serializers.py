@@ -137,6 +137,7 @@ class BaseRepliedCommentSerializer(BaseSerializer):
 
 class BaseCommentListSerializer(BaseSerializer):
     comment_replied = BaseRepliedCommentSerializer(read_only=True)
+    comment_sender = IdentityCommentMiniSerializer(read_only=True)
 
     class Meta:
         model = BaseComment
