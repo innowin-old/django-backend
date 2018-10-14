@@ -425,6 +425,10 @@ class CertificateViewSet(BaseModelViewSet):
     def get_queryset(self):
         queryset = BaseCertificate.objects.filter(delete_flag=False)
 
+        certificate_parent = self.request.query_params.get('certificate_parent', None)
+        if certificate_parent is not None:
+            queryset = queryset.filter(certificate_parent=certificate_parent)
+
         certificate_identity = self.request.query_params.get('certificate_identity', None)
         if certificate_identity is not None:
             queryset = queryset.filter(certificate_identity=certificate_identity)

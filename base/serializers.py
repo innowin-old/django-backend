@@ -141,7 +141,7 @@ class BaseCommentListSerializer(BaseSerializer):
     class Meta:
         model = BaseComment
         depth = 1
-        fields = ['comment_parent', 'comment_sender', 'comment_picture', 'text', 'comment_replied']
+        fields = ['id', 'comment_parent', 'comment_sender', 'comment_picture', 'text', 'comment_replied', 'created_time', 'updated_time']
         extra_kwargs = {
             'updated_time': {'read_only': True},
             'comment_sender': {'read_only': True}
