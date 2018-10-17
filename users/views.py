@@ -690,6 +690,14 @@ class SkillViewset(ModelViewSet):
     def get_serializer_class(self):
         return SkillSerializer
 
+    @list_route(
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def count(self, request):
+        skills_count = Skill.objects.filter(skill_user=request.user, delete_flag=False).count()
+        return Response({'count': skills_count}, status=status.HTTP_200_OK)
+
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
