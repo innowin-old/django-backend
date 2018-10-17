@@ -778,6 +778,15 @@ class BadgeViewSet(ModelViewSet):
             return BadgeListSerializer
         return BadgeSerializer
 
+    @detail_route(
+        methods=['get'],
+        permission_classes=[IsAuthenticated],
+        url_path='(?P<parent_id>[0-9]+)'
+    )
+    def parent_count(self, request, pk=None, parent_id=None):
+        badge_count = Badge.objects.filter(badge_related_parent=parent_id, delete_flag=False).count()
+        return Response({'count': badge_count}, status=status.HTTP_200_OK)
+
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
