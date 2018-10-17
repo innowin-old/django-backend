@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.core import serializers
 from requests.status_codes import title
 from rest_framework import status
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -438,6 +438,15 @@ class CertificateViewSet(BaseModelViewSet):
             queryset = queryset.filter(title__contains=title)
 
         return queryset
+
+    @detail_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get'],
+        url_path='(?P<identity_id>[0-9]+)'
+    )
+    def count_identity(self, request, pk=None, identity_id=None):
+        certificate_count = BaseCertificate.objects.filter(certificate_identity=identity_id, delete_flag=False).count()
+        return Response({'count': certificate_count}, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

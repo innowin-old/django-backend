@@ -227,7 +227,6 @@ class ProductViewset(BaseModelViewSet):
         url_path='(?P<product_owner>[0-9]+)'
     )
     def count(self, request, pk=None, product_owner=None):
-        print(product_owner)
         product_count = Product.objects.filter(product_owner=product_owner, delete_flag=False).count()
         return Response({'count': product_count}, status=status.HTTP_200_OK)
 
