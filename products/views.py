@@ -5,7 +5,7 @@ from django.http import Http404
 from rest_framework import status
 
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 
 from base.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
@@ -220,6 +220,16 @@ class ProductViewset(BaseModelViewSet):
         elif self.action == 'retrieve':
             return ProductReadSerializer
         return ProductSerializer
+
+    @detail_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get'],
+        url_path='(?P<product_owner>[0-9]+)'
+    )
+    def count(self, request, pk=None, product_owner=None):
+        print(product_owner)
+        product_count = Product.objects.filter(product_owner=product_owner, delete_flag=False).count()
+        return Response({'count': product_count}, status=status.HTTP_200_OK)
 
     @list_route(
         permission_classes=[IsAdminUser],
