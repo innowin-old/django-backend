@@ -539,6 +539,32 @@ class EducationViewset(ModelViewSet):
             queryset = queryset.filter(to_date=to_date)
         return queryset
 
+    @list_route(
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def count(self, request):
+        education_count = Education.objects.filter(education_user=request.user, delete_flag=False).count()
+        return Response({'count': education_count}, status=status.HTTP_200_OK)
+
+    @list_route(
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def latest(self, request):
+        response = {}
+        educations_latest = Education.objects.filter(education_user=request.user, delete_flag=False)
+        if educations_latest.count() != 0:
+            for education_latest in educations_latest:
+                if education_latest.grade == 'Phd':
+                    response = education_latest
+                elif education_latest.grade == 'Master':
+                    response = education_latest
+                else:
+                    response = education_latest
+            response = EducationSerializer(response, many=False).data
+        return Response(response, status=status.HTTP_200_OK)
+
     def get_serializer_class(self):
         return EducationSerializer
 

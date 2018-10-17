@@ -216,9 +216,14 @@ class Setting(Base):
 
 
 class Education(Base):
+    EDUCATION_GRADE = (
+        ('Bachelor', "کارشناسی"),
+        ('Master', "کارشناسی ارشد"),
+        ('Phd', "دکتری"),
+    )
     education_user = models.ForeignKey(User, related_name="educations",
                                        on_delete=models.CASCADE, help_text='Integer')
-    grade = models.CharField(max_length=100, help_text='String(100)')
+    grade = models.CharField(choices=EDUCATION_GRADE, default='Bachelor', max_length=10, help_text='Bachelor | Master | Phd')
     university = models.CharField(max_length=100, help_text='String(100)')
     field_of_study = models.CharField(max_length=100, help_text='String(100)')
     from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
