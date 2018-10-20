@@ -404,6 +404,33 @@ class PostViewSet(BaseModelViewSet):
 
         return queryset
 
+    @detail_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get'],
+        url_path='(?P<parent_id>[0-9]+)'
+    )
+    def count(self, request, pk=None, parent_id=None):
+        post_count = Post.objects.filter(post_parent=parent_id, delete_flag=False).count()
+        return Response({'count': post_count}, status=status.HTTP_200_OK)
+
+    @detail_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get'],
+        url_path='(?P<parent_id>[0-9]+)'
+    )
+    def count_demand(self, request, pk=None, parent_id=None):
+        post_count = Post.objects.filter(post_parent=parent_id, delete_flag=False, post_type='demand').count()
+        return Response({'count': post_count}, status=status.HTTP_200_OK)
+
+    @detail_route(
+        permission_classes=[IsAuthenticated],
+        methods=['get'],
+        url_path='(?P<parent_id>[0-9]+)'
+    )
+    def count_supply(self, request, pk=None, parent_id=None):
+        post_count = Post.objects.filter(post_parent=parent_id, delete_flag=False, post_type='supply').count()
+        return Response({'count': post_count}, status=status.HTTP_200_OK)
+
     def get_serializer_class(self):
         if self.action == 'list':
             return PostListSerializer

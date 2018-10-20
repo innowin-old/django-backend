@@ -53,7 +53,9 @@ from .serializers import (
     ConfirmationListViewSerializer,
     CustomerSerializer,
     MetaDataSerializer,
-    FollowListSerializer)
+    FollowListSerializer,
+    CustomerListSerializer
+)
 
 
 class OrganizationViewset(BaseModelViewSet):
@@ -583,13 +585,13 @@ class CustomerViewset(BaseModelViewSet):
         """
             Related Customer Filter Options
         """
-        related_customer_id = self.request.query_params.get('related_customer_id', None)
-        if related_customer_id is not None:
-            queryset = queryset.filter(related_customer_id=related_customer_id)
+        customer_organization = self.request.query_params.get('customer_organization', None)
+        if customer_organization is not None:
+            queryset = queryset.filter(customer_organization_id=customer_organization)
 
-        related_customer_name = self.request.query_params.get('related_customer_name', None)
-        if related_customer_name is not None:
-            queryset = queryset.filter(related_customer__name__contains=related_customer_name)
+        customer_organization_username = self.request.query_params.get('customer_organization_username', None)
+        if customer_organization_username is not None:
+            queryset = queryset.filter(customer_organization__username=customer_organization_username)
 
         related_customer_user_username = self.request.query_params.get('related_customer_user_username', None)
         if related_customer_user_username is not None:
@@ -603,6 +605,8 @@ class CustomerViewset(BaseModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return CustomerListSerializer
         return CustomerSerializer
 
     def destroy(self, request, *args, **kwargs):

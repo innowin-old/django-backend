@@ -269,3 +269,10 @@ class CustomerSerializer(BaseSerializer):
         customer = Customer.objects.create(**validated_data)
         customer.save()
         return customer
+
+
+class CustomerListSerializer(BaseSerializer):
+    class Meta:
+        model = Customer
+        exclude = ['child_name']
+        depth = 1
