@@ -472,21 +472,21 @@ class AbilityViewset(BaseModelViewSet):
         """
             Organizations Filter Options
         """
-        organization_id = self.request.query_params.get('organization_id', None)
-        if organization_id is not None:
-            queryset = queryset.filter(ability_organization_id=organization_id)
+        ability_organization = self.request.query_params.get('ability_organization', None)
+        if ability_organization is not None:
+            queryset = queryset.filter(ability_organization_id=ability_organization)
 
-        organization_username = self.request.query_params.get('organization_username', None)
-        if organization_username is not None:
-            queryset = queryset.filter(ability_organization__username=organization_username)
+        ability_organization_username = self.request.query_params.get('ability_organization_username', None)
+        if ability_organization_username is not None:
+            queryset = queryset.filter(ability_organization__username=ability_organization_username)
 
-        organization_official_name = self.request.query_params.get('organization_official_name', None)
-        if organization_official_name is not None:
-            queryset = queryset.filter(ability_organization__official_name=organization_official_name)
+            ability_organization_official_name = self.request.query_params.get('ability_organization_official_name', None)
+        if ability_organization_official_name is not None:
+            queryset = queryset.filter(ability_organization__official_name=ability_organization_official_name)
 
-        organization_nike_name = self.request.query_params.get('organization_nike_name', None)
-        if organization_official_name is not None:
-            queryset = queryset.filter(ability_organization__nike_name__contains=organization_nike_name)
+        ability_organization_nike_name = self.request.query_params.get('ability_organization_nike_name', None)
+        if ability_organization_nike_name is not None:
+            queryset = queryset.filter(ability_organization__nike_name__contains=ability_organization_nike_name)
 
         title = self.request.query_params.get('title', None)
         if title is not None:
