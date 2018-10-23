@@ -14,10 +14,11 @@ from rest_framework.serializers import (
     IntegerField,
     ListField,
     URLField,
+    BooleanField,
     Serializer,
     ValidationError
 )
-from base.serializers import BaseSerializer
+from base.serializers import BaseSerializer, BadgeListSerializer
 from organizations.utils import OrganizationListSerializer
 from organizations.models import Confirmation, Organization
 from .models import (
@@ -476,6 +477,26 @@ class ProfileListSerializer(BaseSerializer):
         extra_kwargs = {
             'updated_time': {'read_only': True}
         }
+
+
+class ProfileExploreSerializer(BaseSerializer):
+    class Meta:
+        model = Profile
+        fields = ['id', 'profile_media', 'profile_banner', 'description']
+        depth = 1
+
+
+class UserExploreSerializer(Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    user = UserMiniSerializer()
+    profile = ProfileExploreSerializer()
+    is_followed = BooleanField(default=False)
+    badges = BadgeListSerializer(many=True)
 
 
 class SettingSerializer(BaseSerializer):

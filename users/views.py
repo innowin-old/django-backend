@@ -10,8 +10,10 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
+from numpy import record
 from rest_framework import status
 
+from organizations.models import Follow
 from utils.token import validate_token
 from utils.number_generator import random_with_N_digits
 
@@ -21,7 +23,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly, OnlyPostMethod, CanReadContent
-from base.models import BaseSocialType, BaseSocial
+from base.models import BaseSocialType, BaseSocial, Badge
 from .models import (
     Identity,
     Profile,
@@ -61,7 +63,7 @@ from .serializers import (
     AgentRequestSerializer,
     AgentRequestAdminSerializer,
     StrengthStatesSerializer,
-    BlockIdentitySerializer, UserCodeSerializer)
+    BlockIdentitySerializer, UserCodeSerializer, UserExploreSerializer)
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
 
@@ -143,11 +145,30 @@ class UserViewset(ModelViewSet):
         permission_classes=[AllowAny]
     )
     def explore(self, request):
+        result = []
         users = User.objects.filter(is_active=True)
+        self_user_identity = Identity.objects.get(identity_user=request.user)
         username = self.request.query_params.get('username', None)
         if username is not None:
-            users = users.filter(username__contains=username)
-        return Response('salam', status=status.HTTP_200_OK)
+            users = users.filter(username__contains=username).values('id', 'username', 'first_name', 'last_name', 'email')
+        for user in users:
+            explore_record = {'user': user}
+            profile = Profile.objects.select_related(
+                'profile_media', 'profile_banner'
+            ).only('id', 'profile_media', 'profile_banner', 'description').get(profile_user=user)
+            explore_record['profile'] = profile
+            user_identity = Identity.objects.filter(identity_user=user)
+            explore_record['is_followed'] = False
+            follow = Follow.objects.filter(follow_followed=user_identity, follow_follower=self_user_identity, follow_accepted=True)
+            if follow.count() != 0:
+                explore_record['is_followed'] = True
+            badges = Badge.objects.filter(badge_related_parent=user_identity).select_related('badge_related_badge_category')
+            explore_record['badges'] = badges
+            result.append(explore_record)
+
+        explore_serializer = UserExploreSerializer(result, many=True)
+
+        return Response(explore_serializer.data, status=status.HTTP_200_OK)
 
     @list_route(methods=['post'], permission_classes=[AllowAny])
     def user_exist(self, request):
