@@ -138,6 +138,17 @@ class UserViewset(ModelViewSet):
 
         return queryset
 
+    @list_route(
+        methods=['get'],
+        permission_classes=[AllowAny]
+    )
+    def explore(self, request):
+        users = User.objects.filter(is_active=True)
+        username = self.request.query_params.get('username', None)
+        if username is not None:
+            users = users.filter(username__contains=username)
+        return Response('salam', status=status.HTTP_200_OK)
+
     @list_route(methods=['post'], permission_classes=[AllowAny])
     def user_exist(self, request):
         username = request.POST.get('username', None)
