@@ -513,6 +513,55 @@ class SettingViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = Setting.objects.filter(delete_flag=False)
+
+        setting_user = self.request.query_params.get('setting_user', None)
+        if setting_user is not None:
+            queryset = queryset.filter(setting_user_id=setting_user)
+
+        setting_user_username = self.request.query_params.get('setting_user_username', None)
+        if setting_user_username is not None:
+            queryset = queryset.filter(setting_user__username=setting_user_username)
+
+        account_type = self.request.query_params.get('account_type', None)
+        if account_type is not None:
+            queryset = queryset.filter(account_type=account_type)
+
+        image_auto_download = self.request.query_params.get('image_auto_download', None)
+        if image_auto_download is not None:
+            queryset = queryset.filter(image_auto_download=image_auto_download)
+
+        video_auto_download = self.request.query_params.get('video_auto_download', None)
+        if video_auto_download is not None:
+            queryset = queryset.filter(video_auto_download=video_auto_download)
+
+        who_can_read_base_info = self.request.query_params.get('who_can_read_base_info', None)
+        if who_can_read_base_info is not None:
+            queryset = queryset.filter(who_can_read_base_info=who_can_read_base_info)
+
+        who_can_read_activity = self.request.query_params.get('who_can_read_activity', None)
+        if who_can_read_activity is not None:
+            queryset = queryset.filter(who_can_read_activity=who_can_read_activity)
+
+        who_can_read_work_experiences = self.request.query_params.get('who_can_read_work_experiences', None)
+        if who_can_read_work_experiences is not None:
+            queryset = queryset.filter(who_can_read_work_experiences=who_can_read_work_experiences)
+
+        who_can_read_badges = self.request.query_params.get('who_can_read_badges', None)
+        if who_can_read_badges is not None:
+            queryset = queryset.filter(who_can_read_badges=who_can_read_badges)
+
+        who_can_read_certificates = self.request.query_params.get('who_can_read_certificates', None)
+        if who_can_read_certificates is not None:
+            queryset = queryset.filter(who_can_read_certificates=who_can_read_certificates)
+
+        who_can_read_followers = self.request.query_params.get('who_can_read_followers', None)
+        if who_can_read_followers is not None:
+            queryset = queryset.filter(who_can_read_followers=who_can_read_followers)
+
+        can_search_engins_index_me = self.request.query_params.get('can_search_engins_index_me', None)
+        if can_search_engins_index_me is not None:
+            queryset = queryset.filter(can_search_engins_index_me=can_search_engins_index_me)
+
         return queryset
 
     def get_serializer_class(self):
