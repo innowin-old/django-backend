@@ -1044,6 +1044,7 @@ class ForgetPasswordViewset(ViewSet):
             random_number = random_with_N_digits(5)
             # code = '‫‪WiniO-‬‬' + str(random_number)
             user_code = UserCode.objects.create(code=random_number, user=user)
+            user_code.save()
             if send_sms is True:
                 print('sms')
                 # send random number via sms
@@ -1051,7 +1052,7 @@ class ForgetPasswordViewset(ViewSet):
                 print('email')
                 # send random number via email
                 subject = ' بازیابی رمز عبور '
-                message = settings.EMAIL_TEXT + '\n' + ' کد : ' + str(random_number)
+                message = settings.EMAIL_TEXT + '\n' + ' کد : ' + str(user_code.code)
                 email_from = settings.EMAIL_HOST_USER
                 recipient_list = [user.email, ]
                 send_mail(subject, message, email_from, recipient_list)
