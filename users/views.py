@@ -142,7 +142,7 @@ class UserViewset(ModelViewSet):
 
     @list_route(
         methods=['get'],
-        permission_classes=[AllowAny]
+        permission_classes=[IsAuthenticated]
     )
     def explore(self, request):
         result = []
@@ -150,7 +150,7 @@ class UserViewset(ModelViewSet):
         self_user_identity = Identity.objects.get(identity_user=request.user)
         username = self.request.query_params.get('username', None)
         if username is not None:
-            users = users.filter(username__contains=username).values('id', 'username', 'first_name', 'last_name', 'email')
+            users = users.filter(username__contains=username)
         for user in users:
             explore_record = {'user': user}
             profile = Profile.objects.select_related(
