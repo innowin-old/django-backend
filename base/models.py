@@ -130,6 +130,8 @@ class Post(Base):
         null=True,
         blank=True
     )
+    post_related_product_attach = models.ForeignKey('products.Product', related_name='product_attach_post', db_index=True,
+                                                    on_delete=models.CASCADE, blank=True, null=True, help_text='integer')
 
     objects = BaseManager()
 
