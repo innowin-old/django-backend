@@ -324,3 +324,13 @@ class Badge(Base):
 post_save.connect(update_cache, sender=Badge)
 # Set Child Name
 pre_save.connect(set_child_name, sender=Badge)
+
+
+class Favorite(Base):
+    favorite_name = models.CharField(max_length=50, unique=True, db_index=True)
+    favorite_related_media = models.ForeignKey(
+        'media.Media',
+        related_name='favorite_media',
+        on_delete=models.CASCADE,
+        help_text='Integer'
+    )

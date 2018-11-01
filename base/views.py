@@ -37,7 +37,7 @@ from .models import (
     BaseTown,
     BadgeCategory,
     Badge,
-)
+    Favorite)
 
 from .serializers import (
     BaseSerializer,
@@ -59,7 +59,7 @@ from .serializers import (
     BadgeCategoryListSerializer,
     BadgeSerializer,
     BadgeListSerializer,
-)
+    FavoriteSerializer, FavoriteListSerializer)
 
 
 class BaseModelViewSet(ModelViewSet):
@@ -822,3 +822,25 @@ class BadgeViewSet(ModelViewSet):
         except Http404:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FavoriteViewSet(ModelViewSet):
+    permission_classes = [IsAdminUserOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return FavoriteListSerializer
+        return FavoriteSerializer
+
+    def get_queryset(self):
+        queryset = Favorite.objects.filter(delete_flag=False)
+
+        favorite_name = self.request.query_params.get('favorite_name', None)
+        if favorite_name is not None:
+            queryset = queryset.filter(favorite_name=favorite_name)
+
+        favorite_related_media = self.request.query_params.get('favorite_related_media', None)
+        if favorite_related_media is not None:
+            queryset = queryset.filter(favorite_related_media=favorite_related_media)
+
+        return queryset

@@ -19,7 +19,7 @@ from .models import (
     BaseTown,
     BadgeCategory,
     Badge,
-)
+    Favorite)
 
 
 class BaseSerializer(ModelSerializer):
@@ -340,6 +340,25 @@ class BadgeListSerializer(BaseSerializer):
 
     class Meta:
         model = Badge
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class FavoriteSerializer(BaseSerializer):
+    class Meta:
+        model = Favorite
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True},
+        }
+
+
+class FavoriteListSerializer(BaseSerializer):
+    class Meta:
+        model = Favorite
+        depth = 1
         exclude = ['child_name']
         extra_kwargs = {
             'updated_time': {'read_only': True},
