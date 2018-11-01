@@ -20,7 +20,7 @@ from .permissions import (
     IsBadgeCategoryOwnerOrReadOnly,
     BadgePermission,
     CanReadBadge,
-)
+    FavoriteBasePermission)
 
 from .models import (
     Base,
@@ -847,7 +847,7 @@ class FavoriteViewSet(ModelViewSet):
 
 
 class FavoriteBaseViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, FavoriteBasePermission]
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

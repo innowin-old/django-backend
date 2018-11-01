@@ -6,7 +6,7 @@ from organizations.models import Organization
 from products.models import Product
 from users.models import Identity, Setting
 from organizations.models import Follow
-from .models import Base, BaseRoll
+from .models import Base, BaseRoll, FavoriteBase
 
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
@@ -593,3 +593,60 @@ class BadgePermission(permissions.BasePermission):
                         return True
             return False
         return True
+
+
+class FavoriteBasePermission(permissions.BasePermission):
+    message = 'favorites must be less than 5'
+
+    def has_permission(self, request, view):
+        if request.method != "GET":
+            favorite_base_related_parent_id = request.POST.get('favorite_base_related_parent', None)
+            if favorite_base_related_parent_id is not None:
+                try:
+                    base_object = Base.objects.get(pk=favorite_base_related_parent_id)
+                except Base.DoesNotExist:
+                    return False
+                owner_object = base_object.child_name
+                if owner_object == 'organization':
+                    print('this is organizations type')
+                    organization = Organization.objects.get(id=base_object.id)
+                    if organization.owner != request.user:
+                        return False
+                elif owner_object == 'exchange':
+                    print('this is exchanges type')
+                    exchange = Exchange.objects.get(id=base_object.id)
+                    if exchange.owner.identity_user is not None:
+                        if exchange.owner.identity_user != request.user:
+                            return False
+                    else:
+                        if exchange.owner.identity_organization.owner != request.user:
+                            return False
+                elif owner_object == 'product':
+                    print('this is products type')
+                    product = Product.objects.get(id=base_object.id)
+                    if product.product_user != request.user:
+                        return False
+                elif owner_object == 'identity':
+                    print('this is identities type')
+                    identity = Identity.objects.get(id=base_object.id)
+                    if identity.identity_user is not None:
+                        if identity.identity_user != request.user:
+                            return False
+                    elif identity.identity_organization.owner != request.user:
+                        return False
+                # check 5 permission
+                return self.check_five_favorite(base_object, request)
+            return False
+        return True
+
+    @staticmethod
+    def check_five_favorite(base_object, request):
+        print('i am in the check 5 permission')
+        favorite_count = FavoriteBase.objects.filter(favorite_base_related_parent=base_object, delete_flag=False).count()
+        if request.user.is_superuser:
+            print('i am a super user')
+            return True
+        if favorite_count <= 5:
+            print('i have ' + str(favorite_count) + ' favorites')
+            return True
+        return False
