@@ -88,11 +88,13 @@ class SuperAdminUserSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         user = User.objects.get(pk=instance.id)
         profile = Profile.objects.get(profile_user=user)
+        print('in admin Area')
         user_validated_data = self.get_user_validated_args(**validated_data)
+        print(user_validated_data)
         try:
-            user_strength = StrengthStates.objects.get(user_strength=user)
+            user_strength = StrengthStates.objects.get(strength_user=user)
         except StrengthStates.DoesNotExist:
-            user_strength = StrengthStates.objects.create(user_strength=user)
+            user_strength = StrengthStates.objects.create(strength_user=user)
         # check for first name strength rate
         if 'first_name' in user_validated_data and user_validated_data['first_name'] != '':
             user.first_name = user_validated_data['first_name']
@@ -178,7 +180,9 @@ class SuperAdminUserSerializer(ModelSerializer):
 
 
     def get_user_validated_args(self, **kwargs):
-        user_kwargs = {'username': kwargs['username']}
+        user_kwargs = {}
+        if 'username' in kwargs:
+            user_kwargs['username'] = kwargs['username']
         if 'first_name' in kwargs:
             user_kwargs['first_name'] = kwargs['first_name']
         if 'last_name' in kwargs:
