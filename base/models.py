@@ -334,3 +334,17 @@ class Favorite(Base):
         on_delete=models.CASCADE,
         help_text='Integer'
     )
+
+
+class FavoriteBase(Base):
+    favorite_base_related_parent = models.ForeignKey(
+        Base, related_name='favorite_base_parent', db_index=True,
+        on_delete=models.CASCADE,
+        help_text='Integer'
+    )
+    favorite_base_related_favorite = models.ForeignKey(
+        Favorite,
+        related_name='favorite_base_favorite',
+        on_delete=models.CASCADE,
+        help_text='Integer'
+    )

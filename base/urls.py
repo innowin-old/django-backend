@@ -16,7 +16,7 @@ from .views import (
         BadgeCategoryViewSet,
         BadgeViewSet,
         CertificateViewSet,
-        FavoriteViewSet)
+        FavoriteViewSet, FavoriteBaseViewSet)
 
 
 router = DefaultRouter()
@@ -35,6 +35,7 @@ router.register(r'hashtags', HashtagViewset, 'Hashtag')
 router.register(r'comments', BaseCommentViewset, 'Comments')
 router.register(r'posts', PostViewSet, 'posts')
 router.register(r'favorites', FavoriteViewSet, 'Favorite')
+router.register(r'favorites-relations', FavoriteBaseViewSet, 'Favorite Relations')
 router.register(r'', BaseViewset, 'Base')
 
 urlpatterns = [

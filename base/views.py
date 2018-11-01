@@ -37,7 +37,7 @@ from .models import (
     BaseTown,
     BadgeCategory,
     Badge,
-    Favorite)
+    Favorite, FavoriteBase)
 
 from .serializers import (
     BaseSerializer,
@@ -59,7 +59,7 @@ from .serializers import (
     BadgeCategoryListSerializer,
     BadgeSerializer,
     BadgeListSerializer,
-    FavoriteSerializer, FavoriteListSerializer)
+    FavoriteSerializer, FavoriteListSerializer, FavoriteBaseSerializer, FavoriteBaseListSerializer)
 
 
 class BaseModelViewSet(ModelViewSet):
@@ -842,5 +842,27 @@ class FavoriteViewSet(ModelViewSet):
         favorite_related_media = self.request.query_params.get('favorite_related_media', None)
         if favorite_related_media is not None:
             queryset = queryset.filter(favorite_related_media=favorite_related_media)
+
+        return queryset
+
+
+class FavoriteBaseViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return FavoriteBaseListSerializer
+        return FavoriteBaseSerializer
+
+    def get_queryset(self):
+        queryset = FavoriteBase.objects.filter(delete_flag=False)
+
+        favorite_base_related_parent = self.request.query_params.get('favorite_base_related_parent', None)
+        if favorite_base_related_parent is not None:
+            queryset = queryset.filter(favorite_base_related_parent=favorite_base_related_parent)
+
+        favorite_base_related_favorite = self.request.query_params.get('favorite_base_related_favorite', None)
+        if favorite_base_related_favorite is not None:
+            queryset = queryset.filter(favorite_base_related_favorite=favorite_base_related_favorite)
 
         return queryset
