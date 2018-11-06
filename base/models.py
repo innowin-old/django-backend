@@ -132,6 +132,11 @@ class Post(Base):
     )
     post_related_product_attach = models.ForeignKey('products.Product', related_name='product_attach_post', db_index=True,
                                                     on_delete=models.CASCADE, blank=True, null=True, help_text='integer')
+    post_related_file = models.ForeignKey('media.Media', on_delete=models.SET, help_text="Integer", blank=True,
+                                          null=True, related_name='post_related_file')
+    post_related_media = models.ForeignKey('media.Media', on_delete=models.SET_NULL, help_text="Integer",
+                                           blank=True, null=True, related_name='post_related_media')
+    post_link = models.CharField(max_length=255, null=True, blank=True)
 
     objects = BaseManager()
 
@@ -334,6 +339,8 @@ class Favorite(Base):
         'media.Media',
         related_name='favorite_media',
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         help_text='Integer'
     )
 
