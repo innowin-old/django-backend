@@ -424,7 +424,7 @@ class UserViewset(ModelViewSet):
     @list_route(methods=['post', 'get'])
     def password_reset_by_sms(self, request):
         try:
-            code_object = UserCode.objects.filter(code=request.POST["code"], active_flag=True, used=False, user_id=request.POST["user_id"])
+            code_object = UserCode.objects.filter(code=request.POST["code"], active_flag=True, used=False, user_id=request.POST["user_id"], type='sms')
             if code_object.count() > 0:
                 code_object = code_object[0]
                 user_object = code_object.user
@@ -434,7 +434,7 @@ class UserViewset(ModelViewSet):
                     user.set_password(password)
                 code_object.active = False
                 code_object.used = True
-                return Response({'status': 'OK'})
+                return Response({'status': 'SUCCESS'})
             else:
                 return Response({'status': 'FAILED'})
         except Exception as e:
@@ -442,7 +442,7 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['post'])
     def password_reset_by_sms_check_code(self, request):
-        code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST['user_id'])
+        code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST['user_id'], type='sms')
         if code_object.count() > 0:
             return Response({"status": "OK"})
         else:
@@ -454,14 +454,15 @@ class UserViewset(ModelViewSet):
         user_object = profile_object.profile_user
         profile = Profile.objects.get(profile_user=user_object)
         if profile.auth_mobile != '':
-            if UserCode.objects.filter(user_id=user_object.id, active=True, used=False).count() == 0:
+            if UserCode.objects.filter(user_id=user_object.id, active=True, used=False, type='sms').count() == 0:
                 code = random.randint(10000, 99999)
                 code_object = UserCode()
                 code_object.code = code
                 code_object.user = user_object
+                code_object.type = 'sms'
                 code_object.save()
             else:
-                code_object = UserCode.objects.filter(user=user_object, active=True, used=False)[0]
+                code_object = UserCode.objects.filter(user=user_object, active=True, used=False, type='sms')[0]
             print(code_object.code)
             data = {
               "UserApiKey": "ead9bf7ba2865979ab2dcc3e",
