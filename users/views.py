@@ -464,8 +464,8 @@ class UserViewset(ModelViewSet):
                 code_object = UserCode.objects.filter(user=user_object, active=True, used=False)[0]
             print(code_object.code)
             data = {
-              "UserApiKey": "bc44d868166e348961ed868",
-              "SecretKey": "KWt@@uA[aczxTF2B"
+              "UserApiKey": "ead9bf7ba2865979ab2dcc3e",
+              "SecretKey": "w9abTCGEEJqPfgWSEv4Dz9NxSqHFxJuj"
             }
             r = requests.post("http://RestfulSms.com/api/Token", data=data)
             tokenData = json.loads(r.text)
@@ -476,7 +476,7 @@ class UserViewset(ModelViewSet):
                       { "Parameter": "VerificationCode","ParameterValue": code_object.code }
                     ],
                     "Mobile": profile.auth_mobile,
-                    "TemplateId":"1084"
+                    "TemplateId":"5253"
                 }
                 headers = {
                   "Content-Type" : "application/json",
