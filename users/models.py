@@ -537,7 +537,12 @@ class BlockIdentity(Base):
 
 
 class UserCode(Base):
+    TYPE_CHOICES = (
+        ('email', 'Email'),
+        ('sms', 'SMS'),
+    )
     code = models.CharField(max_length=15, db_index=True, unique=True)
     user = models.ForeignKey(User, related_name='user_code', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     active = models.BooleanField(default=True)
     used = models.BooleanField(default=False)
+    type = models.CharField(max_length=5, choices=TYPE_CHOICES, default='email')
