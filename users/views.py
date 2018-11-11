@@ -1,4 +1,6 @@
 import json
+import requests
+import random
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -20,7 +22,7 @@ from utils.number_generator import random_with_N_digits
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from base.permissions import BlockPostMethod, IsOwnerOrReadOnly, SafeMethodsOnly, OnlyPostMethod, CanReadContent
 from base.models import BaseSocialType, BaseSocial, Badge
@@ -418,6 +420,74 @@ class UserViewset(ModelViewSet):
             'errors': errors
         }
         return Response(response)
+
+    @list_route(methods=['post', 'get'])
+    def password_reset_by_sms(self, request):
+        try:
+            code_object = UserCode.objects.filter(code=request.POST["code"], active_flag=True, used=False, user_id=request.POST["user_id"])
+            if code_object.count() > 0:
+                code_object = code_object[0]
+                user_object = code_object.user
+                password = request.POST["password"]
+                confirm_password = request.POST["confirm_password"]
+                if password == confirm_password:
+                    user.set_password(password)
+                code_object.active = False
+                code_object.used = True
+                return Response({'status': 'OK'})
+            else:
+                return Response({'status': 'FAILED'})
+        except Exception as e:
+            return Response({'status': 'FAILED', 'message': e.strerror})
+
+    @list_route(methods=['post'])
+    def password_reset_by_sms_check_code(self, request):
+        code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST['user_id'])
+        if code_object.count() > 0:
+            return Response({"status": "OK"})
+        else:
+            return Response({"status": "FAILED"})
+
+    @list_route(methods=['post', 'get'])
+    def password_reset_by_sms_request(self, request):
+        profile_object = Profile.objects.get(auth_mobile=request.POST["mobile"])
+        user_object = profile_object.profile_user
+        profile = Profile.objects.get(profile_user=user_object)
+        if profile.auth_mobile != '':
+            if UserCode.objects.filter(user_id=user_object.id, active=True, used=False).count() == 0:
+                code = random.randint(10000, 99999)
+                code_object = UserCode()
+                code_object.code = code
+                code_object.user = user_object
+                code_object.save()
+            else:
+                code_object = UserCode.objects.filter(user=user_object, active=True, used=False)[0]
+            print(code_object.code)
+            data = {
+              "UserApiKey": "bc44d868166e348961ed868",
+              "SecretKey": "KWt@@uA[aczxTF2B"
+            }
+            r = requests.post("http://RestfulSms.com/api/Token", data=data)
+            tokenData = json.loads(r.text)
+            if tokenData["IsSuccessful"] == True:
+                sms_body = {
+                    "ParameterArray":[
+                      { "Parameter": "Name", "ParameterValue": "اینوین" },
+                      { "Parameter": "VerificationCode","ParameterValue": code_object.code }
+                    ],
+                    "Mobile": profile.auth_mobile,
+                    "TemplateId":"1084"
+                }
+                headers = {
+                  "Content-Type" : "application/json",
+                  "x-sms-ir-secure-token" : tokenData["TokenKey"]
+                }
+                smsRequest = requests.post("http://RestfulSms.com/api/UltraFastSend", headers=headers, data=json.dumps(sms_body))
+                smsRequestData = json.loads(smsRequest.text)
+                return Response({'status': 'SUCCESS', 'user_id': user_object.id})
+            return Response({'status': 'FAILED'})
+        else:
+            return Response({'status': 'User not set mobile'})
 
 
 class IdentityViewset(ModelViewSet):
