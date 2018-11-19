@@ -248,9 +248,10 @@ SENDFILE_ROOT = os.path.normpath(
         CONFIG.get('SENDFILE_ROOT')))
 SENDFILE_URL = CONFIG.get('SENDFILE_URL')
 # not MEDIA_ROOT. this is media app settings
-MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media_root')
+MEDIA_DIR = os.path.join(SENDFILE_ROOT, 'media')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 
 SOCIAL_AUTH_FACEBOOK_KEY = CONFIG.get('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = CONFIG.get('SOCIAL_AUTH_FACEBOOK_SECRET')
