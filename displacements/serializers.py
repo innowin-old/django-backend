@@ -551,7 +551,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
                             follow_followed_id=follow_follower_object.id
                         )
                         follow.save()
-        # execute our Query
+"""        # execute our Query
         cursor.execute("SELECT * FROM organizations_confirmation")
 
         # retrieve the records from the database
@@ -595,7 +595,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
                         link=confirmation_kwargs['link'],
                         confirm_flag=confirmation_kwargs['confirm_flag']
                     )
-                    confirmation.save()
+                    confirmation.save()"""
         organization.errors_log = errors_log
         cursor.close()
         conn.close()
