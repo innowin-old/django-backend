@@ -563,7 +563,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
             confirmation_kwargs = {}
             for confirmation_key in confirmation_last_fields:
                 confirmation_kwargs[confirmation_key] = confirmation_record[confirmation_key]
-            cursor.execute("SELECT * FROM user_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_corroborant_id'],))
+            cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_corroborant_id'],))
             identity_confirmation_corroborant_records = cursor.fetchall()
             for identity_confirmation_corroborant_record in identity_confirmation_corroborant_records:
                 identity_confirmation_corroborant_name = identity_confirmation_corroborant_record['name']
@@ -575,7 +575,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
                 print('error logged !!!')
                 errors_log.append('identity with username=' + identity_confirmation_corroborant_name + ' not exist !')
             else:
-                cursor.execute("SELECT * FROM user_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_confirmed_id'],))
+                cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (confirmation_kwargs['confirmation_confirmed_id'],))
                 confirmation_confirmed_records = cursor.fetchall()
                 for confirmation_confirmed_record in confirmation_confirmed_records:
                     confirmation_confirmed_name = confirmation_confirmed_record['name']
