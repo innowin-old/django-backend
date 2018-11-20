@@ -26,7 +26,7 @@ def add_user_to_default_exchange(user):
         exchange = Exchange.objects.get(is_default_exchange=True)
     except Exchange.DoesNotExist:
         super_user = User.objects.filter(is_superuser=True).first()
-        super_user_identity = Identity.objects.get(identity_user=super_user)
+        super_user_identity = Identity.objects.filter(identity_user=super_user)[0]
         exchange = Exchange.objects.create(name='دانش بوم', is_default_exchange=True, owner=super_user_identity)
     if exchange is not False:
         exchange_identity = ExchangeIdentity.objects.create(exchange_identity_related_identity=identity,
