@@ -442,9 +442,9 @@ PRODUCTS_BEFORE_FIELDS = {
     'product_owner_id': '',
     'product_category_id': '',
     'name': '',
-    'country': '',
-    'province': '',
-    'city': '',
+    'related_country': '',
+    'related_province': '',
+    'related_town': '',
     'description': '',
     'attrs': '',
     'custom_attrs': ''
