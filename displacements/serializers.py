@@ -517,7 +517,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
             follow_kwargs = {}
             for follow_key in follow_last_fields:
                 follow_kwargs[follow_key] = follow_record[follow_key]
-            cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_identity_id'],))
+            cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_followed_id'],))
             identity_follow_records = cursor.fetchall()
             if len(identity_follow_records) == 0:
                 print('error logged')
@@ -532,7 +532,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
                     print('error logged !!!')
                     errors_log.append('identity with username=' + identity_follow_name + ' not exist !')
                 else:
-                    cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_identity_id'],))
+                    cursor.execute("SELECT * FROM users_identity WHERE identity_user_id=%s", (follow_kwargs['follow_followed_id'],))
                     follow_follower_records = cursor.fetchall()
                     for follow_follower_record in follow_follower_records:
                         follow_follower_name = follow_follower_record['name']
