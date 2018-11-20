@@ -62,7 +62,7 @@ class SuperAdminUserSerializer(ModelSerializer):
 
     def create(self, validated_data):
         user_validated_data = self.get_user_validated_args(**validated_data)
-        user = User.objects.create(**user_validated_data)
+        user = User.objects.create(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
         profile_validated_data = self.get_profile_validated_data(**validated_data)
@@ -181,6 +181,8 @@ class SuperAdminUserSerializer(ModelSerializer):
 
     def get_user_validated_args(self, **kwargs):
         user_kwargs = {}
+        if 'id' in kwargs:
+            user_kwargs['id'] = kwargs['id']
         if 'username' in kwargs:
             user_kwargs['username'] = kwargs['username']
         if 'first_name' in kwargs:
