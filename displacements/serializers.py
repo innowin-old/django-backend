@@ -548,7 +548,7 @@ class GetOrganizationDataSerializer(ModelSerializer):
                     else:
                         follow = Follow.objects.create(
                             follow_follower_id=follow_follower_object.id,
-                            follow_identity_id=follow_follower_object.id
+                            follow_followed_id=follow_follower_object.id
                         )
                         follow.save()
         # execute our Query
