@@ -527,8 +527,10 @@ CONFIRMATION_BEFORE_FIELD = {
 }
 
 FOLLOW_BEFORE_FIELD = {
-    'follow_identity_id': '',
-    'follow_follower_id': ''
+    'follow_followed_id': '',
+    'follow_follower_id': '',
+    'follow_accepted': '',
+    'delete_flag': ''
 }
 
 EXCHANGE_BEFORE_FIELD = {
