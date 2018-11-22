@@ -359,7 +359,6 @@ class FavoriteBase(Base):
         Base, related_name='favorite_base_parent', db_index=True,
         on_delete=models.CASCADE,
         help_text='Integer',
-        db_index=True
     )
     favorite_base_related_favorite = models.ForeignKey(
         Favorite,
