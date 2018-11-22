@@ -33,9 +33,9 @@ class Organization(Base):
                                     related_name="organization_admins",
                                     blank=True,
                                     help_text='Integer')
-    username = models.CharField(max_length=32, unique=True, help_text='String(32)', validators=[MinLengthValidator(3)])
-    email = models.EmailField(blank=True, null=True, help_text='Text')
-    public_email = models.EmailField(blank=True, null=True, help_text='Text')
+    username = models.CharField(max_length=32, unique=True, help_text='String(32)', validators=[MinLengthValidator(3)], db_index=True)
+    email = models.EmailField(blank=True, null=True, help_text='Text', db_index=True)
+    public_email = models.EmailField(blank=True, null=True, help_text='Text', db_index=True)
     nike_name = models.CharField(max_length=20, db_index=True, null=True, blank=True, help_text='String(100)')
     official_name = models.CharField(max_length=50, db_index=True, unique=True, help_text='String(50)')
     national_code = models.CharField(max_length=11, db_index=True, null=True, blank=True, help_text='String(20)')
@@ -53,14 +53,16 @@ class Organization(Base):
         choices=OWNERSHIP_TYPES,
         max_length=20,
         null=True,
-        blank=True
+        blank=True,
+        db_index=True,
     )
     business_type = models.CharField(
         choices=BUSINESS_TYPES,
         max_length=30,
         null=True,
         blank=True,
-        help_text='Array(String(30))'
+        help_text='Array(String(30))',
+        db_index=True,
     )
     organization_logo = models.ForeignKey(
         Media,
@@ -68,22 +70,24 @@ class Organization(Base):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='Integer')
+        help_text='Integer',
+        db_index=True)
     organization_banner = models.ForeignKey(
         Media,
         related_name='organization_banner_media',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='Integer')
-    biography = models.TextField(max_length=70, blank=True, null=True, help_text='String(70)')
-    description = models.TextField(blank=True, null=True, help_text='Text', max_length=1000)
+        help_text='Integer',
+        db_index=True)
+    biography = models.TextField(max_length=70, blank=True, null=True, help_text='String(70)', db_index=True)
+    description = models.TextField(blank=True, null=True, help_text='Text', max_length=1000, db_index=True)
     correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=[],
-                                         help_text='Array(String(50))')
+                                         help_text='Array(String(50))', db_index=True)
     social_network = ArrayField(models.CharField(max_length=100), blank=True, null=True, default=[],
-                                help_text='Array(String(100))')
-    staff_count = models.IntegerField(null=True, blank=True, help_text='Integer')
-    active_flag = models.BooleanField(default=False)
+                                help_text='Array(String(100))', db_index=True)
+    staff_count = models.IntegerField(null=True, blank=True, help_text='Integer', db_index=True)
+    active_flag = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
@@ -113,7 +117,7 @@ pre_save.connect(set_child_name, sender=Organization)
 class StaffCount(Base):
     staff_count_organization = models.ForeignKey(Organization, related_name="staff_counts", db_index=True,
                                                  on_delete=models.CASCADE, help_text='Integer')
-    count = models.IntegerField(help_text='Integer')
+    count = models.IntegerField(help_text='Integer', db_index=True)
 
     def __str__(self):
         return '%s(%s)' % (self.staff_count_organization.official_name, self.count)
@@ -127,11 +131,11 @@ pre_save.connect(set_child_name, sender=StaffCount)
 
 class OrganizationPicture(Base):
     picture_organization = models.ForeignKey(Organization, related_name="organization_pictures",
-                                             on_delete=models.CASCADE, help_text='Integer')
+                                             on_delete=models.CASCADE, help_text='Integer', db_index=True)
     picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="organization_picture_media",
-                                      help_text='Integer')
-    order = models.IntegerField(default=0, help_text='Integer')
-    description = models.TextField(blank=True, help_text='Text')
+                                      help_text='Integer', db_index=True)
+    order = models.IntegerField(default=0, help_text='Integer', db_index=True)
+    description = models.TextField(blank=True, help_text='Text', db_index=True)
 
     def __str__(self):
         return self.picture_organization.official_name
@@ -152,7 +156,7 @@ class Staff(Base):
                                    help_text='Integer')
 
     position = models.CharField(max_length=50, db_index=True, help_text='String(50)')
-    post_permission = models.BooleanField(default=False, help_text='Boolean')
+    post_permission = models.BooleanField(default=False, help_text='Boolean', db_index=True)
 
     objects = BaseManager()
 
@@ -168,7 +172,7 @@ class Follow(Base):
                                         on_delete=models.CASCADE, help_text='Integer')
     follow_follower = models.ForeignKey('users.Identity', related_name='followers', db_index=True,
                                         on_delete=models.CASCADE, help_text='Integer')
-    follow_accepted = models.BooleanField(default=False)
+    follow_accepted = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
@@ -200,9 +204,9 @@ class Confirmation(Base):
     confirmation_confirmed = models.ForeignKey('users.Identity', related_name='confirmation_confirmed', db_index=True,
                                                on_delete=models.CASCADE, help_text='Integer', blank=True, null=True)
     title = models.CharField(max_length=50, db_index=True, help_text='String(String(50))')
-    description = models.TextField(help_text='Text')
-    link = models.CharField(max_length=200, help_text='String(200)')
-    confirm_flag = models.BooleanField(default=False, help_text='Boolean')
+    description = models.TextField(help_text='Text', db_index=True)
+    link = models.CharField(max_length=200, help_text='String(200)', db_index=True)
+    confirm_flag = models.BooleanField(default=False, help_text='Boolean', db_index=True)
     confirmation_parent = models.ForeignKey(Base, related_name='base_confirmation', db_index=True,
                                             on_delete=models.CASCADE, help_text='Integer')
 
@@ -221,8 +225,8 @@ class Customer(Base):
     related_customer = models.ForeignKey('users.Identity', related_name='customers', db_index=True,
                                          on_delete=models.CASCADE, help_text='Integer')
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
-    customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer')
-    customer_active = models.BooleanField(default=False)
+    customer_picture = models.ForeignKey(Media, on_delete=models.CASCADE, help_text='Integer', db_index=True)
+    customer_active = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
@@ -239,8 +243,8 @@ class MetaData(Base):
         ('social', 'شبکه اجتماعی'),
         ('address', 'آدرس'),
     )
-    meta_type = models.CharField(choices=META_TYPES, max_length=20)
-    meta_title = models.CharField(max_length=20, blank=True, null=True)
+    meta_type = models.CharField(choices=META_TYPES, max_length=20, db_index=True)
+    meta_title = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     meta_value = models.CharField(max_length=255, db_index=True)
     meta_organization = models.ForeignKey(Organization, related_name='meta_data', blank=True, null=True,
                                           db_index=True, on_delete=models.CASCADE, help_text='Integer')
