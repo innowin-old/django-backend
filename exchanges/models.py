@@ -27,8 +27,9 @@ class Exchange(Base):
         blank=True,
         null=True,
         help_text="Integer",
+        db_index=True,
     )
-    link = models.URLField(blank=True, help_text='Url')
+    link = models.URLField(blank=True, help_text='Url', db_index=True)
     description = models.TextField(
         max_length=100,
         blank=True,
@@ -43,10 +44,10 @@ class Exchange(Base):
         db_index=True,
         help_text='Integer',
     )
-    private = models.BooleanField(default=False, help_text='Boolean')
-    members_count = models.BigIntegerField(default=100, help_text='BigInteger')
-    is_default_exchange = models.BooleanField(default=False, help_text='Boolean')
-    active_flag = models.BooleanField(default=True, help_text='Boolean')
+    private = models.BooleanField(default=False, help_text='Boolean', db_index=True)
+    members_count = models.BigIntegerField(default=100, help_text='BigInteger', db_index=True)
+    is_default_exchange = models.BooleanField(default=False, help_text='Boolean', db_index=True)
+    active_flag = models.BooleanField(default=True, help_text='Boolean', db_index=True)
 
     objects = BaseManager()
 
@@ -70,22 +71,25 @@ class ExchangeIdentity(Base):
         Exchange,
         related_name="identities_exchange",
         help_text='Integer',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     exchange_identity_related_identity = models.ForeignKey(
         Identity,
         related_name="exchanges_identities",
         help_text='Integer',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True,
     )
     join_type = models.CharField(
         choices=JOIN_TYPES,
         max_length=10,
         default='join',
-        help_text='join | quest'
+        help_text='join | quest',
+        db_index=True,
     )
-    active_flag = models.BooleanField(default=True, help_text='Boolean')
-    indicator_flag = models.BooleanField(default=False)
+    active_flag = models.BooleanField(default=True, help_text='Boolean', db_index=True)
+    indicator_flag = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
