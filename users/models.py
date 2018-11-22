@@ -401,7 +401,7 @@ pre_save.connect(set_child_name, sender=Skill)
 
 
 class IdentityUrl(Base):
-    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True, db_index=True)
+    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
     identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,
                                                          help_text='Integer', db_index=True)
 
