@@ -14,7 +14,7 @@ class Category(Base):
                                         help_text='Integer')
     name = models.CharField(max_length=100, unique=True, db_index=True, help_text='String(100)')
     title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
-    creatable = models.BooleanField(default=False, help_text='Boolean')
+    creatable = models.BooleanField(default=False, help_text='Boolean', db_index=True)
 
     objects = BaseManager()
 
@@ -81,7 +81,7 @@ class Product(Base):
     attrs = JSONField(null=True, blank=True, help_text='JSON')
     custom_attrs = JSONField(null=True, blank=True, help_text='JSON')
     product_user = models.ForeignKey(User, related_name="user_products", on_delete=models.CASCADE, db_index=True, help_text="Integer")
-    product_price_type = models.CharField(max_length=10, choices=PRICE_CHOICES, default='specified', help_text='specified | call')
+    product_price_type = models.CharField(max_length=10, db_index=True, choices=PRICE_CHOICES, default='specified', help_text='specified | call')
 
     objects = BaseManager()
 
@@ -110,7 +110,7 @@ class Price(Base):
     price_product = models.ForeignKey(Product, related_name="prices", on_delete=models.CASCADE, db_index=True,
                                       help_text='Integer')
     value = models.FloatField(help_text='Float')
-    price_currency = models.CharField(max_length=20, choices=CURRENCY_CHOICES, default='IRR', help_text='IRR | USD | EUR | JPY | GBP | AUD | CAD | CHF | CNY')
+    price_currency = models.CharField(max_length=20, db_index=True, choices=CURRENCY_CHOICES, default='IRR', help_text='IRR | USD | EUR | JPY | GBP | AUD | CAD | CHF | CNY')
 
     objects = BaseManager()
 
@@ -127,11 +127,11 @@ pre_save.connect(set_child_name, sender=Price)
 class Picture(Base):
     picture_product = models.ForeignKey(Product, related_name="product_pictures", on_delete=models.CASCADE,
                                         db_index=True, help_text='Integer')
-    picture_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="product_picture_media",
+    picture_media = models.ForeignKey(Media, db_index=True, on_delete=models.CASCADE, related_name="product_picture_media",
                                       help_text='Integer')
-    order = models.IntegerField(default=0, help_text='Integer')
+    order = models.IntegerField(default=0, help_text='Integer', db_index=True)
     description = models.TextField(blank=True, db_index=True, help_text='Text')
-    picture_original = models.BooleanField(default=False)
+    picture_original = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
