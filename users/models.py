@@ -548,5 +548,5 @@ class UserCode(Base):
     code = models.CharField(max_length=15, db_index=True, unique=True)
     user = models.ForeignKey(User, related_name='user_code', db_index=True, on_delete=models.CASCADE, help_text='Integer')
     active = models.BooleanField(default=True, db_index=True)
-    used = models.BooleanField(default=False, db_inex=True)
+    used = models.BooleanField(default=False, db_index=True)
     type = models.CharField(max_length=5, choices=TYPE_CHOICES, default='email', db_index=True)
