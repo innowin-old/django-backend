@@ -39,9 +39,9 @@ class Identity(Base):
         blank=True,
         help_text='Integer')
     name = models.CharField(max_length=150, db_index=True, unique=True, help_text='String(150)')
-    accepted = models.BooleanField(default=False)
-    mobile_verified = models.BooleanField(default=False)
-    email_verified = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False, db_index=True)
+    mobile_verified = models.BooleanField(default=False, db_index=True)
+    email_verified = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()
 
@@ -106,43 +106,44 @@ class Profile(Base):
         ('male', 'مرد'),
         ('female', 'زن')
     )
-    profile_user = models.OneToOneField(User, related_name="profile",
+    profile_user = models.OneToOneField(User, related_name="profile", db_index=True,
                                         on_delete=models.CASCADE, help_text='Integer')
-    public_email = models.EmailField(null=True, blank=True, help_text='Email')
-    national_code = models.CharField(max_length=10, blank=True,
+    public_email = models.EmailField(null=True, blank=True, help_text='Email', db_index=True)
+    national_code = models.CharField(max_length=10, blank=True, db_index=True,
                                      validators=[RegexValidator('^\d{10}$')], help_text='String(20)')
-    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_profile_media",
+    profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, db_index=True, related_name="users_profile_media",
                                       help_text='Integer', blank=True, null=True)
-    birth_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
-    web_site = ArrayField(models.URLField(), blank=True, default=[], help_text='Array')
-    phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
-    mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array')
-    auth_mobile = models.CharField(max_length=11, blank=True, null=True, unique=True,
+    birth_date = models.CharField(max_length=10, blank=True, db_index=True, null=True, help_text='String(10)')
+    web_site = ArrayField(models.URLField(), blank=True, db_index=True, default=[], help_text='Array')
+    phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array', db_index=True)
+    mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array', db_index=True)
+    auth_mobile = models.CharField(max_length=11, blank=True, null=True, unique=True, db_index=True,
                                    validators=[RegexValidator('^[0][9][1][0-9]{8,8}$')], help_text='Phone')
-    fax = PhoneField(blank=True, help_text='Phone')
+    fax = PhoneField(blank=True, help_text='Phone', db_index=True)
     telegram_account = models.CharField(
-        max_length=256, blank=True, validators=[
+        max_length=256, blank=True, db_index=True, validators=[
             RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
-    instagram_account = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+    instagram_account = models.CharField(max_length=256, db_index=True, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
                                          help_text='String(256)')
-    linkedin_account = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+    linkedin_account = models.CharField(max_length=256, db_index=True, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
                                         help_text='String(256)')
-    description = models.TextField(blank=True, help_text='Text', max_length=70)
+    description = models.TextField(blank=True, db_index=True, help_text='Text', max_length=70)
     gender = models.CharField(
         choices=GENDER,
         max_length=7,
         default='Male',
-        help_text='Male | Female'
+        help_text='Male | Female',
+        db_index=True,
     )
-    is_plus_user = models.BooleanField(default=False)
-    is_user_organization = models.BooleanField(default=False)
-    google_plus_address = models.CharField(max_length=255, blank=True, null=True)
-    social_image_url = models.CharField(max_length=255, blank=True, null=True)
-    linkedin_headline = models.CharField(max_length=255, blank=True, null=True)
-    linkedin_positions = models.TextField(blank=True, null=True)
-    yahoo_contacts = models.TextField(blank=True, null=True)
-    profile_strength = models.SmallIntegerField(default=10)
-    address = models.CharField(max_length=100, blank=True, null=True)
+    is_plus_user = models.BooleanField(default=False, db_index=True)
+    is_user_organization = models.BooleanField(default=False, db_index=True)
+    google_plus_address = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    social_image_url = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    linkedin_headline = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    linkedin_positions = models.TextField(blank=True, null=True, db_index=True)
+    yahoo_contacts = models.TextField(blank=True, null=True, db_index=True)
+    profile_strength = models.SmallIntegerField(default=10, db_index=True)
+    address = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     profile_related_country = models.ForeignKey(BaseCountry, related_name='profile_country', db_index=True, blank=True
                                                 , null=True, on_delete=models.CASCADE, help_text='Integer')
     profile_related_province = models.ForeignKey(BaseProvince, related_name='profile_province', db_index=True,
@@ -152,8 +153,8 @@ class Profile(Base):
                                              null=True,
                                              on_delete=models.CASCADE, help_text='Integer')
     profile_banner = models.ForeignKey(Media, on_delete=models.CASCADE, related_name="users_banner_media",
-                                       help_text='Integer', blank=True, null=True)
-    profile_secret_key = models.CharField(blank=True, null=True, max_length=100)
+                                       help_text='Integer', blank=True, null=True, db_index=True)
+    profile_secret_key = models.CharField(blank=True, null=True, max_length=100, db_index=True)
 
     objects = BaseManager()
 
@@ -193,26 +194,26 @@ class Setting(Base):
         ('public', "عمومی"),
         ('private', "خصوصی"),
     )
-    setting_user = models.OneToOneField(User, related_name="setting",
+    setting_user = models.OneToOneField(User, related_name="setting", db_index=True,
                                         on_delete=models.CASCADE, help_text='Integer')
-    image_auto_download = models.BooleanField(default=True, help_text='Boolean')
-    video_auto_download = models.BooleanField(default=True, help_text='Boolean')
-    who_can_read_base_info = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_activity = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_work_experiences = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_badges = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_certificates = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_followers = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_followings = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    who_can_read_exchanges = models.CharField(choices=USER_TYPE, default='all', max_length=10, help_text='all | followers | no body')
-    can_search_engins_index_me = models.BooleanField(default=False)
-    account_type = models.CharField(choices=ACCOUNT_TYPE, default='public', max_length=10, help_text='public | private')
-    send_notifications_by_email = models.BooleanField(default=True, help_text='Boolean')
-    send_follow_requests_by_email = models.BooleanField(default=False, help_text='Boolean')
-    send_join_exchange_join_by_email = models.BooleanField(default=False, help_text='Boolean')
-    send_supply_demand_recommends_by_email = models.BooleanField(default=False, help_text='Boolean')
-    send_messages_notifications_by_email = models.BooleanField(default=False, help_text='Boolean')
-    send_exchange_updates_by_email = models.BooleanField(default=False, help_text='Boolean')
+    image_auto_download = models.BooleanField(default=True, help_text='Boolean', db_index=True)
+    video_auto_download = models.BooleanField(default=True, help_text='Boolean', db_index=True)
+    who_can_read_base_info = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_activity = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_work_experiences = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_badges = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_certificates = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_followers = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_followings = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    who_can_read_exchanges = models.CharField(choices=USER_TYPE, db_index=True, default='all', max_length=10, help_text='all | followers | no body')
+    can_search_engins_index_me = models.BooleanField(default=False, db_index=True)
+    account_type = models.CharField(choices=ACCOUNT_TYPE, db_index=True, default='public', max_length=10, help_text='public | private')
+    send_notifications_by_email = models.BooleanField(default=True, db_index=True, help_text='Boolean')
+    send_follow_requests_by_email = models.BooleanField(default=False, db_index=True, help_text='Boolean')
+    send_join_exchange_join_by_email = models.BooleanField(default=False, db_index=True, help_text='Boolean')
+    send_supply_demand_recommends_by_email = models.BooleanField(default=False, db_index=True, help_text='Boolean')
+    send_messages_notifications_by_email = models.BooleanField(default=False, db_index=True, help_text='Boolean')
+    send_exchange_updates_by_email = models.BooleanField(default=False, db_index=True, help_text='Boolean')
 
 
 class Education(Base):
@@ -221,13 +222,13 @@ class Education(Base):
         ('Master', "کارشناسی ارشد"),
         ('Phd', "دکتری"),
     )
-    education_user = models.ForeignKey(User, related_name="educations",
+    education_user = models.ForeignKey(User, related_name="educations", db_index=True,
                                        on_delete=models.CASCADE, help_text='Integer')
-    grade = models.CharField(choices=EDUCATION_GRADE, default='Bachelor', max_length=10, help_text='Bachelor | Master | Phd')
-    university = models.CharField(max_length=100, help_text='String(100)')
-    field_of_study = models.CharField(max_length=100, help_text='String(100)')
-    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
-    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(7)')
+    grade = models.CharField(choices=EDUCATION_GRADE, db_index=True, default='Bachelor', max_length=10, help_text='Bachelor | Master | Phd')
+    university = models.CharField(max_length=100, db_index=True, help_text='String(100)')
+    field_of_study = models.CharField(max_length=100, db_index=True, help_text='String(100)')
+    from_date = models.CharField(max_length=10, db_index=True, blank=True, null=True, help_text='String(7)')
+    to_date = models.CharField(max_length=10, db_index=True, blank=True, null=True, help_text='String(7)')
     average = models.FloatField(
         validators=[
             MaxValueValidator(20),
@@ -235,7 +236,7 @@ class Education(Base):
         null=True,
         blank=True,
         help_text='Float')
-    description = models.TextField(blank=True, help_text='Text', max_length=30)
+    description = models.TextField(blank=True, db_index=True, help_text='Text', max_length=30)
 
     objects = BaseManager()
 
@@ -270,15 +271,15 @@ pre_save.connect(set_child_name, sender=Education)
 
 
 class Research(Base):
-    research_user = models.ForeignKey(User, related_name="researches",
+    research_user = models.ForeignKey(User, related_name="researches", db_index=True,
                                       on_delete=models.CASCADE, help_text='Integer')
-    title = models.CharField(max_length=250, help_text='String(250)')
-    url = models.URLField(blank=True, help_text='URL')
-    author = ArrayField(models.CharField(max_length=100), blank=True, help_text='Array(String(100))')
-    publication = models.CharField(max_length=100, blank=True, help_text='String(100)')
-    year = models.IntegerField(null=True, blank=True, help_text='Integer')
-    page_count = models.IntegerField(null=True, blank=True, help_text='Integer')
-    research_link = models.CharField(max_length=255, blank=True, null=True, help_text='String(255)')
+    title = models.CharField(max_length=250, help_text='String(250)', db_index=True)
+    url = models.URLField(blank=True, help_text='URL', db_index=True)
+    author = ArrayField(models.CharField(max_length=100), db_index=True, blank=True, help_text='Array(String(100))')
+    publication = models.CharField(max_length=100, db_index=True, blank=True, help_text='String(100)')
+    year = models.IntegerField(null=True, blank=True, db_index=True, help_text='Integer')
+    page_count = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer')
+    research_link = models.CharField(max_length=255, db_index=True, blank=True, null=True, help_text='String(255)')
 
     objects = BaseManager()
 
@@ -293,14 +294,15 @@ pre_save.connect(set_child_name, sender=Research)
 
 
 class Certificate(Base):
-    certificate_user = models.ForeignKey(User, related_name="certificates",
+    certificate_user = models.ForeignKey(User, related_name="certificates", db_index=True,
                                          on_delete=models.CASCADE, help_text='Integer')
-    title = models.CharField(max_length=250, help_text='String(250)')
+    title = models.CharField(max_length=250, help_text='String(250)', db_index=True)
     picture_media = models.ForeignKey(
         Media,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        db_index=True,
         help_text='Integer')
 
     objects = BaseManager()
@@ -323,21 +325,23 @@ class WorkExperience(Base):
         ('UNCONFIRMED', 'تایید نشده'),
     )
 
-    work_experience_user = models.ForeignKey(User, related_name="work_experiences",
+    work_experience_user = models.ForeignKey(User, related_name="work_experiences", db_index=True,
                                              on_delete=models.CASCADE, help_text='Integer')
-    name = models.CharField(max_length=100, blank=True, help_text='String(100)')
+    name = models.CharField(max_length=100, blank=True, help_text='String(100)', db_index=True)
     work_experience_organization = models.ForeignKey(
         Organization,
         related_name="work_experience_organization",
         on_delete=models.CASCADE,
-        help_text='Integer')
-    position = models.CharField(max_length=100, blank=True, help_text='String(100)')
-    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
-    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)')
+        help_text='Integer',
+        db_index=True)
+    position = models.CharField(max_length=100, blank=True, help_text='String(100)', db_index=True)
+    from_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)', db_index=True)
+    to_date = models.CharField(max_length=10, blank=True, null=True, help_text='String(10)', db_index=True)
     status = models.CharField(
         choices=STATUSES,
         max_length=20,
         default='WITHOUT_CONFIRM',
+        db_index=True,
         help_text='WITHOUT_CONFIRM | WAIT_FOR_CONFIRM | CONFIRMED | UNCONFIRMED')
 
     objects = BaseManager()
@@ -378,11 +382,11 @@ pre_save.connect(set_child_name, sender=WorkExperience)
 
 
 class Skill(Base):
-    skill_user = models.ForeignKey(User, related_name="skills",
+    skill_user = models.ForeignKey(User, related_name="skills", db_index=True,
                                    on_delete=models.CASCADE, help_text='Integer')
-    title = models.CharField(max_length=250, help_text='String(250)')
-    tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50')
-    description = models.TextField(blank=True, help_text='Text')
+    title = models.CharField(max_length=250, help_text='String(250)', db_index=True)
+    tag = ArrayField(models.CharField(max_length=50), blank=True, help_text='50', db_index=True)
+    description = models.TextField(blank=True, help_text='Text', db_index=True)
 
     objects = BaseManager()
 
@@ -397,9 +401,9 @@ pre_save.connect(set_child_name, sender=Skill)
 
 
 class IdentityUrl(Base):
-    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True)
+    url = models.CharField(max_length=50, db_index=True, help_text='String(50)', unique=True, db_index=True)
     identity_url_related_identity = models.OneToOneField(Identity, related_name='urls', on_delete=models.CASCADE,
-                                                         help_text='Integer')
+                                                         help_text='Integer', db_index=True)
 
 
 # Cache Model Data After Update
@@ -409,13 +413,13 @@ pre_save.connect(set_child_name, sender=IdentityUrl)
 
 
 class UserArticle(Base):
-    user_article_related_user = models.ForeignKey(User, related_name="articles",
+    user_article_related_user = models.ForeignKey(User, related_name="articles", db_index=True,
                                                   on_delete=models.CASCADE, help_text='Integer')
     doi_link = models.URLField(db_index=True)
     doi_meta = JSONField()
-    publisher = models.CharField(max_length=100)
-    title = models.CharField(max_length=255)
-    article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array')
+    publisher = models.CharField(max_length=100, db_index=True)
+    title = models.CharField(max_length=255, db_index=True)
+    article_author = ArrayField(models.CharField(max_length=255), blank=True, default=[], help_text='Array', db_index=True)
 
 
 # Cache Model Data After Update
@@ -447,7 +451,7 @@ pre_save.connect(set_child_name, sender=AgentRequest)
 
 
 class Device(Base):
-    device_user = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE, help_text='Integer')
+    device_user = models.ForeignKey(User, db_index=True, related_name='devices', on_delete=models.CASCADE, help_text='Integer')
     fingerprint = models.CharField(max_length=50, unique=True)
     browser_name = models.CharField(max_length=20, blank=True, null=True)
     browser_version = models.CharField(max_length=30, blank=True, null=True)
@@ -516,7 +520,7 @@ class UserMetaData(Base):
         ('mobile', 'شماه همراه'),
         ('email', 'آدرس ایمیل'),
     )
-    user_meta_type = models.CharField(choices=META_TYPES, max_length=20)
+    user_meta_type = models.CharField(choices=META_TYPES, max_length=20, db_index=True)
     user_meta_value = models.CharField(max_length=20, db_index=True)
     user_meta_related_user = models.ForeignKey(User, related_name='meta_data_user', blank=True, null=True,
                                                db_index=True, on_delete=models.CASCADE, help_text='Integer')
@@ -533,7 +537,7 @@ class BlockIdentity(Base):
                                          on_delete=models.CASCADE, help_text='Integer')
     blocker_identity = models.ForeignKey(Identity, related_name='blocker_identity', db_index=True,
                                          on_delete=models.CASCADE, help_text='integer')
-    active_flag = models.BooleanField(default=True)
+    active_flag = models.BooleanField(default=True, db_index=True)
 
 
 class UserCode(Base):
@@ -543,6 +547,6 @@ class UserCode(Base):
     )
     code = models.CharField(max_length=15, db_index=True, unique=True)
     user = models.ForeignKey(User, related_name='user_code', db_index=True, on_delete=models.CASCADE, help_text='Integer')
-    active = models.BooleanField(default=True)
-    used = models.BooleanField(default=False)
-    type = models.CharField(max_length=5, choices=TYPE_CHOICES, default='email')
+    active = models.BooleanField(default=True, db_index=True)
+    used = models.BooleanField(default=False, db_inex=True)
+    type = models.CharField(max_length=5, choices=TYPE_CHOICES, default='email', db_index=True)
