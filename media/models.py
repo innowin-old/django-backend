@@ -41,8 +41,8 @@ class Media(models.Model):
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True,
                                  db_index=True)
-    create_time = models.DateTimeField(auto_now_add=True)
-    info = models.TextField(default='{}')
+    create_time = models.DateTimeField(auto_now_add=True, db_index=True)
+    info = models.TextField(default='{}', db_index=True)
     delete_flag = models.BooleanField(db_index=True, default=False)
 
     objects = BaseManager()
