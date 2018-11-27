@@ -21,7 +21,7 @@ class MediaSeriaizer(ModelSerializer):
     def create(self, validated_data):
         data = validated_data.pop('file_string')
         request = self.context.get("request")
-        
+
         if 'identity' not in validated_data:
             validated_data['identity'] = Identity.objects.get(identity_user=request.user)
 
