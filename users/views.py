@@ -434,6 +434,7 @@ class UserViewset(ModelViewSet):
                     user_object.set_password(password)
                 code_object.active = False
                 code_object.used = True
+                code_object.save()
                 return Response({'status': 'SUCCESS'})
             else:
                 return Response({'status': 'FAILED'})
