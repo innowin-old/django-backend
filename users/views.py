@@ -426,14 +426,14 @@ class UserViewset(ModelViewSet):
         try:
             code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST["user_id"], type='sms')
             if code_object.count() > 0:
-                code_object = code_object[0]
+                """code_object = code_object[0]
                 user_object = code_object.user
                 password = request.POST["password"]
                 confirm_password = request.POST["confirm_password"]
                 if password == confirm_password:
                     user.set_password(password)
                 code_object.active = False
-                code_object.used = True
+                code_object.used = True"""
                 return Response({'status': 'SUCCESS'})
             else:
                 return Response({'status': 'FAILED'})
