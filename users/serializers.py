@@ -236,7 +236,7 @@ class UserSerializer(ModelSerializer):
     phone = ListField(child=CharField(max_length=23, required=False), required=False)
     mobile = ListField(child=CharField(max_length=23, required=False), required=False)
     password = CharField(max_length=255)
-    auth_mobile = CharField(required=False, validators=[RegexValidator('^[0][9][1][0-9]{8,8}$')])
+    auth_mobile = CharField(required=False, validators=[RegexValidator('^[0][9][0-9]{9,9}$')])
 
     class Meta:
         model = User
