@@ -438,7 +438,7 @@ class UserViewset(ModelViewSet):
             else:
                 return Response({'status': 'FAILED'})
         except Exception as e:
-            return Response({'status': 'FAILED', 'message': e.strerror})
+            return Response({'status': 'FAILED', 'message': e})
 
     @list_route(methods=['post'])
     def password_reset_by_sms_check_code(self, request):
