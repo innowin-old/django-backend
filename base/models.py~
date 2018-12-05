@@ -1,0 +1,369 @@
+from django.core.validators import RegexValidator, MinLengthValidator
+from django.db import models
+from django.conf import settings
+from django.db.models.signals import post_save, pre_save
+from django.utils.timezone import now
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
+from django.contrib.auth.models import User
+
+from unixtimestampfield.fields import UnixTimeStampField
+
+from .signals import update_cache, set_child_name
+
+
+class BaseManager(models.Manager):
+    def get_queryset(self):
+        if not cache.get(self.model._meta.db_table):
+            cache.set(self.model._meta.db_table, super(BaseManager, self).get_queryset().filter(delete_flag=False),
+                      settings.CACHE_TIMEOUT)
+        return cache.get(self.model._meta.db_table)
+
+
+class Base(models.Model):
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name_plural = "Basics"
+
+    created_time = models.DateTimeField(db_index=True, default=now, editable=False, blank=True)
+    updated_time = models.DateTimeField(db_index=True, default=now, blank=True)
+    delete_flag = models.BooleanField(db_index=True, default=False)
+    child_name = models.CharField(db_index=True, max_length=50, blank=True)
+
+    objects = BaseManager()
+
+    def __str__(self):
+        return str(self.pk)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Base)
+
+
+class HashtagParent(Base):
+    title = models.CharField(db_index=True, unique=True, max_length=50, help_text='String(50)')
+    usage = models.BigIntegerField(db_index=True, default=0)
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=HashtagParent)
+# Set Child Name
+pre_save.connect(set_child_name, sender=HashtagParent)
+
+
+class Hashtag(Base):
+    title = models.CharField(db_index=True, max_length=50, help_text='String(50)')
+    related_parent = models.ForeignKey(HashtagParent, related_name='nested_mentions', blank=True, null=True,
+                                       db_index=True, on_delete=models.CASCADE, help_text='String(50)')
+    hashtag_base = models.ForeignKey(Base, related_name='base_hashtags', on_delete=models.CASCADE, blank=True,
+                                     null=True, db_index=True, help_text='Integer')
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Hashtag)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Hashtag)
+
+
+class HashtagRelation(Base):
+    hashtag_first = models.ForeignKey(HashtagParent, related_name='hashtag_first_relation', db_index=True,
+                                      on_delete=models.CASCADE, help_text='Integer')
+    hashtag_second = models.ForeignKey(HashtagParent, related_name='hashtag_second_relation', db_index=True,
+                                       on_delete=models.CASCADE, help_text='Integer')
+    active = models.BooleanField(default=True, db_index=True)
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=HashtagRelation)
+# Set Child Name
+pre_save.connect(set_child_name, sender=HashtagRelation)
+
+
+class BaseComment(Base):
+    comment_parent = models.ForeignKey(Base, related_name='base_comments', db_index=True, on_delete=models.CASCADE,
+                                       help_text='Integer')
+    comment_sender = models.ForeignKey('users.Identity', related_name='base_comment_senders', db_index=True,
+                                       on_delete=models.CASCADE, help_text='Integer')
+    comment_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, related_name="base_comment_picture",
+                                        blank=True, null=True, help_text='Integer', db_index=True)
+    text = models.TextField(help_text='Text', max_length=1000, db_index=True)
+    comment_replied = models.ForeignKey('self', related_name='base_comment_base', db_index=True,
+                                        on_delete=models.CASCADE, help_text='Integer', null=True, blank=True)
+
+    objects = BaseManager()
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseComment)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseComment)
+
+
+class Post(Base):
+    POST_TYPES = (
+        ('supply', 'عرضه'),
+        ('demand', 'تقاضا'),
+        ('post', 'پست'),
+    )
+    post_type = models.CharField(choices=POST_TYPES, db_index=True, default='post', max_length=10, help_text='supply | demand | post')
+    post_user = models.ForeignKey(User, related_name="user_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
+    post_identity = models.ForeignKey('users.Identity', related_name="identity_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
+    post_related_product = models.ForeignKey('products.Product', related_name='product_related_posts', on_delete=models.CASCADE, help_text='Integer', db_index=True, blank=True, null=True)
+    post_title = models.CharField(max_length=100, db_index=True, help_text='String(100)')
+    post_description = models.TextField(validators=[MinLengthValidator(5)], max_length=1000, db_index=True, help_text='String(1000)', blank=True, null=True)
+    post_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, db_index=True, help_text='Integer', blank=True,
+                                     null=True, default=None)
+    post_parent = models.ForeignKey(Base, related_name='base_posts', db_index=True, on_delete=models.CASCADE,
+                                    blank=True, null=True, help_text='integer')
+    post_pinned = models.BooleanField(default=False, help_text='Boolean', db_index=True)
+    post_promote = UnixTimeStampField(auto_now_add=True, use_numeric=True, help_text='Unix Time Stamp', db_index=True)
+    post_related_identity_image = models.ForeignKey(
+        'media.Media',
+        related_name='posts',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True
+    )
+    post_related_product_attach = models.ForeignKey('products.Product', related_name='product_attach_post', db_index=True,
+                                                    on_delete=models.CASCADE, blank=True, null=True, help_text='integer')
+    post_related_file = models.ForeignKey('media.Media', on_delete=models.SET, db_index=True, help_text="Integer", blank=True,
+                                          null=True, related_name='post_related_file')
+    post_related_media = models.ForeignKey('media.Media', on_delete=models.SET_NULL, db_index=True, help_text="Integer",
+                                           blank=True, null=True, related_name='post_related_media')
+    post_link = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    objects = BaseManager()
+
+    def __str__(self):
+        return str(self.pk) + ': ' + self.post_title + ' (' + self.post_identity.name + ')'
+
+    @property
+    def user_username(self):
+        return self.post_identity.name
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Post)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Post)
+
+
+class BaseCertificate(Base):
+    certificate_parent = models.ForeignKey(Base, related_name='base_certificates', db_index=True,
+                                           on_delete=models.CASCADE,
+                                           help_text='Integer')
+    certificate_identity = models.ForeignKey('users.Identity', related_name='base_certificate_senders', db_index=True,
+                                             on_delete=models.CASCADE, help_text='Integer')
+    certificate_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE,
+                                            related_name="base_certificate_picture",
+                                            help_text='Integer',
+                                            db_index=True)
+    certificate_logo = models.ForeignKey('media.Media', on_delete=models.CASCADE,
+                                         related_name="base_certificate_logo",
+                                         help_text='Integer',
+                                         db_index=True)
+    title = models.CharField(max_length=250, help_text='String(250)', db_index=True)
+    validation_flag = models.BooleanField(default=False, db_index=True)
+    validation_request_flag = models.BooleanField(default=False, db_index=True)
+
+    objects = BaseManager()
+
+    def __str__(self):
+        return "%s(%s)" % (self.certificate_identity.name, self.title)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseCertificate)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseCertificate)
+
+
+class BaseRoll(Base):
+    name = models.CharField(max_length=100, db_index=True)
+    roll_owner = models.ForeignKey(Base, related_name='base_rolls', db_index=True,
+                                   on_delete=models.CASCADE, help_text='Integer')
+    user_roll = models.ManyToManyField(User, related_name='user_rolls', help_text='Integer', db_index=True)
+
+    class Meta:
+        unique_together = ('name', 'roll_owner',)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseRoll)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseRoll)
+
+
+class RollPermission(Base):
+    permission = models.CharField(max_length=50, choices=settings.ORGANIZATION_RELATED_MODELS_ACTIONS, db_index=True)
+    roll_permission_related_roll = models.ForeignKey(BaseRoll, related_name='permission_rolls', db_index=True,
+                                                     on_delete=models.CASCADE, help_text='Integer')
+
+    class Meta:
+        unique_together = ('permission', 'roll_permission_related_roll',)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=RollPermission)
+# Set Child Name
+pre_save.connect(set_child_name, sender=RollPermission)
+
+
+class BaseCountry(Base):
+    name = models.CharField(max_length=255, db_index=True)
+    code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseCountry)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseCountry)
+
+
+class BaseProvince(Base):
+    name = models.CharField(max_length=255, db_index=True)
+    code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
+    province_related_country = models.ForeignKey(BaseCountry, related_name='province_country', db_index=True,
+                                                 on_delete=models.CASCADE, help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseProvince)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseProvince)
+
+
+class BaseTown(Base):
+    name = models.CharField(max_length=255, db_index=True)
+    code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
+    town_related_province = models.ForeignKey(BaseProvince, related_name='town_province', db_index=True,
+                                              on_delete=models.CASCADE, help_text='Integer')
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseTown)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseTown)
+
+
+class BaseSocialType(Base):
+    social_logo = models.CharField(max_length=255, db_index=True)
+    social_name = models.CharField(max_length=30, unique=True, db_index=True)
+    social_base_url = models.CharField(max_length=50, db_index=True)
+    social_sort = models.IntegerField(db_index=True)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseSocialType)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseSocialType)
+
+
+class BaseSocial(Base):
+    base_social_related_social_type = models.ForeignKey(BaseSocialType, related_name='base_social_parent',
+                                                        db_index=True, on_delete=models.CASCADE, help_text='Integer')
+    base_social_parent = models.ForeignKey(Base, related_name='social_parent', db_index=True, on_delete=models.CASCADE,
+                                           help_text='Integer')
+    base_social_value = models.CharField(max_length=256, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
+                                         help_text='String(256)', db_index=True)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BaseSocial)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BaseSocial)
+
+
+class BadgeCategory(Base):
+    badge_title = models.CharField(max_length=50, unique=True, db_index=True)
+    badge_related_media = models.ForeignKey(
+        "media.Media",
+        related_name="badge_media",
+        on_delete=models.CASCADE,
+        help_text="Integer",
+        db_index=True
+    )
+    badge_description = models.TextField(blank=True, null=True, db_index=True)
+    badge_related_user = models.ForeignKey(
+        User,
+        related_name="badge_user",
+        on_delete=models.SET_NULL,
+        help_text="Integer",
+        null=True,
+        blank=True,
+        db_index=True
+    )
+    badge_category_related_parent = models.ForeignKey(
+        Base,
+        related_name="badge_parent",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=BadgeCategory)
+# Set Child Name
+pre_save.connect(set_child_name, sender=BadgeCategory)
+
+
+class Badge(Base):
+    badge_related_badge_category = models.ForeignKey(
+        BadgeCategory,
+        related_name="badge_category",
+        on_delete=models.CASCADE,
+        help_text="Integer",
+        db_index=True
+    )
+    badge_related_parent = models.ForeignKey(
+        Base,
+        related_name="badge_base",
+        on_delete=models.CASCADE,
+        help_text="Integer",
+        db_index=True
+    )
+    badge_active = models.BooleanField(default=False, db_index=True)
+    badge_show_navigation = models.BooleanField(default=False, db_index=True)
+
+
+# Cache Model Data After Update
+post_save.connect(update_cache, sender=Badge)
+# Set Child Name
+pre_save.connect(set_child_name, sender=Badge)
+
+
+class Favorite(Base):
+    favorite_name = models.CharField(max_length=50, unique=True, db_index=True)
+    favorite_related_media = models.ForeignKey(
+        'media.Media',
+        related_name='favorite_media',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text='Integer',
+        db_index=True
+    )
+
+
+class FavoriteBase(Base):
+    favorite_base_related_parent = models.ForeignKey(
+        Base, related_name='favorite_base_parent', db_index=True,
+        on_delete=models.CASCADE,
+        help_text='Integer',
+    )
+    favorite_base_related_favorite = models.ForeignKey(
+        Favorite,
+        related_name='favorite_base_favorite',
+        on_delete=models.CASCADE,
+        help_text='Integer',
+        db_index=True
+    )
