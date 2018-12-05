@@ -80,7 +80,7 @@ class Organization(Base):
         blank=True,
         help_text='Integer',
         db_index=True)
-    biography = models.TextField(max_length=70, blank=True, null=True, help_text='String(70)', db_index=True)
+    biography = models.TextField(max_length=700, blank=True, null=True, help_text='String(70)', db_index=True)
     description = models.TextField(blank=True, null=True, help_text='Text', max_length=1000, db_index=True)
     correspondence_language = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=[],
                                          help_text='Array(String(50))', db_index=True)
