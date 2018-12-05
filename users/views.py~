@@ -432,7 +432,6 @@ class UserViewset(ModelViewSet):
                 confirm_password = request.POST["confirm_password"]
                 if password == confirm_password:
                     user_object.set_password(password)
-                    user_object.save()
                 code_object.active = False
                 code_object.used = True
                 code_object.save()
