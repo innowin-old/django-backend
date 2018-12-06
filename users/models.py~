@@ -114,9 +114,9 @@ class Profile(Base):
     profile_media = models.ForeignKey(Media, on_delete=models.CASCADE, db_index=True, related_name="users_profile_media",
                                       help_text='Integer', blank=True, null=True)
     birth_date = models.CharField(max_length=10, blank=True, db_index=True, null=True, help_text='String(10)')
-    web_site = ArrayField(models.URLField(), blank=True, db_index=True, default=[], help_text='Array')
-    phone = ArrayField(PhoneField(), blank=True, default=[], help_text='Array', db_index=True)
-    mobile = ArrayField(PhoneField(), blank=True, default=[], help_text='Array', db_index=True)
+    web_site = models.CharField(max_length=256, blank=True, db_index=True, null=True, help_text='Text')
+    phone = models.CharField(max_length=11, blank=True, null=True, help_text='Phone', validators=[RegexValidator('^[0][0-9]{10,10}$')], db_index=True)
+    mobile = models.CharField(max_length=11, blank=True, null=True, help_text='Phone', validators=[RegexValidator('^[0][9][0-9]{9,9}$')], db_index=True)
     auth_mobile = models.CharField(max_length=11, blank=True, null=True, unique=True, db_index=True,
                                    validators=[RegexValidator('^[0][9][0-9]{9,9}$')], help_text='Phone')
     fax = PhoneField(blank=True, help_text='Phone', db_index=True)

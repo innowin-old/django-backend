@@ -121,12 +121,9 @@ class Profile(Base):
                                    validators=[RegexValidator('^[0][9][0-9]{9,9}$')], help_text='Phone')
     fax = PhoneField(blank=True, help_text='Phone', db_index=True)
     telegram_account = models.CharField(
-        max_length=256, blank=True, db_index=True, validators=[
-            RegexValidator('^@[\w\d_]+$')], help_text='String(256)')
-    instagram_account = models.CharField(max_length=256, db_index=True, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
-                                         help_text='String(256)')
-    linkedin_account = models.CharField(max_length=256, db_index=True, blank=True, validators=[RegexValidator('^@[\w\d_]+$')],
-                                        help_text='String(256)')
+        max_length=256, blank=True, db_index=True, help_text='String(256)')
+    instagram_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='String(256)')
+    linkedin_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='String(256)')
     description = models.TextField(blank=True, db_index=True, help_text='Text', max_length=70)
     gender = models.CharField(
         choices=GENDER,
