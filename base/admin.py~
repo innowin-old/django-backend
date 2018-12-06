@@ -4,9 +4,18 @@ from .models import RollPermission, Post, BaseCountry, BaseProvince, BaseTown
 class PostAdmin(admin.ModelAdmin):
     list_display = ['pk', 'post_title', 'post_identity', 'post_type', 'post_user', 'post_parent']
 
+class BaseCountryAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'name', 'code']
+
+class BaseProvinceAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'name', 'code']
+
+class BaseTownAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'name', 'code']
+
 # Register your models here.
 admin.site.register(RollPermission)
 admin.site.register(Post, PostAdmin)
-admin.site.register(BaseCountry)
-admin.site.register(BaseProvince)
-admin.site.register(BaseTown)
+admin.site.register(BaseCountry, BaseCountryAdmin)
+admin.site.register(BaseProvince, BaseProvinceAdmin)
+admin.site.register(BaseTown, BaseTownAdmin)

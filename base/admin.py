@@ -8,10 +8,10 @@ class BaseCountryAdmin(admin.ModelAdmin):
     list_display = ['pk', 'name', 'code']
 
 class BaseProvinceAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'name', 'code']
+    list_display = ['pk', 'name', 'code', 'province_related_country']
 
 class BaseTownAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'name', 'code']
+    list_display = ['pk', 'name', 'code', 'town_related_province']
 
 # Register your models here.
 admin.site.register(RollPermission)
