@@ -425,7 +425,7 @@ class UserViewset(ModelViewSet):
     @list_route(methods=['get'])
     def search_users(self, request):
         try:
-            user = User.objects.filter(Q(username=request.GET['input']) || Q(mobile=request.GET['input']) || Q(email=request.GET['input']))
+            user = User.objects.filter(Q(username=request.GET['input']) || Q(email=request.GET['input']))
             if user.count() > 0:
                 user = user[0]
                 serializer = UserSerializer(user)
