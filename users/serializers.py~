@@ -245,6 +245,8 @@ class UserSerializer(ModelSerializer):
                   'description', 'phone', 'mobile', 'auth_mobile']
 
     def create(self, validated_data):
+        validated_data['username'] = validated_data['username'].lower()
+        validated_data['username'] = validated_data['username'].replace('.', '')
         user_validated_data = self.get_user_validated_args(**validated_data)
         user = User.objects.create(**user_validated_data)
         user.set_password(validated_data['password'])

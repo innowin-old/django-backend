@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -420,6 +421,19 @@ class UserViewset(ModelViewSet):
             'errors': errors
         }
         return Response(response)
+
+    @list_route(methods=['get'])
+    def search_users(self, request):
+        try:
+            user = User.objects.filter(Q(username=request.GET['input']) || Q(mobile=request.GET['input']) || Q(email=request.GET['input']))
+            if user.count() > 0:
+                user = user[0]
+                serializer = UserSerializer(user)
+                return Response(serializer.data)
+            else:
+                return Response({'status': 'NOT_FOUND'})
+        except Exception as e:
+            return Response({'status': 'FAILED'})
 
     @list_route(methods=['post', 'get'])
     def password_reset_by_sms(self, request):

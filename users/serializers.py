@@ -224,6 +224,27 @@ class SuperAdminUserSerializer(ModelSerializer):
         return profile_kwargs
 
 
+class UserSearchSerializer(ModelSerializer):
+    public_email = EmailField(required=False)
+    national_code = CharField(required=False, max_length=20, allow_blank=True)
+    profile_media = IntegerField(required=False, allow_null=True)
+    birth_date = CharField(required=False, max_length=10, allow_blank=True)
+    fax = CharField(required=False, allow_blank=True)
+    telegram_account = CharField(required=False, max_length=256, allow_blank=True)
+    description = CharField(required=False, allow_blank=True)
+    web_site = ListField(child=URLField(required=False), required=False)
+    phone = ListField(child=CharField(max_length=23, required=False), required=False)
+    mobile = ListField(child=CharField(max_length=23, required=False), required=False)
+    password = CharField(max_length=255)
+    auth_mobile = CharField(required=False, validators=[RegexValidator('^[0][9][0-9]{9,9}$')])
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'password', 'date_joined',
+                  'web_site', 'public_email', 'national_code', 'profile_media', 'birth_date', 'fax', 'telegram_account',
+                  'description', 'phone', 'mobile', 'auth_mobile']
+
+
 class UserSerializer(ModelSerializer):
     public_email = EmailField(required=False)
     national_code = CharField(required=False, max_length=20, allow_blank=True)
