@@ -424,11 +424,11 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['get'], permission_classes=[AllowAny])
     def search_users(self, request):
-        user = User.objects.filter(username=request.GET['input'])
+        user = User.objects.filter(username=request.POST['input'])
         if user.count() > 0:
             user = user[0]
-            # serializer = UserSerializer(user)
-            return Response(dict(id=user.id))
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
         else:
             return Response({'status': 'NOT_FOUND'})
 
