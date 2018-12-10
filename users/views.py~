@@ -424,7 +424,7 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['get'], permission_classes=[AllowAny])
     def search_users(self, request):
-        user = User.objects.filter(Q(username=request.POST['input']) || Q(email=request.POST['input']))
+        user = User.objects.filter(Q(username=request.POST['input']) | Q(email=request.POST['input']))
         if user.count() > 0:
             user = user[0]
             profile = Profile.objects.filter(profile_user_id=user.id)[0]
