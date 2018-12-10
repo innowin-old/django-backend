@@ -424,16 +424,13 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['get'], permission_classes=[AllowAny])
     def search_users(self, request):
-        try:
-            user = User.objects.filter(username=request.GET['input'])
-            if user.count() > 0:
-                user = user[0]
-                # serializer = UserSerializer(user)
-                return Response(dict(id=user.id))
-            else:
-                return Response({'status': 'NOT_FOUND'})
-        except Exception as e:
-            return Response({'status': 'FAILED'})
+        user = User.objects.filter(username=request.GET['input'])
+        if user.count() > 0:
+            user = user[0]
+            # serializer = UserSerializer(user)
+            return Response(dict(id=user.id))
+        else:
+            return Response({'status': 'NOT_FOUND'})
 
     @list_route(methods=['post', 'get'])
     def password_reset_by_sms(self, request):
