@@ -430,7 +430,7 @@ class UserViewset(ModelViewSet):
             profile = Profile.objects.filter(profile_user_id=user.id)[0]
             # serializer = UserSerializer(user)
             mobile = profile.auth_mobile
-            mobile = mobile[:1] + "*******" + mobile[-2:]
+            mobile = mobile[:2] + "*******" + mobile[-2:]
             return Response(dict(id=user.id, email=user.email, mobile=mobile))
         else:
             return Response({'status': 'NOT_FOUND'})
