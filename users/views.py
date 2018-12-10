@@ -424,14 +424,14 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['get'], permission_classes=[AllowAny])
     def search_users(self, request):
-        user = User.objects.filter(username=request.POST['input'])
+        user = User.objects.filter(Q(username=request.POST['input']) || Q(email=request.POST['input']))
         if user.count() > 0:
             user = user[0]
             profile = Profile.objects.filter(profile_user_id=user.id)[0]
             # serializer = UserSerializer(user)
             mobile = profile.auth_mobile
-            mobile = mobile[:2] + "*******" + mobile[-2:]
-            return Response(dict(id=user.id, email=user.email, mobile=mobile))
+            mobile = mobile[:1] + "*******" + mobile[-2:]
+            return Response(dict(id=user.id, username=user.username, email=user.email, mobile=mobile))
         else:
             return Response({'status': 'NOT_FOUND'})
 
