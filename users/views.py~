@@ -422,7 +422,7 @@ class UserViewset(ModelViewSet):
         }
         return Response(response)
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=[AllowAny])
     def search_users(self, request):
         try:
             user = User.objects.filter(username=request.GET['input'])

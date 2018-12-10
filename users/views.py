@@ -428,8 +428,8 @@ class UserViewset(ModelViewSet):
             user = User.objects.filter(username=request.GET['input'])
             if user.count() > 0:
                 user = user[0]
-                serializer = UserSerializer(user)
-                return Response(serializer.data)
+                # serializer = UserSerializer(user)
+                return Response(dict(id=user.id))
             else:
                 return Response({'status': 'NOT_FOUND'})
         except Exception as e:
