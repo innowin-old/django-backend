@@ -427,8 +427,9 @@ class UserViewset(ModelViewSet):
         user = User.objects.filter(username=request.POST['input'])
         if user.count() > 0:
             user = user[0]
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+            profile = Profile.objects.filter(profile_user_id=user.id)[0]
+            # serializer = UserSerializer(user)
+            return Response(dict(id=user.id, email=user.email, mobile=user.auth_mobile))
         else:
             return Response({'status': 'NOT_FOUND'})
 
