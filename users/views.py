@@ -422,7 +422,7 @@ class UserViewset(ModelViewSet):
         }
         return Response(response)
 
-    @list_route(methods=['get'], permission_classes=[AllowAny])
+    @list_route(methods=['get', 'post'], permission_classes=[AllowAny])
     def search_users(self, request):
         user = User.objects.filter(Q(username=request.POST['input']) | Q(email=request.POST['input']))
         profile = Profile.objects.filter(auth_mobile=request.POST['input'])

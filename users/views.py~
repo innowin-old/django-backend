@@ -435,7 +435,7 @@ class UserViewset(ModelViewSet):
             return Response(dict(id=user.id, username=user.username, email=user.email, mobile=mobile))
         elif profile.count() > 0:
             profile = profile[0]
-            user = User.objects.filter(id=prfile.profile_user_id)[0]
+            user = User.objects.filter(id=profile.profile_user_id)[0]
             mobile = profile.auth_mobile
             mobile = mobile[:2] + "*******" + mobile[-2:]
             return Response(dict(id=user.id, username=user.username, email=user.email, mobile=mobile))
