@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from users.models import Profile, Education, Research, Certificate, \
-    WorkExperience, Skill, Identity
+    WorkExperience, Skill, Identity, DefaultHeader
 
 
 class ProfileInline(admin.StackedInline):
@@ -43,6 +43,10 @@ class SkillAdmin(admin.ModelAdmin):
     list_display = ['skill_user', 'title', 'tag']
 
 
+class DefaultHeaderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'default_header_related_file']
+
+
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Education, EducationAdmin)
@@ -51,3 +55,4 @@ admin.site.register(Certificate, CertificateAdmin)
 admin.site.register(WorkExperience, WorkExperienceAdmin)
 admin.site.register(Skill, SkillAdmin)
 admin.site.register(Identity)
+admin.site.register(DefaultHeader, DefaultHeaderAdmin)
