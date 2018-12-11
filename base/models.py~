@@ -220,6 +220,9 @@ class BaseCountry(Base):
     name = models.CharField(max_length=255, db_index=True)
     code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
 
+    def __str__(self):
+        return self.name
+
 
 # Cache Model Data After Update
 post_save.connect(update_cache, sender=BaseCountry)
@@ -230,8 +233,10 @@ pre_save.connect(set_child_name, sender=BaseCountry)
 class BaseProvince(Base):
     name = models.CharField(max_length=255, db_index=True)
     code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
-    province_related_country = models.ForeignKey(BaseCountry, related_name='province_country', db_index=True,
-                                                 on_delete=models.CASCADE, help_text='Integer')
+    province_related_country = models.ForeignKey(BaseCountry, related_name='province_country', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+
+    def __str__(self):
+        return self.name
 
 
 # Cache Model Data After Update
@@ -245,6 +250,9 @@ class BaseTown(Base):
     code = models.CharField(max_length=10, blank=True, null=True, db_index=True)
     town_related_province = models.ForeignKey(BaseProvince, related_name='town_province', db_index=True,
                                               on_delete=models.CASCADE, help_text='Integer')
+
+    def __str__(self):
+        return self.name
 
 
 # Cache Model Data After Update
