@@ -547,3 +547,7 @@ class UserCode(Base):
     active = models.BooleanField(default=True, db_index=True)
     used = models.BooleanField(default=False, db_index=True)
     type = models.CharField(max_length=5, choices=TYPE_CHOICES, default='email', db_index=True)
+
+
+class DefaultHeader(Base):
+    default_header_related_file = models.ForeignKey(Media, related_name='default_header_related_file', db_index=True, on_delete=models.CASCADE, help_text='Integer')
