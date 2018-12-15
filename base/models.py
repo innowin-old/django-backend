@@ -116,7 +116,7 @@ class Post(Base):
     post_identity = models.ForeignKey('users.Identity', related_name="identity_posts", on_delete=models.CASCADE, help_text='Integer', db_index=True)
     post_related_product = models.ForeignKey('products.Product', related_name='product_related_posts', on_delete=models.CASCADE, help_text='Integer', db_index=True, blank=True, null=True)
     post_title = models.CharField(max_length=100, db_index=True, help_text='String(100)', null=True, blank=True)
-    post_description = models.TextField(validators=[MinLengthValidator(5)], max_length=1000, db_index=True, help_text='String(1000)', blank=True, null=True)
+    post_description = models.TextField(validators=[MinLengthValidator(5)], max_length=4096, db_index=True, help_text='String(1000)', blank=True, null=True)
     post_picture = models.ForeignKey('media.Media', on_delete=models.CASCADE, db_index=True, help_text='Integer', blank=True,
                                      null=True, default=None)
     post_parent = models.ForeignKey(Base, related_name='base_posts', db_index=True, on_delete=models.CASCADE,
