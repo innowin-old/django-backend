@@ -473,7 +473,7 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['post', 'get'])
     def password_reset_by_sms_request(self, request):
-        profile_object = Profile.objects.get(auth_mobile=request.POST["mobile"])
+        profile_object = Profile.objects.get(profile_user_id=request.POST["user_id"])
         user_object = profile_object.profile_user
         profile = Profile.objects.get(profile_user=user_object)
         if profile.auth_mobile != '':
