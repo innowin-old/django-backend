@@ -1151,7 +1151,8 @@ class ForgetPasswordViewset(ViewSet):
                 message = settings.EMAIL_TEXT + '\n' + ' کد : ' + str(user_code.code)
                 email_from = settings.EMAIL_HOST_USER
                 recipient_list = [user.email, ]
-                send_mail(subject, message, email_from, recipient_list)
+                # send_mail(subject, message, email_from, recipient_list)
+                send_mail('Subject', 'Test', 'saeidrd90@gmail.com', ['saeid@varpex.com'], fail_silently=False)
             return Response({'detail': 'code sended'}, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'invalid data'}, status=status.HTTP_400_BAD_REQUEST)
