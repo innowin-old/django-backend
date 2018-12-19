@@ -1171,16 +1171,19 @@ class UserCodeViewset(ModelViewSet):
     def change_password(self, request):
         code = request.data.get('code', None)
         password = request.data.get('password')
-        if code is not None:
+	confirm_password = request.data.get('confirm_password')
+        if code is not None and password == confirm_password:
             try:
                 user_code = UserCode.objects.get(code=code, used=False)
             except UserCode.DoesNotExist:
                 return Response({'detail': 'code not found or used before'}, status=status.HTTP_404_NOT_FOUND)
             user = User.objects.get(pk=user_code.user_id)
             user.set_password(password)
+            user.save()
             user_code.used = True
             user_code.save()
-        return Response({'detail': 'password changed'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'password changed'}, status=status.HTTP_200_OK)
+	return Response({'detail': 'please send correct code and password'}, status=status.HTTP_200_OK)
 
 
 def login_page(request):
