@@ -18,29 +18,29 @@ class CustomUserAdmin(UserAdmin):
 
 class EducationAdmin(admin.ModelAdmin):
     model = Education
-    list_display = ['education_user', 'grade', 'university', 'field_of_study',
+    list_display = ['id', 'education_user', 'grade', 'university', 'field_of_study',
                     'from_date', 'to_date', 'average', 'description']
 
 
 class ResearchAdmin(admin.ModelAdmin):
     model = Research
-    list_display = ['research_user', 'title', 'author', 'publication', 'year']
+    list_display = ['id', 'research_user', 'title', 'author', 'publication', 'year']
 
 
 class CertificateAdmin(admin.ModelAdmin):
     model = Certificate
-    list_display = ['certificate_user', 'title']
+    list_display = ['id', 'certificate_user', 'title']
 
 
 class WorkExperienceAdmin(admin.ModelAdmin):
     model = WorkExperience
-    list_display = ['work_experience_user', 'name', 'work_experience_organization', 'position',
+    list_display = ['id', 'work_experience_user', 'name', 'work_experience_organization', 'position',
                     'from_date', 'to_date', 'status']
 
 
 class SkillAdmin(admin.ModelAdmin):
     model = Skill
-    list_display = ['skill_user', 'title', 'tag']
+    list_display = ['id', 'skill_user', 'title', 'tag']
 
 
 class DefaultHeaderAdmin(admin.ModelAdmin):
