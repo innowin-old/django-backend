@@ -1123,7 +1123,7 @@ class ForgetPasswordViewset(ViewSet):
         forget_password_serializer = ForgetPasswordSerializer(data=request.POST)
         if forget_password_serializer.is_valid():
             send_sms = False
-            if 'email' in forget_password_serializer.validated_data:
+            """if 'email' in forget_password_serializer.validated_data:
                 try:
                     user = User.objects.get(email=forget_password_serializer.validated_data['email'])
                 except User.DoesNotExist:
@@ -1136,7 +1136,11 @@ class ForgetPasswordViewset(ViewSet):
                     return Response({'detail': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
                 user = User.objects.get(pk=profile.profile_user)
             else:
-                return Response({'detail': 'please insert email or mobile'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'please insert email or mobile'}, status=status.HTTP_400_BAD_REQUEST)"""
+            try:
+                user = User.objects.get(pk=request.POST['user_id'])
+            except User.DoesNotExist:
+                return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
             random_number = random_with_N_digits(5)
             # code = '‫‪WiniO-‬‬' + str(random_number)
             user_code = UserCode.objects.create(code=random_number, user=user)
