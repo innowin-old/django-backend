@@ -1131,7 +1131,7 @@ class ForgetPasswordViewset(ViewSet):
             elif 'mobile' in forget_password_serializer.validated_data:
                 send_sms = True
                 try:
-                    profile = Profile.objects.get(mobile__in=forget_password_serializer.validated_data['mobile'])
+                    profile = Profile.objects.get(auth_mobile=forget_password_serializer.validated_data['mobile'])
                 except Profile.DoesNotExist:
                     return Response({'detail': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
                 user = User.objects.get(pk=profile.profile_user)
