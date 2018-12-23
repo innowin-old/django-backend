@@ -19,13 +19,12 @@ itypes==1.1.0
 Jinja2==2.10
 MarkupSafe==1.0
 moviepy==0.2.3.2
-numpy==1.14.1
 oauthlib==2.0.1
 olefile==0.44
 parameterized==0.6.1
-Pillow==4.0.0
+Pillow
 promise==1.0.1
-psycopg2==2.7.3.2
+psycopg2
 pybase64==0.2.1
 PyJWT==1.5.3
 python-memcached==1.59

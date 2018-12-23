@@ -467,7 +467,7 @@ class UserViewset(ModelViewSet):
 
     @list_route(methods=['post'])
     def password_reset_by_sms_check_code(self, request):
-        code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST['user_id'], type='sms')
+        code_object = UserCode.objects.filter(code=request.POST["code"], active=True, used=False, user_id=request.POST['user_id'])
         if code_object.count() > 0:
             return Response({"status": "OK"})
         else:
