@@ -46,10 +46,23 @@ class ExchangeSerializer(BaseSerializer):
 
 
 class ExchangeMiniSerializer(BaseSerializer):
+    supply_count = serializers.SerializerMethodField()
+    demand_count = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Exchange
         depth = 1
         exclude = ['created_time', 'updated_time', 'delete_flag', 'active_flag', 'child_name']
+
+    def get_supply_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='supply').count()
+
+    def get_demand_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='demand').count()
+
+    def get_post_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='post').count()
 
 
 class ExchangeIdentityListViewSerializer(BaseSerializer):
