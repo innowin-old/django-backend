@@ -9,6 +9,10 @@ from base.models import Post
 
 # Create Serializers Here
 class ExchangeSerializer(BaseSerializer):
+    supply_count = serializers.SerializerMethodField()
+    demand_count = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Exchange
         exclude = ['child_name']
