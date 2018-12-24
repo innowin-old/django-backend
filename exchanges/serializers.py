@@ -4,6 +4,7 @@ from organizations.serializers import FollowListSerializer
 from .models import Exchange, ExchangeIdentity
 from users.models import Identity, Profile, StrengthStates
 from users.serializers import IdentityMiniSerializer
+from base.models import Post
 
 
 # Create Serializers Here
@@ -15,6 +16,15 @@ class ExchangeSerializer(BaseSerializer):
             'owner': {'required': False},
             'updated_time': {'read_only': True}
         }
+
+    def get_supply_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='supply').count()
+
+    def get_demand_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='demand').count()
+
+    def get_post_count(self, obj):
+        return Post.objects.filter(post_parent_id=obj.id, post_type='post').count()
 
     def create(self, validated_data):
         request = self.context.get("request")
