@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import re
 import uuid
+import random
 
 from django.db import models, transaction
 from django.db.models.signals import post_save, pre_save
@@ -98,6 +99,9 @@ def create_profile(sender, instance, created, **kwargs):
     if created:
         profile = Profile.objects.create(profile_user=instance)
         profile.profile_secret_key = str(uuid.uuid4())
+        headers = DefaultHeader.objects.all()
+        if headers.count() > 0:
+            profile.profile_banner_id = headers[random.randint(0, headers.count())].id
         profile.save()
 
 
