@@ -181,7 +181,7 @@ class PostSerializer(BaseSerializer):
             exchange = Exchange.objects.filter(id=post.post_parent_id)
             if exchange.count() > 0:
                 exchange = exchange[0]
-                exchange.post_count = Post.object.filter(post_parent_id=exchange.id, post_type='post').count()
+                exchange.post_count = Post.objects.filter(post_parent_id=exchange.id, post_type='post').count()
                 exchange.save()
         if post.post_type == 'post':
             self.check_post_profile_strength()
