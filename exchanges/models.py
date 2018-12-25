@@ -48,6 +48,9 @@ class Exchange(Base):
     members_count = models.BigIntegerField(default=100, help_text='BigInteger', db_index=True)
     is_default_exchange = models.BooleanField(default=False, help_text='Boolean', db_index=True)
     active_flag = models.BooleanField(default=True, help_text='Boolean', db_index=True)
+    supply_count = models.IntegerField(default=0)
+    demand_count = models.IntegerField(default=0)
+    post_count = models.IntegerField(default=0)
 
     objects = BaseManager()
 

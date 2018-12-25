@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from django.db.models import Q
+from exchanges.models import Exchange
 
 from users.models import Identity, Profile, StrengthStates
 from .models import (
@@ -164,6 +165,24 @@ class PostSerializer(BaseSerializer):
             validated_data['post_user'] = request.user
         post = Post.objects.create(**validated_data)
         post.save()
+        if post.post_type == 'supply':
+            exchange = Exchange.objects.filter(id=post.post_parent_id)
+            if exchange.count() > 0:
+                exchange = exchange[0]
+                exchange.supply_count = Post.objects.filter(post_parent_id=exchange.id, post_type='supply').count()
+                exchange.save()
+        elif post.post_type == 'demand':
+            exchange = Exchange.objects.filter(id=post.post_parent_id)
+            if exchange.count() > 0:
+                exchange = exchange[0]
+                exchange.demand_count = Post.objects.filter(post_parent_id=exchange.id, post_type='demand').count()
+                exchange.save()
+        elif post.post_type == 'post':
+            exchange = Exchange.objects.filter(id=post.post_parent_id)
+            if exchange.count() > 0:
+                exchange = exchange[0]
+                exchange.post_count = Post.object.filter(post_parent_id=exchange.id, post_type='post').count()
+                exchange.save()
         if post.post_type == 'post':
             self.check_post_profile_strength()
         else:
