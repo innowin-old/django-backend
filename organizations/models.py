@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.core.validators import MinLengthValidator, MaxLengthValidator
+from django.core.validators import MinLengthValidator, MaxLengthValidator, RegexValidator
 from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -46,7 +46,7 @@ class Organization(Base):
     province = models.CharField(max_length=50, db_index=True, null=True, blank=True, help_text='String(50)')
     city = models.CharField(max_length=50, db_index=True, null=True, blank=True, help_text='String(50)')
     address = models.TextField(blank=True, null=True, db_index=True, help_text='Text')
-    phone = ArrayField(PhoneField(), blank=True, null=True, db_index=True, default=[], help_text='Phone')
+    phone = models.CharField(max_length=11, blank=True, null=True, help_text='Phone', validators=[RegexValidator('^[0][0-9]{10,10}$')], db_index=True)
     web_site = models.TextField(max_length=100, null=True, db_index=True, blank=True, help_text='URL')
     established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
     ownership_type = models.CharField(
