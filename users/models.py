@@ -566,7 +566,7 @@ class UniversityModel(Base):
 
 
 class UniversityField(Base):
-    university_title = models.CharField(max_length=128, db_index=True, unique=True)
+    university_field_title = models.CharField(max_length=128, db_index=True, unique=True)
 
 
 # post_save(update_cache, sender=UniversityField)

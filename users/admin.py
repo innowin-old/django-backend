@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from users.models import Profile, Education, Research, Certificate, \
-    WorkExperience, Skill, Identity, DefaultHeader
+    WorkExperience, Skill, Identity, DefaultHeader, UniversityModel, UniversityField
 
 
 class ProfileInline(admin.StackedInline):
@@ -47,6 +47,14 @@ class DefaultHeaderAdmin(admin.ModelAdmin):
     list_display = ['id', 'default_header_related_file']
 
 
+class UniversityModelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'university_title', 'university_town']
+
+
+class UniversityFieldAdmin(admin.ModelAdmin):
+    list_display = ['id', 'university_field_title']
+
+
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Education, EducationAdmin)
@@ -56,3 +64,5 @@ admin.site.register(WorkExperience, WorkExperienceAdmin)
 admin.site.register(Skill, SkillAdmin)
 admin.site.register(Identity)
 admin.site.register(DefaultHeader, DefaultHeaderAdmin)
+admin.site.register(UniversityModel, UniversityModelAdmin)
+admin.site.register(UniversityField, UniversityFieldAdmin)
