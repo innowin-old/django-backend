@@ -42,7 +42,11 @@ from .models import (
     UserMetaData,
     AgentRequest,
     StrengthStates,
-    BlockIdentity, UserCode)
+    BlockIdentity,
+    UserCode,
+    UniversityModel,
+    UniversityField
+)
 
 from .serializers import (
     SuperAdminUserSerializer,
@@ -66,7 +70,12 @@ from .serializers import (
     AgentRequestSerializer,
     AgentRequestAdminSerializer,
     StrengthStatesSerializer,
-    BlockIdentitySerializer, UserCodeSerializer, UserExploreSerializer)
+    BlockIdentitySerializer,
+    UserCodeSerializer,
+    UserExploreSerializer,
+    UniversityModelSerializer,
+    UniversityFieldSerializer
+)
 from .permissions import IsUrlOwnerOrReadOnly, IsAuthenticatedOrCreateOnly, IsDeviceOwnerOrReadOnly
 
 
@@ -1188,6 +1197,28 @@ class UserCodeViewset(ModelViewSet):
             user_code.save()
             return Response({'detail': 'password changed'}, status=status.HTTP_200_OK)
         return Response({'detail': 'please send correct code and password'}, status=status.HTTP_200_OK)
+
+
+class UniveristyModelViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = UniversityModel.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UniversityModelSerializer
+
+
+class UniversityFieldViewset(ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = UniversityField.objects.all()
+        return queryset
+
+    def get_serializer_class(self):
+        return UniversityFieldSerializer
 
 
 def login_page(request):

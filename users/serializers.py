@@ -37,7 +37,10 @@ from .models import (
     UserMetaData,
     AgentRequest,
     BlockIdentity,
-    UserCode)
+    UserCode,
+    UniversityModel,
+    UniversityField
+)
 from .utils import add_user_to_default_exchange, add_organization_to_default_exchange
 
 
@@ -1078,3 +1081,21 @@ class UserCodeSerializer(BaseSerializer):
             validated_data['user'] = request.user
         user_code = UserCode.objects.create(**validated_data)
         return user_code
+
+
+class UniversityModelSerializer(BaseSerializer):
+    class Meta:
+        model = UniversityModel
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
+
+
+class UniversityFieldSerializer(BaseSerializer):
+    class Meta:
+        model = UniversityField
+        exclude = ['child_name']
+        extra_kwargs = {
+            'updated_time': {'read_only': True}
+        }
