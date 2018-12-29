@@ -16,7 +16,7 @@ class MediaSeriaizer(ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ('id', 'identity', 'file', 'uploader', 'create_time', 'info', 'delete_flag', 'file_string', 'file_usage')
+        fields = ('id', 'file_related_parent', 'identity', 'file', 'uploader', 'create_time', 'info', 'delete_flag', 'file_string', 'file_usage')
 
     def create(self, validated_data):
         data = validated_data.pop('file_string')

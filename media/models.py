@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
-from base.models import BaseManager
+from base.models import BaseManager, Base
 from base.signals import update_cache
 from media.MediaStorage import MediaStorage
 
@@ -23,6 +23,7 @@ media_file_storage = MediaStorage(location=settings.MEDIA_DIR)
 
 
 class Media(models.Model):
+    file_related_parent = models.ForeignKey(Base, related_name='file_related_parent', on_delete=models.CASCADE, blank=True, null=True, help_text='این فیلد بیانگر شناسه مدلی است که فایل به آن مربوط هست')
     identity = models.ForeignKey(
         'users.Identity',
         related_name="identity_medias",
