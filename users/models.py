@@ -555,3 +555,18 @@ class UserCode(Base):
 
 class DefaultHeader(Base):
     default_header_related_file = models.ForeignKey(Media, related_name='default_header_related_file', db_index=True, on_delete=models.CASCADE, help_text='Integer')
+
+
+class University(Base):
+    title = models.CharField(max_length=128, on_index=True, unique=True)
+    university_town = models.ForeignKey(BaseTown, related_name="university_town", on_delete=models.CASCADE, on_index=True, help_text='Integer')
+
+
+post_save(update_cache, sender=University)
+
+
+class UniversityField(Base):
+    title = models.CharField(max_length=128, on_index=True, unique=True)
+
+
+post_save(update_cache, sender=UniversityField)
