@@ -557,8 +557,8 @@ class DefaultHeader(Base):
     default_header_related_file = models.ForeignKey(Media, related_name='default_header_related_file', db_index=True, on_delete=models.CASCADE, help_text='Integer')
 
 
-class University(Base):
-    title = models.CharField(max_length=128, db_index=True, unique=True)
+class UniversityModel(Base):
+    university_title = models.CharField(max_length=128, db_index=True, unique=True)
     university_town = models.ForeignKey(BaseTown, related_name="university_town", on_delete=models.CASCADE, db_index=True, help_text='Integer')
 
 
@@ -566,7 +566,7 @@ class University(Base):
 
 
 class UniversityField(Base):
-    title = models.CharField(max_length=128, db_index=True, unique=True)
+    university_title = models.CharField(max_length=128, db_index=True, unique=True)
 
 
 # post_save(update_cache, sender=UniversityField)
