@@ -562,11 +562,11 @@ class University(Base):
     university_town = models.ForeignKey(BaseTown, related_name="university_town", on_delete=models.CASCADE, db_index=True, help_text='Integer')
 
 
-post_save(update_cache, sender=University)
+# post_save(update_cache, sender=University)
 
 
 class UniversityField(Base):
     title = models.CharField(max_length=128, db_index=True, unique=True)
 
 
-post_save(update_cache, sender=UniversityField)
+# post_save(update_cache, sender=UniversityField)
