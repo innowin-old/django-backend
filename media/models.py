@@ -41,8 +41,10 @@ class Media(models.Model):
     )
     uploader = models.ForeignKey(User, related_name="medias",
                                  on_delete=models.SET_NULL,
-                                 null=True, blank=True,
-                                 db_index=True)
+                                 null=True,
+                                 blank=True,
+                                 db_index=True,
+                                 help_text='شناسه کاربری است که آپلود فایل را انجام می دهد. این فیلد به صورت سیستمی ذخیره می شود و نیازی نیست توسط فرانت مقدار بگیرد')
     create_time = models.DateTimeField(auto_now_add=True, db_index=True)
     info = models.TextField(default='{}', db_index=True)
     delete_flag = models.BooleanField(db_index=True, default=False)
