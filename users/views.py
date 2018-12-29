@@ -1199,7 +1199,7 @@ class UserCodeViewset(ModelViewSet):
         return Response({'detail': 'please send correct code and password'}, status=status.HTTP_200_OK)
 
 
-class UniveristyModelViewset(ModelViewSet):
+class UniversityModelViewset(ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_queryset(self):

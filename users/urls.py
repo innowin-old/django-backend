@@ -24,7 +24,11 @@ from .views import (
     login_page,
     logout_page,
     active_user,
-    BlockIdentityViewset, UserCodeViewset)
+    BlockIdentityViewset,
+    UserCodeViewset,
+    UniversityModelViewset,
+    UniversityFieldViewset
+)
 
 
 router = DefaultRouter()
@@ -47,6 +51,8 @@ router.register(r'urls', IdentityUrlViewset, 'urls')
 router.register(r'user-meta', UserMetaDataViewset, 'user-meta')
 router.register(r'user-articles', UserArticleViewset, 'articles')
 router.register(r'user-articles-ris', UserArticleRisViewset, 'articles-ris')
+router.register(r'universities', UniversityModelViewset, 'universities')
+router.register(r'university-fields', UniversityFieldViewset, 'university-fields')
 router.register(r'', UserViewset, 'users')
 
 
