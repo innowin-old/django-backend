@@ -37,6 +37,7 @@ class Media(models.Model):
         storage=media_file_storage,
         blank=True,
         null=True,
+        help_text='فایل مورد نظر برای ذخیره'
     )
     uploader = models.ForeignKey(User, related_name="medias",
                                  on_delete=models.SET_NULL,
