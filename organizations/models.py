@@ -48,7 +48,7 @@ class Organization(Base):
     address = models.TextField(blank=True, null=True, db_index=True, help_text='Text')
     phone = models.CharField(max_length=11, blank=True, null=True, help_text='Phone', validators=[RegexValidator('^[0][0-9]{10,10}$')], db_index=True)
     web_site = models.TextField(max_length=100, null=True, db_index=True, blank=True, help_text='URL')
-    established_year = models.IntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
+    established_year = models.PositiveIntegerField(null=True, db_index=True, blank=True, help_text='Integer', validators=[MaxLengthValidator(4)])
     ownership_type = models.CharField(
         choices=OWNERSHIP_TYPES,
         max_length=20,
