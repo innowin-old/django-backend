@@ -30,8 +30,9 @@ class Exchange(Base):
         db_index=True,
     )
     link = models.URLField(blank=True, help_text='Url', db_index=True)
+    biography = models.CharField(max_length=100, null=True, blank=True, db_index=True, help_text='معرفی مختصر درباره پنجره')
     description = models.TextField(
-        max_length=100,
+        max_length=700,
         blank=True,
         db_index=True,
         help_text='Integer',
