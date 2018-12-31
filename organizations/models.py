@@ -86,7 +86,7 @@ class Organization(Base):
                                          help_text='Array(String(50))', db_index=True)
     social_network = ArrayField(models.CharField(max_length=100), blank=True, null=True, default=[],
                                 help_text='Array(String(100))', db_index=True)
-    staff_count = models.IntegerField(null=True, blank=True, help_text='Integer', db_index=True)
+    staff_count = models.IntegerField(null=True, blank=True, help_text='تعداد پرسنل این سازمان که در سامانه حضور دارند را نمایش می دهد', db_index=True)
     active_flag = models.BooleanField(default=False, db_index=True)
 
     objects = BaseManager()

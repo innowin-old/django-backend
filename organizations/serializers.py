@@ -238,6 +238,10 @@ class ConfirmationSerializer(BaseSerializer):
             else:
                 experience.status = "WITHOUT_CONFIRM"
             experience.save()
+            if validated_data.get('confirm_flag') is True:
+                organization = Organization.objects.filter(id=experience.work_experience_organization_id)[0]
+                organization.staff_count = WorkExperience.objects.filter(work_experience_organization_id=organization.id, status="CONFIRMED").count()
+                organization.save()
         for key in validated_data:
             setattr(instance, key, validated_data.get(key))
         instance.save()
