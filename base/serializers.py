@@ -110,6 +110,10 @@ class BaseCommentSerializer(BaseSerializer):
             identity = Identity.objects.get(identity_user=request.user)
             validated_data['comment_sender'] = identity
         comment = BaseComment.objects.create(**validated_data)
+        # حال تعداد کامنت های مربوط به هر مدل بیس را در فیلد مربوطه ذخیره می کنیم
+        base_instance = Base.objects.filter(id=comment.comment_parent_id)[0]
+        base_instance.comments_count = BaseComment.objects.filter(comment_parent_id=base_instance.id).count()
+        base_instance.save()
         return comment
 
 
