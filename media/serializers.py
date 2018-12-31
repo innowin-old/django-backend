@@ -6,8 +6,9 @@ from rest_framework.serializers import ModelSerializer, CharField
 from .models import Media
 from users.models import Identity
 from django.contrib.auth.models import User
+from base.models import Base
 
-from .utils import compress_video, compress_image
+from .utils import compress_video, compress_image, set_files_count
 
 
 class MediaSeriaizer(ModelSerializer):
@@ -38,6 +39,8 @@ class MediaSeriaizer(ModelSerializer):
         if 'file_usage' in validated_data:
             validated_data.pop('file_usage')
         media = Media.objects.create(**validated_data)
+        if validated_data.get('file_related_parent', '') != '':
+            set_files_count(validated_data.get('file_related_parent', 0))
         return media
 
 

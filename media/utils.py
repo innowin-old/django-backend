@@ -4,6 +4,8 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from moviepy.editor import *
 import sys
+from base.models import Base
+from .models import Media
 
 
 def compress_video(file):
@@ -35,3 +37,9 @@ def compress_image(image, usage):
 
 def get_file_name(file):
     return os.path.basename(file.name)
+
+
+def set_files_count(id):
+    base_instance = Base.objects.filter(id=id)[0]
+    base_instance.files_count = Media.objects.filter(file_related_parent_id=id).count()
+    base_instance.save()
