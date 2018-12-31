@@ -169,6 +169,10 @@ class PostSerializer(BaseSerializer):
             validated_data['post_user'] = request.user
         post = Post.objects.create(**validated_data)
         post.save()
+        if post.post_parent != None:
+            base_parent = Base.objects.filter(id=post.post_parent_id)[0]
+            base_parent.posts_count = Post.objects.filter(post_parent_id=post.id).count()
+            base_parent.save()
         if post.post_type == 'supply':
             exchange = Exchange.objects.filter(id=post.post_parent_id)
             if exchange.count() > 0:

@@ -31,6 +31,7 @@ class Base(models.Model):
     child_name = models.CharField(db_index=True, max_length=50, blank=True)
     files_count = models.PositiveIntegerField(default=0, db_index=True)
     comments_count = models.PositiveIntegerField(default=0, db_index=True)
+    posts_count = models.PositiveIntegerField(default=0, db_index=True)
 
     objects = BaseManager()
 
