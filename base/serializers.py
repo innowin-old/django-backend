@@ -114,6 +114,17 @@ class BaseCommentSerializer(BaseSerializer):
         base_instance = Base.objects.filter(id=comment.comment_parent_id)[0]
         base_instance.comments_count = BaseComment.objects.filter(comment_parent_id=base_instance.id).count()
         base_instance.save()
+        related_post = Post.objects.filter(id=comment.comment_parent_id)
+        if related_post.count() > 0:
+            related_post = related_post[0]
+            related_exchange = Exchange.objects.filter(id=related_post.post_parent_id)
+            if related_exchange.count() > 0:
+                related_exchange = related_exchange[0]
+                related_exchange_posts = Post.objects.filter(post_parent_id=related_exchange.id)
+                comments_count = 0
+                for post in related_exchange_posts:
+                    comments_count += post.comments_count
+                related_exchange.posts_comments_count = comments_count
         return comment
 
 
