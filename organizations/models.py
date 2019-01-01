@@ -90,6 +90,7 @@ class Organization(Base):
         max_length=256, blank=True, null=True, db_index=True, help_text='String(256)')
     instagram_account = models.CharField(max_length=256, db_index=True, blank=True, null=True, help_text='String(256)')
     linkedin_account = models.CharField(max_length=256, db_index=True, blank=True, null=True, help_text='String(256)')
+    twitter_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='شناسه اکانت توئیتر که نهایت 256 کاراکتر ذخیره می کند')
     staff_count = models.IntegerField(null=True, blank=True, help_text='تعداد پرسنل این سازمان که در سامانه حضور دارند را نمایش می دهد', db_index=True)
     active_flag = models.BooleanField(default=False, db_index=True)
 

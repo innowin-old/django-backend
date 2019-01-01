@@ -128,6 +128,7 @@ class Profile(Base):
         max_length=256, blank=True, db_index=True, help_text='String(256)')
     instagram_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='String(256)')
     linkedin_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='String(256)')
+    twitter_account = models.CharField(max_length=256, db_index=True, blank=True, help_text='شناسه اکانت توئیتر که نهایت 256 کاراکتر ذخیره می کند')
     description = models.TextField(blank=True, db_index=True, help_text='Text', max_length=70)
     gender = models.CharField(
         choices=GENDER,
