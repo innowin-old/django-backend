@@ -167,7 +167,7 @@ class Profile(Base):
     def related_organization_id(self):
         if self.is_user_organization:
             organization_username = self.profile_user.username + '_official'
-            organization = Organization.objects.filter(username=organization_username)
+            organization = Organization.objects.filter(username=organization_username)[0]
             return organization.id
         return None
 
