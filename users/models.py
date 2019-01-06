@@ -163,6 +163,14 @@ class Profile(Base):
     def __str__(self):
         return self.profile_user.username
 
+    @property
+    def related_organization_id(self):
+        if self.is_user_organization:
+            organization_username = self.profile_user.username + '_official'
+            organization = Organization.objects.filter(username=organization_username)
+            return organization.id
+        return None
+
     def clean(self):
         if self.birth_date:
             p = re.compile('^\d{4}-\d{2}-\d{2}$')
