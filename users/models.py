@@ -166,7 +166,7 @@ class Profile(Base):
     @property
     def related_organization_id(self):
         if self.is_user_organization:
-            organization_username = self.profile_user.username + '_official'
+            organization_username = self.profile_user.username
             organization = Organization.objects.filter(username=organization_username)
             if organization.count() > 0:
                 return organization[0].id
