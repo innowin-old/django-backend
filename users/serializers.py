@@ -514,7 +514,7 @@ class ProfileListSerializer(BaseSerializer):
 class ProfileExploreSerializer(BaseSerializer):
     class Meta:
         model = Profile
-        fields = ['id', 'profile_media', 'profile_banner', 'description']
+        fields = ['id', 'profile_media', 'profile_banner', 'description', 'related_organization_id']
         depth = 1
 
 
